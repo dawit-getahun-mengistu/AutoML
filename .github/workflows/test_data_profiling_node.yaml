@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - "apps/data-profiling-node/**"
+  pull_request:
+    branches:
+      - main
+    path:
+      - "apps/data-profiling-node/**"
 
   workflow_dispatch:
 

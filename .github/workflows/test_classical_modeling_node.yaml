@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - "apps/classical-modeling-node/**"
+  pull_request:
+    branches:
+      - main
+    path:
+      - "apps/classical-modeling-node/**"
 
   workflow_dispatch:
 
