@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd apps/llm-service
           docker build -t tinsu2/llm-service:latest .
 
       - name: Push Docker image

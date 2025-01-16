@@ -1,4 +1,4 @@
-name: data_profiling_node Cd
+name: data_profiling_node CD
 
 on:
   push:
@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd apps/data-profiling-node
           docker build -t tinsu2/data-profiling-node:latest .
 
       - name: Push Docker image

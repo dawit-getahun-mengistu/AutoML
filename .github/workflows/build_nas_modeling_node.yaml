@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd apps/nas-modeling-node
           docker build -t tinsu2/nas-modeling-node:latest .
 
       - name: Push Docker image

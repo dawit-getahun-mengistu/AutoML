@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd apps/feature-selection-node
           docker build -t tinsu2/feature-selection-node:latest .
 
       - name: Push Docker image

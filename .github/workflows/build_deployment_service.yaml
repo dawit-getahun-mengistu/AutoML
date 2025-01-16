@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd apps/deployment-service
           docker build -t tinsu2/deployment-service:latest .
 
       - name: Push Docker image
