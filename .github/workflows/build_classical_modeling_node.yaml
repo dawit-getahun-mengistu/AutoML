@@ -1,4 +1,4 @@
-name: Build and push the docker image of the classical_modeling_node
+name: classical_modeling_node CD
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Build and push the docker image of the deployment service.
+name: deployment_service CD
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Build and push the docker image of the feature_selection_node.
+name: feature_selection_node CD
 
 on:
   push:

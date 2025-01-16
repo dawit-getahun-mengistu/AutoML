@@ -1,4 +1,4 @@
-name: Build and push the docker image of the llm_service.
+name: llm_service CD
 
 on:
   push:

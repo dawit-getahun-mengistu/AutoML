@@ -1,4 +1,4 @@
-name: Build and push the docker image of the data_profiling_node
+name: data_profiling_node Cd
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Build and push the docker image of the nas_modeling_node.
+name: nas_modeling_node CD
 
 on:
   push:
