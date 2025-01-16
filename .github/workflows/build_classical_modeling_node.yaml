@@ -24,7 +24,7 @@ jobs:
         run: |
           cd apps/classical-modeling-node
           python -m pip install --upgrade pip
-          pip install -r requirements.txt'
+          pip install -r requirements.txt
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
