@@ -29,4 +29,5 @@ jobs:
 
       - name: Run unit tests
         run: |
+          cd apps/classical-modeling-node
           python -m unittest tests/dummy_test.py
