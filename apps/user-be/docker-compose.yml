@@ -37,7 +37,7 @@ services:
       - 3001:3001
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - /usr/src/app/node_modules  # keep the node modules within the docker
     env_file:
       - .env
     depends_on:
