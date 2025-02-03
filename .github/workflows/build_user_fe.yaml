@@ -38,4 +38,4 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker build tinsu2/user-dashboard:latest
+          docker push tinsu2/user-dashboard:latest
