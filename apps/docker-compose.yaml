@@ -78,6 +78,30 @@ services:
     networks:
       - automl
 
+  user-fe:
+    image: tinsu2/user-dashboard:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ./user-fe:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      pgadmin4:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      seaweedfs-s3:
+        condition: service_started
+      user-be:
+        condition: service_started
+
+    networks:
+      - automl
+
 networks:
   automl:
 
