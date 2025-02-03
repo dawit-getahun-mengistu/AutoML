@@ -97,7 +97,7 @@ export default function Dashboard() {
           <Menu className="mx-3"/>
           <h1 className="text-3xl font-bold px-3">LOGO</h1>
         </div>
-        <p className="text-gray-500">Manage your data efficiently</p>
+        <p className="text-gray-500"><a href='/login'>Log Out</a></p>
       </header>
 
       <div className="flex flex-1">

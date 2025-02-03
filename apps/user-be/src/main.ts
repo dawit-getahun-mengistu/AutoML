@@ -8,7 +8,9 @@ async function bootstrap() {
   app.useGlobalPipes( new ValidationPipe({whitelist: true}))
 
   app.enableCors({
-    origin: false,  // Completely disables cross-origin requests
+    // origin: false,  // Completely disables cross-origin requests
+    origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow only these origins
+    Credentials: true,
   });
 
   const config = new DocumentBuilder()

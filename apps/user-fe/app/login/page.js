@@ -1,10 +1,12 @@
 'use client'
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 // import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui/button";
 // import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,7 +25,7 @@ export default function Home() {
     setPopupType("success");
 
     try {
-      const response = await fetch("http://localhost:3001/api/auth/signin", {
+      const response = await fetch("http://localhost:3001/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,13 +34,15 @@ export default function Home() {
       });
 
       const data = await response.json();
-
-      if (!data.success) {
+      
+      if (!data) {
         setPopupMessage(data.message);
         setPopupType("error");
       } else {
         setPopupMessage(data.message);
         setPopupType("success");
+        console.log(data)
+        router.push("/dashboard")
       }
     } catch (error) {
       setPopupMessage("An error occurred. Please try again.");
@@ -85,6 +89,12 @@ export default function Home() {
         <button type="submit" className="bg-gray-950 text-white rounded-lg py-2 w-full">
           Login
         </button>
+        <p className="text-center text-gray-500 text-sm">
+          Don't have an account?{" "}
+          <a href="/sign-up" className="text-gray-900 font-semibold">
+            Sign Up
+          </a>
+        </p>
       </form>
     </div>
   </div>
