@@ -7,6 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes( new ValidationPipe({whitelist: true}))
 
+  app.enableCors({
+    origin: false,  // Completely disables cross-origin requests
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Users-Backend')
     .setDescription('Service for user authentication and database upload')

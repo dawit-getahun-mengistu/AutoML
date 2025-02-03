@@ -22,3 +22,4 @@ EXPOSE 3001
 
 # Start the server using the production build
 CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npm run start:dev"]
+

@@ -74,6 +74,7 @@ export class AuthService{
             },
         })
 
+        delete user.passwordHash;
         return user;
         } catch (error){
             if (error instanceof PrismaClientKnownRequestError){
@@ -94,24 +95,25 @@ export class AuthService{
 
     async logOut(userId: string){
         try {
-            await this.prisma.refreshToken.update({
-                where: {
-                    userId: userId,
-                },
-                data: {
-                    hash: null
-                }
-            })
+          await this.prisma.refreshToken.update({
+            where: {
+              userId: userId,
+            },
+            data: {
+              hash: null
+            }
+          });
         } catch(error){
-            if (error === 'RecordNotFound') { 
-                return throwError(() => new Error('User has already logged out!'));
-              }
+          if (error === 'RecordNotFound') { 
+            throw new Error('User has already logged out!');
+          }
+          throw error;
         }
-
         return {
-            msg: 'Logout successful'
+          msg: 'Logout successful'
         }
-    }
+      }
+      
 
     signRefreshToken(userId: string, userName: string){
         return this.jwtService.sign({userId, userName}, {
