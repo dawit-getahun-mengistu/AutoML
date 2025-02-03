@@ -1,11 +1,12 @@
 # Base image
-FROM node:20
+FROM node:22
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+# COPY package*.json ./
+COPY user-be/package*.json ./
 
 # Install app dependencies
 RUN npm install
