@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  db:
+    image: postgis/postgis
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - inventory_dev_db_data:/var/lib/postgresql/data
+    networks:
+      - automl
+
+  pgadmin4:
+    image: dpage/pgadmin4
+    ports:
+      - 8001:80
+    env_file:
+      - .env
+    volumes:
+      - inventory_dev_pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - automl
+
+  user-be:
+    build:
+      context: .
+      dockerfile: ./user-be/Dockerfile.dev
+    image: ${USER_BE_IMAGE:-user-be:dev}
+    ports:
+      - 3001:3001
+    volumes:
+      - ./user-be:/usr/src/app
+      # - node_modules:/usr/src/app/node_modules
+      - /usr/src/app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - automl
+
+networks:
+  automl:
+
+volumes:
+  inventory_dev_db_data:
+  inventory_dev_pgadmin_data:
