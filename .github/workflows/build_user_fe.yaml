@@ -33,7 +33,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd apps/user-be
+          cd apps/user-fe
           docker build -t tinsu2/user-dashboard:latest .
 
       - name: Push Docker image
