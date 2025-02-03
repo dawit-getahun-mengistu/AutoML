@@ -227,12 +227,11 @@ describe('AuthService', () => {
     });
 
     it('should throw an error if record is not found', async () => {
-        // Make sure the update method throws a "RecordNotFound" error.
         (prisma.refreshToken.update as jest.Mock).mockRejectedValue('RecordNotFound');
     
         await expect(service.logOut(userId)).rejects.toThrow('User has already logged out!');
       });
   });
 
-  // Optionally, you can also add tests for signRefreshToken, signAccessToken, and saveRefreshToken
+  
 });
