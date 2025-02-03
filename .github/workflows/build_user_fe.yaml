@@ -1,0 +1,41 @@
+name: user_fe CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/user-fe/**"
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22"
+
+      - name: Install requirements
+        run: |
+          cd apps/user-fe
+          npm install
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.user_name }}
+          password: ${{ secrets.password }}
+
+      - name: Build Docker image
+        run: |
+          cd apps/user-be
+          docker build -t tinsu2/user-dashboard:latest .
+
+      - name: Push Docker image
+        run: |
+          docker build -t tinsu2/user-dashboard:latest
