@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   db:
     image: postgis/postgis
@@ -29,15 +28,14 @@ services:
       - automl
 
   user-be:
-    build:
-      context: .
-      dockerfile: ./user-be/Dockerfile.dev
-    image: ${USER_BE_IMAGE:-user-be:dev}
+    # build:
+    #   context: .
+    #   dockerfile: ./user-be/Dockerfile.dev
+    image: tinsu2/user-api-gateway:latest
     ports:
       - 3001:3001
     volumes:
       - ./user-be:/usr/src/app
-      # - node_modules:/usr/src/app/node_modules
       - /usr/src/app/node_modules
     env_file:
       - .env
