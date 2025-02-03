@@ -15,14 +15,10 @@ COPY . .
 # Expose the app port
 EXPOSE 3001
 
-# Generate Prisma client
-RUN npx prisma generate
 
-# Apply migrations
-RUN npx prisma migrate deploy
 
 # Use a development command (assumes you have a script like "start:dev")
-CMD ["npm", "run", "start:dev"]
-# # Add Prisma migrations before starting the app
-# CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+# CMD ["npm", "run", "start:dev"]
+# Add Prisma migrations before starting the app
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npm run start:dev"]
 
