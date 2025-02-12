@@ -1,25 +1,18 @@
 # Base image
 FROM node:22
 
-# Create app directory
+# Set working directory
 WORKDIR /usr/src/app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# COPY package*.json ./
+# Copy package files and install dependencies
 COPY user-fe/package*.json ./
-
-# Install app dependencies
 RUN npm install
 
-# Bundle app source
-COPY . .
+# Copy the rest of the source code
+COPY user-fe ./
 
-# # Creates a "dist" folder with the production build
-# RUN npm run build
-
-# Expose the port on which the app will run
+# Expose the Next.js port
 EXPOSE 3000
 
-# Start the server using the production build
-CMD ["npm", "run" ,"dev"]
-
+# Start the development server
+CMD ["npm", "run", "dev"]

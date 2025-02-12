@@ -85,7 +85,7 @@ services:
     build:
       context: .
       dockerfile: user-fe/Dockerfile
-    image: ${USER_BE_IMAGE:-user-be:dev}
+    image: ${USER_BE_IMAGE:-user-fe:dev}
     ports:
       - 3000:3000
     # volumes:
