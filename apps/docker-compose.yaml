@@ -45,7 +45,7 @@ services:
 
   seaweedfs-s3:
     image: chrislusf/seaweedfs
-    container_name: seaweedfs-s3-test
+    container_name: seaweedfs-s3
     ports:
       - "8333:8333"
     volumes:
@@ -58,7 +58,10 @@ services:
       - automl
 
   user-be:
-    image: tinsu2/user-api-gateway:latest
+    build:
+      context: .
+      dockerfile: user-be/Dockerfile
+    image: ${USER_BE_IMAGE:-user-be:dev}
     ports:
       - 3001:3001
     volumes:
@@ -79,12 +82,15 @@ services:
       - automl
 
   user-fe:
-    image: tinsu2/user-dashboard:latest
+    build:
+      context: .
+      dockerfile: user-fe/Dockerfile
+    image: ${USER_BE_IMAGE:-user-be:dev}
     ports:
       - 3000:3000
-    volumes:
-      - ./user-fe:/usr/src/app
-      - /usr/src/app/node_modules
+    # volumes:
+    #   - ./user-fe:/usr/src/app
+    #   - /usr/src/app/node_modules
     env_file:
       - .env
     depends_on:
