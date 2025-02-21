@@ -58,9 +58,10 @@ services:
       - automl
 
   user-be:
+    restart: always
     build:
-      context: .
-      dockerfile: user-be/Dockerfile
+      context: ./user-be
+      dockerfile: Dockerfile
     image: ${USER_BE_IMAGE:-user-be:dev}
     ports:
       - 3001:3001
@@ -83,14 +84,14 @@ services:
 
   user-fe:
     build:
-      context: .
-      dockerfile: user-fe/Dockerfile
-    image: ${USER_BE_IMAGE:-user-be:dev}
+      context: ./user-fe
+      dockerfile: Dockerfile
+    image: ${USER_FE_IMAGE:-user-fe:dev}
     ports:
       - 3000:3000
-    # volumes:
-    #   - ./user-fe:/usr/src/app
-    #   - /usr/src/app/node_modules
+    volumes:
+      - ./user-fe:/usr/src/app
+      - /usr/src/app/node_modules
     env_file:
       - .env
     depends_on:
