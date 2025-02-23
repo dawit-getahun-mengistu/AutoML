@@ -14,8 +14,10 @@ export class AtStrategy extends PassportStrategy(Strategy, 'access_strategy') {
       secretOrKey: config.get('ACCESS_TOKEN_SECRET'),
       ignoreExpiration: false,
     });
+
   }
   validate(payload: { userId: string; userName: string }) {
+    console.log("payload:", payload)
     return payload;
   }
 }
