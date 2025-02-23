@@ -17,6 +17,22 @@ async function bootstrap() {
     .setTitle('Users-Backend')
     .setDescription('Service for user authentication and database upload')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'refresh-token',
+    )
     .addTag('user-be')
     .build();
 
