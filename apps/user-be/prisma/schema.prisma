@@ -29,8 +29,8 @@ model User {
 
   // Relations (user has projects, reports, and chats)
   projects Project[]
-  // reports       Report[]   
-  // chats         Chat[]    
+  reports  Report[]
+  chats    Chat[]
 
   // Indexes (optional for faster lookups)
   @@index([username])
@@ -39,7 +39,6 @@ model User {
 }
 
 // status = ["Active", "Inactive", "Completed"]
-
 enum ProjectStatus {
   ACTIVE
   INACTIVE
@@ -61,12 +60,148 @@ model Project {
   updatedAt DateTime? @updatedAt
 
   // Relations (Assuming datasets, models, reports, and chat)
-  // datasets    Dataset[]
-  // models      Model[]
-  // reports     Report[]
-  // chats       Chat[]
+  datasets Dataset[]
+  models   Model[]
+  reports  Report[]
+  chats    Chat[]
 
   @@index([name])
   @@index([userId])
   @@map("projects")
+}
+
+enum DatasetStatus {
+  UPLOADED
+  PROCESSING
+  READY
+  IN_USE
+  ARCHIVED
+}
+
+enum DatasetFormat {
+  CSV
+  JSON
+  EXCEL
+}
+
+model Dataset {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  status DatasetStatus
+  file   String
+  format DatasetFormat
+  size   Int?
+  rows   Int?
+  cols   Int?
+
+  // Relations (Assuming attributes)
+  attributes Attribute[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+enum DataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  DATE
+  TIME
+  DATETIME
+  JSON
+}
+
+model Attribute {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  datasetId String
+  dataset   Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  dataType          String
+  isNullable        Boolean @default(false)
+  isTargetAttribute Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Model {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Relations (Assuming model performance, inference requests)
+  modelPerformances ModelPerformance[]
+  inferenceRequests InfereneRequest[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Report {
+  id      String @id @default(uuid())
+  title   String
+  content String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model ModelPerformance {
+  id      String @id @default(uuid())
+  modelId String
+  model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  metricName  String
+  metricValue Float
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model InfereneRequest {
+  id      String @id @default(uuid())
+  modelId String
+  model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  inputData  Json
+  prediction Json
+
+  // Request body
+  requestBody String?
+
+  // Response body
+  responseBody String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Chat {
+  id      String @id @default(uuid())
+  message String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
