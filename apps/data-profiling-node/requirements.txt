@@ -2,3 +2,4 @@ pika
 jsonschema
 fastapi
 uvicorn
+jinja2
