@@ -5,6 +5,8 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectModule } from './project/project.module';
+import { DatasetModule } from './dataset/dataset.module';
+import { SeaweedModule } from 'SeaweedClient';
 
 
 @Module({
@@ -12,9 +14,10 @@ import { ProjectModule } from './project/project.module';
     ConfigModule.forRoot({
       isGlobal: true
     }), 
+    SeaweedModule.forRootAsync(),
     AuthModule, 
     UserModule, 
-    PrismaModule, ProjectModule
+    PrismaModule, ProjectModule, DatasetModule
   ],
   controllers: [],
   providers: [],

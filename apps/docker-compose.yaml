@@ -70,6 +70,13 @@ services:
       - /usr/src/app/node_modules
     env_file:
       - .env
+    environment:
+      SEAWEED_ACCESS_KEY: "any"
+      SEAWEED_SECRET_KEY: "any"
+      SEAWEED_S3_ENDPOINT: "http://seaweedfs-s3:8333" # Use the service name
+      AWS_EC2_METADATA_DISABLED: "true" # Disable AWS metadata checks
+      AWS_SDK_LOAD_CONFIG: "false" # Disable AWS config file loading
+
     depends_on:
       db:
         condition: service_healthy
