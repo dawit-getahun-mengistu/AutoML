@@ -1,8 +1,7 @@
-import threading
-import pika
+import pika, threading, os
 
 # RabbitMQ Configuration
-RABBITMQ_HOST = "localhost"
+RABBITMQ_HOST = RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'rabbitmq')
 QUEUE_NAME = "task_queue"
 
 def process_message(ch, method, properties, body):
@@ -25,5 +24,5 @@ def consume():
 def start_consumer():
     """ Runs RabbitMQ consumer in a separate thread """
     print(f'Consumer starting at {QUEUE_NAME}')
-    thread = threading.Thread(target=consume, daemon=True)
+    thread = threading.Thread(target=consume)
     thread.start()
