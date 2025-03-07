@@ -4,19 +4,21 @@ import React from "react";
 
 interface Props {
   id?: string;
+  name?:string;
   value?: string;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onChange?: (e:React.ChangeEvent<HTMLInputElement>)=>void;
   className?: string;
   placeholder?: string;
 }
 
 export default function TextInput({
   id,
+  name,
   value,
   onChange,
   className,
   placeholder,
-}: Props) {
+}: Props):React.JSX.Element {
   return (
     <div
       className={`flex w-full items-center justify-center border rounded-xl h-14 px-4 my-2 ${
@@ -25,6 +27,7 @@ export default function TextInput({
     >
       <input
         type="text"
+        name ={name}
         id={id}
         value={value}
         onChange={onChange}

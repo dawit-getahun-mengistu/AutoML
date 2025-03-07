@@ -22,6 +22,9 @@
       "@/*": ["./*"]
     }
   },
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval"
+  },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/features/auth/authActions.ts"],
   "exclude": ["node_modules"]
 }

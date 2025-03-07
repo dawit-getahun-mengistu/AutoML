@@ -7,17 +7,19 @@ import { UilEye, UilEyeSlash } from "@iconscout/react-unicons";
 
 interface Props {
   id?: string;
+  name?:string;
   value?: string;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onChange?: (e:React.ChangeEvent<HTMLInputElement>)=>void;
   className?: string;
 }
 
 export default function PasswordInput({
   id,
+  name,
   value,
   onChange,
   className,
-}: Props) {
+}: Props):React.JSX.Element{
   const [isVisible, setIsVisible] = useState(false);
 
   const handleVisibility = () => {
@@ -33,6 +35,7 @@ export default function PasswordInput({
       <input
         type={isVisible ? "text" : "password"}
         id={id}
+        name ={name}
         value={value}
         onChange={onChange}
         autoComplete="on"
