@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent } from "react";
-import { createProject, fetchProjects } from "@/lib/features/project/projectActions";
+import {
+  createProject,
+  fetchProjects,
+} from "@/lib/features/project/projectActions";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import {
@@ -24,6 +27,7 @@ import {
 import { Button } from "../components/NewButton";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { createDataset } from "@/lib/features/data/dataActions";
 
 type DataRow = Record<string, any>;
 
@@ -39,13 +43,26 @@ export default function Dashboard() {
   const { access_token } = useAppSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<{ [key: string]: DataRow[] }>({});
-  const [pagination, setPagination] = useState<{ 
-    [key: string]: { page: number; rowsPerPage: number } 
+  const [pagination, setPagination] = useState<{
+    [key: string]: { page: number; rowsPerPage: number };
   }>({});
   const [columns, setColumns] = useState<Column[]>([]);
   const [projectName, setProjectName] = useState("");
   const [projectDesc, setProjectDesc] = useState("");
   const [statuss, setStatus] = useState("ACTIVE");
+
+  // const [datasetName, setDatasetName] = useState("");
+  // const [datasetDesc, setDatasetDesc] = useState("");
+  // const [datasetFormat, setDatasetFormat] = useState("CSV");
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [datasetForm, setDatasetForm] = useState<{
+    [projectId: string]: {
+      name: string;
+      description: string;
+      format: string;
+      file: File | null;
+    };
+  }>({});
 
   useEffect(() => {
     if (!access_token) {
@@ -67,14 +84,16 @@ export default function Dashboard() {
           [projectId]: data,
         }));
         // Initialize pagination for the project
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
           [projectId]: {
             page: 0,
             rowsPerPage: 5,
           },
         }));
-        setColumns(Object.keys(data[0]).map(key => ({ Header: key, accessor: key })));
+        setColumns(
+          Object.keys(data[0]).map((key) => ({ Header: key, accessor: key }))
+        );
       },
       header: true,
     });
@@ -93,50 +112,53 @@ export default function Dashboard() {
         [projectId]: jsonData,
       }));
       // Initialize pagination for the project
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         [projectId]: {
           page: 0,
           rowsPerPage: 5,
         },
       }));
-      setColumns(Object.keys(jsonData[0]).map(key => ({ Header: key, accessor: key })));
+      setColumns(
+        Object.keys(jsonData[0]).map((key) => ({ Header: key, accessor: key }))
+      );
     };
     reader.readAsArrayBuffer(file);
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>, projectId: string) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.name.endsWith(".csv")) {
-        handleCSVUpload(file, projectId);
-      } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-        handleExcelUpload(file, projectId);
-      }
+  const handleFileChange = (file: File, projectId: string) => {
+    if (!file) return;
+
+    if (file.name.endsWith(".csv")) {
+      handleCSVUpload(file, projectId);
+    } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
+      handleExcelUpload(file, projectId);
     }
   };
 
   // Project-specific pagination handlers
-  const handleChangePage = (projectId: string) => (event: unknown, newPage: number) => {
-    setPagination(prev => ({
-      ...prev,
-      [projectId]: {
-        ...prev[projectId],
-        page: newPage,
-      },
-    }));
-  };
+  const handleChangePage =
+    (projectId: string) => (event: unknown, newPage: number) => {
+      setPagination((prev) => ({
+        ...prev,
+        [projectId]: {
+          ...prev[projectId],
+          page: newPage,
+        },
+      }));
+    };
 
-  const handleChangeRowsPerPage = (projectId: string) => (event: ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10);
-    setPagination(prev => ({
-      ...prev,
-      [projectId]: {
-        page: 0,
-        rowsPerPage: newRowsPerPage,
-      },
-    }));
-  };
+  const handleChangeRowsPerPage =
+    (projectId: string) => (event: ChangeEvent<HTMLInputElement>) => {
+      const newRowsPerPage = parseInt(event.target.value, 10);
+      setPagination((prev) => ({
+        ...prev,
+        [projectId]: {
+          page: 0,
+          rowsPerPage: newRowsPerPage,
+        },
+      }));
+    };
 
   const handleCreateProject = () => {
     const userInfoString = localStorage.getItem("userInfo");
@@ -160,6 +182,50 @@ export default function Dashboard() {
     setProjectName("");
     setProjectDesc("");
     setStatus("ACTIVE");
+  };
+ 
+  const handleUploadData = async (projectId: string) => {
+    const datasetData = datasetForm[projectId]; // Get the dataset form data for the specific project
+    console.log("Selected Format:", datasetData?.format);
+    console.log("Selected File:", datasetData?.file);
+    if (!datasetData || !datasetData.file) {
+      // Check if the file exists for the project
+      alert("Please complete all fields and select a file.");
+      return;
+    }
+  
+    let detectedFormat = "CSV"; // Default to CSV
+    const fileName = datasetData.file.name.toLowerCase();
+
+    if (fileName.endsWith(".csv")) {
+        detectedFormat = "CSV";
+    } else if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
+        detectedFormat = "EXCEL";
+    } else {
+        alert("Invalid file format. Please upload a CSV or Excel file.");
+        return;
+    }
+
+    try {
+      // Dispatch createDataset to upload dataset info
+      const result = await dispatch(
+        createDataset({
+          name: datasetData.name, // Dataset name
+          description: datasetData.description, // Dataset description
+          projectId: projectId, // Project ID
+          format: detectedFormat, // Dataset format
+          file: datasetData.file, // Dataset file
+        })
+      ).unwrap(); // Unwrap to catch errors properly
+
+      // If the dataset creation is successful, process the file
+      if (result) {
+        handleFileChange(datasetData.file, projectId); // Process the file after successful upload
+      }
+    } catch (error) {
+      console.error("Dataset upload failed:", error);
+      alert("Dataset upload failed. Please try again.");
+    }
   };
 
   return (
@@ -199,7 +265,9 @@ export default function Dashboard() {
         <div className="flex-1 p-6 overflow-hidden">
           {/* Project Creation Form */}
           <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-900">Create New Project</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Create New Project
+            </h2>
             <div className="mt-4">
               <input
                 type="text"
@@ -251,58 +319,134 @@ export default function Dashboard() {
                 key={project.id}
                 className="bg-white p-4 rounded-lg shadow-md mt-4 border border-gray-300"
               >
-                <h3 className="text-lg font-bold text-gray-900">{project.name}</h3>
+                <h3 className="text-lg font-bold text-gray-900">
+                  {project.name}
+                </h3>
                 <p className="text-sm text-gray-800">{project.description}</p>
-                <p className="text-sm font-semibold text-gray-900">Status: {project.status}</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  Status: {project.status}
+                </p>
 
                 {/* Dataset Upload Form Inside Each Project */}
                 <div className="mt-4 border-t pt-4">
-                  <h4 className="text-md font-semibold text-gray-900">Add Dataset</h4>
+                  <h4 className="text-md font-semibold text-gray-900">
+                    Add Dataset
+                  </h4>
 
-                  <div className="mt-2">
+                  {/* <div className="mt-2">
                     <input
                       type="text"
                       placeholder=" Dataset Name"
                       className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
                     />
-                  </div>
-
+                  </div> */}
+                  <input
+                    type="text"
+                    placeholder="Dataset Name"
+                    value={datasetForm[project.id]?.name || ""}
+                    onChange={(e) =>
+                      setDatasetForm((prev) => ({
+                        ...prev,
+                        [project.id]: {
+                          ...prev[project.id],
+                          name: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
+                  />
+                 
                   <div className="mt-2">
                     <textarea
                       placeholder="Description"
+                      value={datasetForm[project.id]?.description || ""} // Bind the value to datasetForm state for this project
+                      onChange={(e) =>
+                        setDatasetForm((prev) => ({
+                          ...prev,
+                          [project.id]: {
+                            ...prev[project.id],
+                            description: e.target.value, // Update description for this project
+                          },
+                        }))
+                      }
                       className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
                     />
                   </div>
 
+                
                   <div className="mt-2">
-                    <select className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white">
+                    <select
+                      value={datasetForm[project.id]?.format || "CSV"} // Bind the value to datasetForm state for this project
+                      onChange={(e) => {
+                        // Log to ensure the format is being updated
+                        console.log(
+                          `beforeeeUpdating format for project ${project.id}: ${e.target.value}`
+                        );
+
+                        setDatasetForm((prev) => ({
+                          ...prev,
+                          [project.id]: {
+                            ...prev[project.id], // Preserve other data (like name, description, file)
+                            format: e.target.value, // Update format for this specific project
+                          },
+                        }));
+                        console.log(
+                          `afterrrr Updating format for project ${project.id}: ${e.target.value}`
+                        );
+                      }}
+
+                      className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
+                    >
                       <option value="CSV">📄 CSV</option>
                       <option value="EXCEL">📊 EXCEL</option>
-                      <option value="JSON">📜 JSON</option>
                     </select>
                   </div>
 
-                  {/* File Upload */}
+                 
                   <div className="mt-2">
                     <input
                       type="file"
-                      accept=".csv,.xlsx,.xls,.json"
-                      onChange={(e) => handleFileChange(e, project.id)}
+                      accept=".csv,.xlsx,.xls,"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setDatasetForm((prev) => ({
+                            ...prev,
+                            [project.id]: {
+                              ...prev[project.id],
+                              file: file, // Store the selected file for this project
+                            },
+                          }));
+                          console.log(
+                            `after file upload format for project ${project.id}: ${e.target.value}`
+                          );
+                        }
+                      }}
                       className="file:border file:border-gray-800 file:rounded-lg file:px-4 file:py-2 file:text-gray-100 file:bg-gray-900 file:hover:bg-gray-700 file:cursor-pointer"
                     />
                   </div>
 
                   {/* Upload Data Button */}
                   <div className="mt-4">
-                    <Button variant="default">✅ Upload Data</Button>
+                    <Button
+                      variant="default"
+                      onClick={() => handleUploadData(project.id)}
+                    >
+                      ✅ Upload Data
+                    </Button>
                   </div>
                 </div>
 
                 {/* Visualization Section for this Project */}
                 {data[project.id] && data[project.id].length > 0 && (
                   <div className="mt-6 border-t pt-4">
-                    <h4 className="text-md font-semibold">📊 Datasets & Visualizations</h4>
-                    <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+                    <h4 className="text-md font-semibold">
+                      📊 Datasets & Visualizations
+                    </h4>
+                    <TableContainer
+                      component={Paper}
+                      sx={{ overflowX: "auto" }}
+                    >
                       <Table sx={{ minWidth: 650 }} aria-label="data table">
                         <TableHead>
                           <TableRow>
@@ -316,9 +460,11 @@ export default function Dashboard() {
                         <TableBody>
                           {data[project.id]
                             ?.slice(
-                              (pagination[project.id]?.page || 0) * (pagination[project.id]?.rowsPerPage || 5),
-                              (pagination[project.id]?.page || 0) * (pagination[project.id]?.rowsPerPage || 5) + 
-                              (pagination[project.id]?.rowsPerPage || 5)
+                              (pagination[project.id]?.page || 0) *
+                                (pagination[project.id]?.rowsPerPage || 5),
+                              (pagination[project.id]?.page || 0) *
+                                (pagination[project.id]?.rowsPerPage || 5) +
+                                (pagination[project.id]?.rowsPerPage || 5)
                             )
                             .map((row, rowIndex) => (
                               <TableRow key={rowIndex}>
