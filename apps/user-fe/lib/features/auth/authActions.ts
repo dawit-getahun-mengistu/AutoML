@@ -1,6 +1,5 @@
 import  {createAppAsyncThunk, useAppSelector,} from "@/lib/hooks";
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
-import { userInfo } from "./authSlice";
 const axios = require("axios").default;
 const backendURL = "http://localhost:3001"
 const config:AxiosRequestConfig = {

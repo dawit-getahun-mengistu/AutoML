@@ -1,8 +1,11 @@
 import {Action, ThunkAction, configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice"; // Authentication slice
+import projectReducer from "./features/project/projectSlice";
+//TODO:USE REDUX PERSIST INSTEAD LATER
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    project:projectReducer,
   },
 });
 
