@@ -91,8 +91,8 @@ services:
 
   user-fe:
     build:
-      context: ./user-fe
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: user-fe/Dockerfile
     image: ${USER_FE_IMAGE:-user-fe:dev}
     ports:
       - 3000:3000
