@@ -35,6 +35,7 @@ async function bootstrap() {
       },
       'refresh-token',
     )
+    .addServer('http://localhost:3001/', 'Local environment')
     .addTag('user-be')
     .build();
 

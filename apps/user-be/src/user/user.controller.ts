@@ -6,6 +6,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
 import { Request } from 'express';
+import { ApiDefaultResponses } from 'src/decorators';
+import { CreateProjectDto } from 'src/project/dto';
 
 
 
@@ -17,6 +19,8 @@ export class UserController {
 
     constructor(private readonly userService: UserService) {}
 
+
+    @ApiDefaultResponses({type: UserResponseDto})
     @UseGuards(AuthGuard('access_strategy'))
     @Get()
     async findAll(): Promise<UserResponseDto[]> {
@@ -24,6 +28,8 @@ export class UserController {
         return users.map(user => plainToInstance(UserResponseDto, user));
     }
 
+
+    @ApiDefaultResponses({type:UserResponseDto})
     @UseGuards(AuthGuard('access_strategy'))
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id')
@@ -37,6 +43,8 @@ export class UserController {
     }
 
 
+
+    @ApiDefaultResponses({type:UserUpdateDto})
     @UseGuards(AuthGuard('access_strategy'))
     @Patch(':id')
     async update(@Param('id') id: string, @Body() data: UserUpdateDto): Promise<UserResponseDto> {
@@ -44,12 +52,16 @@ export class UserController {
         return plainToInstance(UserResponseDto, user);
     }
 
+
+    @ApiDefaultResponses({endpointDescription: "remove/delete a user. send the id as a param"})
     @UseGuards(AuthGuard('access_strategy'))
     @Delete(':id')
     async remove(@Param('id') id: string)  {
         return this.userService.removeUser(id);
     }
 
+
+    @ApiDefaultResponses({type: CreateProjectDto})
     @UseGuards(AuthGuard('access_strategy'))
     @Get(':userId/projects')
     async getUserProjects(@Param('userId') userId:string){
@@ -57,6 +69,8 @@ export class UserController {
 
     }
 
+
+    @ApiDefaultResponses({type: CreateProjectDto})
     @UseGuards(AuthGuard('access_strategy'))
     @Get('projects/me')
     async getMyProjects(@Req() req: Request) {        
@@ -68,20 +82,23 @@ export class UserController {
 
     }
 
+
+    // Todo: add api response decorator with report dto
     @UseGuards(AuthGuard('access_strategy'))
     @Get(':userId/projects/:projectId/reports')
     async getUserProjectReports(@Param('userId') userId:string, @Param('projectId') projectId: string){
         return await this.userService.getUserProjectReports(userId, projectId);
     }
 
+
+    // Todo: add api response decorator with chat dto
     @UseGuards(AuthGuard('access_strategy'))
     @Get(':userId/chats')
     async getUserChats(@Param('userId') userId:string, @Req() req: Request){
         return await this.userService.getUserChats(userId);
-        
-
     }
 
+    // Todo: add api response decorator with chat dto
     @UseGuards(AuthGuard('access_strategy'))
     @Get(':userId/chats/:chatId')
     async getUserChatsById(@Param('userId') userId:string,  @Param('chatId') chatId: string, @Req() req: Request){
@@ -89,6 +106,7 @@ export class UserController {
     }
 
 
+    // Todo: add api response decorator with chat dto
     @UseGuards(AuthGuard('access_strategy'))
     @Get('chats/me')
     async getMyChats(@Req() req: Request) {        
