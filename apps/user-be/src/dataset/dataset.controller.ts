@@ -22,6 +22,9 @@ import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { UpdateDatasetDto } from './dto/update-dataset.dto';
 import { DatasetFormat } from '@prisma/client';
 import { Response } from 'express';
+import { ApiDefaultResponses } from 'src/decorators';
+
+
 
 @Controller('datasets')
 export class DatasetController {
@@ -43,6 +46,7 @@ export class DatasetController {
       },
     },
   })
+  @ApiDefaultResponses({type: CreateDatasetDto})
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async create(
@@ -60,16 +64,22 @@ export class DatasetController {
     return this.datasetService.create(createDatasetDto, file);
   }
 
+
+  @ApiDefaultResponses({type: CreateDatasetDto})
   @Get('project/:projectId')
   async findAll(@Param('projectId') projectId: string) {
     return this.datasetService.findAll(projectId);
   }
 
+
+  @ApiDefaultResponses({type: CreateDatasetDto})
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.datasetService.findOne(id);
   }
 
+
+  @ApiDefaultResponses({type: UpdateDatasetDto})
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -78,6 +88,7 @@ export class DatasetController {
     return this.datasetService.update(id, updateDatasetDto);
   }
 
+  @ApiDefaultResponses({type: CreateDatasetDto})
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.datasetService.remove(id);

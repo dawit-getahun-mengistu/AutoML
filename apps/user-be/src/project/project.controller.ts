@@ -4,13 +4,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { CreateProjectDto, UpdateProjectDto } from './dto';
 import { Request } from 'express';
+import { ApiDefaultResponses } from 'src/decorators';
 
 @ApiBearerAuth('access-token')
 @Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-
+  @ApiDefaultResponses({type: CreateProjectDto})
   // @UseGuards(AuthGuard('access_strategy'))
   @Post()
   async create(@Body() createProjectDto: CreateProjectDto){
@@ -18,6 +19,7 @@ export class ProjectController {
 
   }
 
+  @ApiDefaultResponses({type: CreateProjectDto})
   // @UseGuards(AuthGuard('access_strategy'))
   @Get()
   async findAll(){
@@ -25,6 +27,7 @@ export class ProjectController {
 
   }
 
+  @ApiDefaultResponses({type: CreateProjectDto})
   // @UseGuards(AuthGuard('access_strategy'))
   @Get('me')
   async findMy(@Req() req: Request){
@@ -34,6 +37,7 @@ export class ProjectController {
 
   }
 
+  @ApiDefaultResponses({type: CreateProjectDto})
   // @UseGuards(AuthGuard('access_strategy'))
   @Get(':id')
   async findOne(@Param('id') id: string) {
@@ -41,6 +45,8 @@ export class ProjectController {
 
   }
 
+
+  @ApiDefaultResponses({type: UpdateProjectDto})
   // @UseGuards(AuthGuard('access_strategy'))
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto){
@@ -48,6 +54,7 @@ export class ProjectController {
 
   }
 
+  @ApiDefaultResponses({type: CreateProjectDto})
   // @UseGuards(AuthGuard('access_strategy'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
