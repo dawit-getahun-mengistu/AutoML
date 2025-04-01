@@ -9,11 +9,12 @@ import AuthLayout from "../layouts/authentication/layout";
 import GoogleButton from "../components/GoogleButton";
 import Button from "../components/Button";
 import Link from "next/link";
+import { fetchProjects } from "@/lib/features/project/projectActions";
 
 export default function Login() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { access_token, status, error } = useAppSelector((state) => state.auth);
+  const { access_token, status, error, refresh_token } = useAppSelector((state) => state.auth);
 
   const [form, setForm] = useState({
     identifier: "", 
@@ -22,9 +23,17 @@ export default function Login() {
 
   useEffect(() => {
     if (access_token) {
-      router.push("/dashboard");
+      router.push("/dashboard"); 
     }
   }, [access_token, router]);
+  
+  useEffect(() => {
+    console.log("use effect on login page after the login the redux access_token is", access_token);
+    if(access_token && refresh_token){
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
+    }
+  },[access_token,refresh_token]);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

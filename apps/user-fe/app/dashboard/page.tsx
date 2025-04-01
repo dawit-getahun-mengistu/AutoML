@@ -1,9 +1,14 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent } from "react";
+import { jwtDecode } from "jwt-decode";
 import {
   createProject,
   fetchProjects,
 } from "@/lib/features/project/projectActions";
+import {
+  refresh,
+  logout
+} from "@/lib/features/auth/authActions";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import {
@@ -37,10 +42,13 @@ interface Column {
 }
 
 export default function Dashboard() {
+  console.log("dashboard is being rendered");
   const dispatch = useAppDispatch();
-  const { projects, status, error } = useAppSelector((state) => state.project);
+  const { projects, status:projectStatus, error:projectError } = useAppSelector((state) => state.project);
   const router = useRouter();
-  const { access_token } = useAppSelector((state) => state.auth);
+  const { status:authStatus, access_token, refresh_token, userInfo, error:authError} = useAppSelector(
+    (state) => state.auth
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<{ [key: string]: DataRow[] }>({});
   const [pagination, setPagination] = useState<{
@@ -55,6 +63,7 @@ export default function Dashboard() {
   // const [datasetDesc, setDatasetDesc] = useState("");
   // const [datasetFormat, setDatasetFormat] = useState("CSV");
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // console.log(" on the dashboard the redux access_token is returning",access_token);
   const [datasetForm, setDatasetForm] = useState<{
     [projectId: string]: {
       name: string;
@@ -65,16 +74,47 @@ export default function Dashboard() {
   }>({});
 
   useEffect(() => {
+    console.log("useffect is being called from dashboard page");
     if (!access_token) {
+      console.log("No access token, redirecting to login...");
       router.push("/login");
-    } else {
-      dispatch(fetchProjects());
-      setIsLoading(false);
+    } else if (access_token){
+      console.log("fetching projects called from dashboard page");
+      dispatch(fetchProjects())
+        .unwrap()
+        .then(() => {
+          console.log("the dashboard fetch projects returned successfully");
+           setIsLoading(false);
+        })
+    } else if(authError){
+      console.log("authError in dashboard page",authError);
+      router.push("/login");
     }
-  }, [access_token, dispatch, router]);
+  }, [access_token, dispatch, router,authError]);
+
+  useEffect(() => {
+    if (projectError) {
+      console.log("use Effect projectError", projectError); 
+      if(projectError=="Unauthorized"){
+         dispatch(refresh())
+      }
+    }
+  }, [projectError]); 
+
 
   if (isLoading) return null;
 
+   const handleLogout = () => {
+    dispatch(logout()).unwrap().then(() => {
+      if(typeof window !== "undefined") {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        router.push("/login");
+      }
+    }).catch((error) => {
+      console.error("Logout failed:", error);
+    });
+   }
   const handleCSVUpload = (file: File, projectId: string) => {
     Papa.parse(file, {
       complete: (result: any) => {
@@ -170,6 +210,22 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error parsing userInfo:", error);
       }
+    } else {
+      if (access_token && refresh_token) {
+        const decoded = jwtDecode<{
+          userId: string;
+          userName: string;
+          iat: number;
+          exp: number;
+        }>(access_token);
+        const refresh_decoded = jwtDecode<{
+          userId: string;
+          userName: string;
+          iat: number;
+          exp: number;
+        }>(refresh_token);
+        userId = decoded.userId;
+      }
     }
     dispatch(
       createProject({
@@ -183,7 +239,7 @@ export default function Dashboard() {
     setProjectDesc("");
     setStatus("ACTIVE");
   };
- 
+
   const handleUploadData = async (projectId: string) => {
     const datasetData = datasetForm[projectId]; // Get the dataset form data for the specific project
     console.log("Selected Format:", datasetData?.format);
@@ -193,17 +249,17 @@ export default function Dashboard() {
       alert("Please complete all fields and select a file.");
       return;
     }
-  
+
     let detectedFormat = "CSV"; // Default to CSV
     const fileName = datasetData.file.name.toLowerCase();
 
     if (fileName.endsWith(".csv")) {
-        detectedFormat = "CSV";
+      detectedFormat = "CSV";
     } else if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
-        detectedFormat = "EXCEL";
+      detectedFormat = "EXCEL";
     } else {
-        alert("Invalid file format. Please upload a CSV or Excel file.");
-        return;
+      alert("Invalid file format. Please upload a CSV or Excel file.");
+      return;
     }
 
     try {
@@ -236,7 +292,14 @@ export default function Dashboard() {
           <Menu className="mx-3" />
           <h1 className="text-3xl font-extrabold px-3 text-gray-800">LOGO</h1>
         </div>
-        <p className="text-gray-500">Manage your data efficiently</p>
+        <Button
+                variant="default"
+                onClick={handleLogout}
+                disabled={authStatus === "loading"}
+              >
+                {authStatus === "loading" ? "Logging Out..." : " Logout"}
+              </Button>
+        {/* <p className="text-gray-500">Manage your data efficiently</p> */}
       </header>
 
       <div className="flex flex-1">
@@ -297,17 +360,17 @@ export default function Dashboard() {
               </select>
             </div>
             <div className="mt-4">
-              {typeof error === "string" && (
+              {typeof projectError === "string" && (
                 <p className="text-red-500">
-                  {status == "failed" ? (error as string) : ""}
+                  {projectStatus == "failed" ? (projectError as string) : ""}
                 </p>
               )}
               <Button
                 variant="default"
                 onClick={handleCreateProject}
-                disabled={status === "loading"}
+                disabled={projectStatus === "loading"}
               >
-                {status === "loading" ? "Creating..." : "✅ Create Project"}
+                {projectStatus === "loading" ? "Creating..." : "✅ Create Project"}
               </Button>
             </div>
           </div>
@@ -355,7 +418,7 @@ export default function Dashboard() {
                     }
                     className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
                   />
-                 
+
                   <div className="mt-2">
                     <textarea
                       placeholder="Description"
@@ -373,7 +436,6 @@ export default function Dashboard() {
                     />
                   </div>
 
-                
                   <div className="mt-2">
                     <select
                       value={datasetForm[project.id]?.format || "CSV"} // Bind the value to datasetForm state for this project
@@ -394,7 +456,6 @@ export default function Dashboard() {
                           `afterrrr Updating format for project ${project.id}: ${e.target.value}`
                         );
                       }}
-
                       className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
                     >
                       <option value="CSV">📄 CSV</option>
@@ -402,7 +463,6 @@ export default function Dashboard() {
                     </select>
                   </div>
 
-                 
                   <div className="mt-2">
                     <input
                       type="file"

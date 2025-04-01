@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createProject, fetchProjects } from "./projectActions"; // Import your createProject thunk
+import { AxiosError } from "axios";
 
 // Define the shape of a Project
 export interface Project {
