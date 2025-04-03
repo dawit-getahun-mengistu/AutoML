@@ -4,13 +4,6 @@ import axios from "axios";
 import { Dataset } from "./datasetSlice";
 
 const backendURL = "http://localhost:3001";
-const config = {
-  headers: {
-    "Content-Type": "multipart/form-data",
-    // Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
-  }
-};
-
 export const createDataset = createAppAsyncThunk<
   Dataset,
   { 
@@ -24,6 +17,13 @@ export const createDataset = createAppAsyncThunk<
   "datasets",
   async ({ name, description, projectId, format, file }, { rejectWithValue }) => {
     try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
+        }
+      };
+      
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);

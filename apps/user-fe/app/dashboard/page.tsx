@@ -5,10 +5,7 @@ import {
   createProject,
   fetchProjects,
 } from "@/lib/features/project/projectActions";
-import {
-  refresh,
-  logout
-} from "@/lib/features/auth/authActions";
+import { refresh, logout } from "@/lib/features/auth/authActions";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import {
@@ -42,28 +39,46 @@ interface Column {
 }
 
 export default function Dashboard() {
-  console.log("dashboard is being rendered");
   const dispatch = useAppDispatch();
-  const { projects, status:projectStatus, error:projectError } = useAppSelector((state) => state.project);
+  const {
+    projects,
+    status: projectStatus,
+    error: projectError,
+  } = useAppSelector((state) => state.project);
   const router = useRouter();
-  const { status:authStatus, access_token, refresh_token, userInfo, error:authError} = useAppSelector(
-    (state) => state.auth
-  );
+  const {
+    status: authStatus,
+    access_token,
+    refresh_token,
+    userInfo,
+    error: authError,
+  } = useAppSelector((state) => state.auth);
+  const {
+    status: dataStatus,
+    datasets,
+    error: dataError,
+  } = useAppSelector((state) => state.data);
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<{ [key: string]: DataRow[] }>({});
-  const [pagination, setPagination] = useState<{
-    [key: string]: { page: number; rowsPerPage: number };
+
+  const [data, setData] = useState<{
+    [projectId: string]: {
+      [datasetId: string]: DataRow[];
+    };
   }>({});
-  const [columns, setColumns] = useState<Column[]>([]);
+  const [pagination, setPagination] = useState<{
+    [projectId: string]: {
+      [datasetId: string]: { page: number; rowsPerPage: number };
+    };
+  }>({});
+  const [columns, setColumns] = useState<{
+    [projectId: string]: {
+      [datasetId: string]: Column[];
+    };
+  }>({});
+
   const [projectName, setProjectName] = useState("");
   const [projectDesc, setProjectDesc] = useState("");
   const [statuss, setStatus] = useState("ACTIVE");
-
-  // const [datasetName, setDatasetName] = useState("");
-  // const [datasetDesc, setDatasetDesc] = useState("");
-  // const [datasetFormat, setDatasetFormat] = useState("CSV");
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  // console.log(" on the dashboard the redux access_token is returning",access_token);
   const [datasetForm, setDatasetForm] = useState<{
     [projectId: string]: {
       name: string;
@@ -72,74 +87,115 @@ export default function Dashboard() {
       file: File | null;
     };
   }>({});
-
   useEffect(() => {
-    console.log("useffect is being called from dashboard page");
+    console.log("datasetForm", datasetForm);
+  }, [datasetForm]);
+  useEffect(() => {
+    // console.log("useffect is being called from dashboard page");
     if (!access_token) {
-      console.log("No access token, redirecting to login...");
+      // console.log("No access token, redirecting to login...");
       router.push("/login");
-    } else if (access_token){
-      console.log("fetching projects called from dashboard page");
+    } else if (access_token) {
+      // console.log("fetching projects called from dashboard page");
       dispatch(fetchProjects())
         .unwrap()
         .then(() => {
-          console.log("the dashboard fetch projects returned successfully");
-           setIsLoading(false);
-        })
-    } else if(authError){
-      console.log("authError in dashboard page",authError);
+          // console.log("the dashboard fetch projects returned successfully");
+          setIsLoading(false);
+        });
+    } else if (authError) {
+      // console.log("authError in dashboard page",authError);
       router.push("/login");
     }
-  }, [access_token, dispatch, router,authError]);
+  }, [access_token, dispatch, router, authError]);
 
   useEffect(() => {
     if (projectError) {
-      console.log("use Effect projectError", projectError); 
-      if(projectError=="Unauthorized"){
-         dispatch(refresh())
+      // console.log("use Effect projectError", projectError);
+      if (projectError == "Unauthorized") {
+        dispatch(refresh());
       }
     }
-  }, [projectError]); 
-
+  }, [projectError, dataError]);
 
   if (isLoading) return null;
 
-   const handleLogout = () => {
-    dispatch(logout()).unwrap().then(() => {
-      if(typeof window !== "undefined") {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        router.push("/login");
-      }
-    }).catch((error) => {
-      console.error("Logout failed:", error);
-    });
-   }
-  const handleCSVUpload = (file: File, projectId: string) => {
+  const handleLogout = () => {
+    dispatch(logout())
+      .unwrap()
+      .then(() => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          router.push("/login");
+        }
+      })
+      .catch((error) => {
+        // console.error("Logout failed:", error);
+      });
+  };
+  const handleFileChange = (
+    file: File,
+    projectId: string,
+    datasetId: string
+  ) => {
+    if (!file) return;
+
+    if (file.name.endsWith(".csv")) {
+      handleCSVUpload(file, projectId, datasetId);
+    } else if (file.name.endsWith(".xlsx")) {
+      handleExcelUpload(file, projectId, datasetId);
+    } else if (file.name.endsWith(".json")) {
+      handleJSONUpload(file, projectId, datasetId);
+    }
+  };
+
+  const handleCSVUpload = (
+    file: File,
+    projectId: string,
+    datasetId: string
+  ) => {
     Papa.parse(file, {
       complete: (result: any) => {
         const data = result.data as DataRow[];
         setData((prevData) => ({
           ...prevData,
-          [projectId]: data,
+          [projectId]: {
+            ...(prevData[projectId] || {}),
+            [datasetId]: data,
+          },
         }));
-        // Initialize pagination for the project
+        // Initialize pagination for the dataset
         setPagination((prev) => ({
           ...prev,
           [projectId]: {
-            page: 0,
-            rowsPerPage: 5,
+            ...(prev[projectId] || {}),
+            [datasetId]: {
+              page: 0,
+              rowsPerPage: 5,
+            },
           },
         }));
-        setColumns(
-          Object.keys(data[0]).map((key) => ({ Header: key, accessor: key }))
-        );
+        setColumns((prevColumns) => ({
+          ...prevColumns,
+          [projectId]: {
+            ...(prevColumns[projectId] || {}),
+            [datasetId]: Object.keys(data[0]).map((key) => ({
+              Header: key,
+              accessor: key,
+            })),
+          },
+        }));
       },
       header: true,
     });
   };
 
-  const handleExcelUpload = (file: File, projectId: string) => {
+  const handleExcelUpload = (
+    file: File,
+    projectId: string,
+    datasetId: string
+  ) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const ab = e.target?.result;
@@ -149,53 +205,74 @@ export default function Dashboard() {
       const jsonData = XLSX.utils.sheet_to_json(ws) as DataRow[];
       setData((prevData) => ({
         ...prevData,
-        [projectId]: jsonData,
+        [projectId]: {
+          ...(prevData[projectId] || {}),
+          [datasetId]: jsonData,
+        },
       }));
-      // Initialize pagination for the project
+      // Initialize pagination for the dataset
       setPagination((prev) => ({
         ...prev,
         [projectId]: {
-          page: 0,
-          rowsPerPage: 5,
+          ...(prev[projectId] || {}),
+          [datasetId]: {
+            page: 0,
+            rowsPerPage: 5,
+          },
         },
       }));
-      setColumns(
-        Object.keys(jsonData[0]).map((key) => ({ Header: key, accessor: key }))
-      );
+      setColumns((prevColumns) => ({
+        ...prevColumns,
+        [projectId]: {
+          ...(prevColumns[projectId] || {}),
+          [datasetId]: Object.keys(jsonData[0]).map((key) => ({
+            Header: key,
+            accessor: key,
+          })),
+        },
+      }));
     };
     reader.readAsArrayBuffer(file);
   };
-
-  const handleFileChange = (file: File, projectId: string) => {
-    if (!file) return;
-
-    if (file.name.endsWith(".csv")) {
-      handleCSVUpload(file, projectId);
-    } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-      handleExcelUpload(file, projectId);
-    }
+  //TODO: finish handleJSONUpload
+  const handleJSONUpload = (
+    file: File,
+    projectId: string,
+    datasetId: string
+  ) => {
+    // Implementation for handling JSON upload
   };
 
   // Project-specific pagination handlers
   const handleChangePage =
-    (projectId: string) => (event: unknown, newPage: number) => {
+    (projectId: string, datasetId: string) =>
+    (event: unknown, newPage: number) => {
       setPagination((prev) => ({
         ...prev,
         [projectId]: {
-          ...prev[projectId],
-          page: newPage,
+          ...(prev[projectId] || {}),
+          [datasetId]: {
+            ...((prev[projectId] && prev[projectId][datasetId]) || {
+              rowsPerPage: 5,
+            }),
+            page: newPage,
+          },
         },
       }));
     };
 
   const handleChangeRowsPerPage =
-    (projectId: string) => (event: ChangeEvent<HTMLInputElement>) => {
+    (projectId: string, datasetId: string) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
       const newRowsPerPage = parseInt(event.target.value, 10);
       setPagination((prev) => ({
         ...prev,
         [projectId]: {
-          page: 0,
-          rowsPerPage: newRowsPerPage,
+          ...(prev[projectId] || {}),
+          [datasetId]: {
+            page: 0,
+            rowsPerPage: newRowsPerPage,
+          },
         },
       }));
     };
@@ -208,7 +285,7 @@ export default function Dashboard() {
         const userInfo = JSON.parse(userInfoString);
         userId = userInfo.id;
       } catch (error) {
-        console.error("Error parsing userInfo:", error);
+        // console.error("Error parsing userInfo:", error);
       }
     } else {
       if (access_token && refresh_token) {
@@ -239,26 +316,26 @@ export default function Dashboard() {
     setProjectDesc("");
     setStatus("ACTIVE");
   };
-
+  //TODO:can't accept DatasetId as an argument because it hasn't yet been sent to backend it is still unknown
   const handleUploadData = async (projectId: string) => {
-    const datasetData = datasetForm[projectId]; // Get the dataset form data for the specific project
+    const datasetData = datasetForm[projectId];
     console.log("Selected Format:", datasetData?.format);
     console.log("Selected File:", datasetData?.file);
     if (!datasetData || !datasetData.file) {
-      // Check if the file exists for the project
       alert("Please complete all fields and select a file.");
       return;
     }
 
-    let detectedFormat = "CSV"; // Default to CSV
+    let detectedFormat = "CSV";
     const fileName = datasetData.file.name.toLowerCase();
-
     if (fileName.endsWith(".csv")) {
       detectedFormat = "CSV";
-    } else if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
+    } else if (fileName.endsWith(".xlsx")) {
       detectedFormat = "EXCEL";
+    } else if (fileName.endsWith(".json")) {
+      detectedFormat = "JSON";
     } else {
-      alert("Invalid file format. Please upload a CSV or Excel file.");
+      alert("Invalid file format. Please upload a CSV or Excel or JSON file.");
       return;
     }
 
@@ -266,24 +343,22 @@ export default function Dashboard() {
       // Dispatch createDataset to upload dataset info
       const result = await dispatch(
         createDataset({
-          name: datasetData.name, // Dataset name
-          description: datasetData.description, // Dataset description
-          projectId: projectId, // Project ID
-          format: detectedFormat, // Dataset format
-          file: datasetData.file, // Dataset file
+          name: datasetData.name,
+          description: datasetData.description,
+          projectId: projectId,
+          format: detectedFormat,
+          file: datasetData.file,
         })
-      ).unwrap(); // Unwrap to catch errors properly
-
-      // If the dataset creation is successful, process the file
+      ).unwrap();
       if (result) {
-        handleFileChange(datasetData.file, projectId); // Process the file after successful upload
+        //TODO: g the dataset id from the result(backend))
+        handleFileChange(datasetData.file, projectId, result.id);
       }
     } catch (error) {
       console.error("Dataset upload failed:", error);
-      alert("Dataset upload failed. Please try again.");
+      alert(error);
     }
   };
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 max-w-full">
       {/* Header */}
@@ -293,13 +368,12 @@ export default function Dashboard() {
           <h1 className="text-3xl font-extrabold px-3 text-gray-800">LOGO</h1>
         </div>
         <Button
-                variant="default"
-                onClick={handleLogout}
-                disabled={authStatus === "loading"}
-              >
-                {authStatus === "loading" ? "Logging Out..." : " Logout"}
-              </Button>
-        {/* <p className="text-gray-500">Manage your data efficiently</p> */}
+          variant="default"
+          onClick={handleLogout}
+          disabled={authStatus === "loading"}
+        >
+          {authStatus === "loading" ? "Logging Out..." : " Logout"}
+        </Button>
       </header>
 
       <div className="flex flex-1">
@@ -370,7 +444,9 @@ export default function Dashboard() {
                 onClick={handleCreateProject}
                 disabled={projectStatus === "loading"}
               >
-                {projectStatus === "loading" ? "Creating..." : "✅ Create Project"}
+                {projectStatus === "loading"
+                  ? "Creating..."
+                  : "✅ Create Project"}
               </Button>
             </div>
           </div>
@@ -395,14 +471,6 @@ export default function Dashboard() {
                   <h4 className="text-md font-semibold text-gray-900">
                     Add Dataset
                   </h4>
-
-                  {/* <div className="mt-2">
-                    <input
-                      type="text"
-                      placeholder=" Dataset Name"
-                      className="w-full p-2 border border-gray-500 text-gray-900 rounded-md bg-white"
-                    />
-                  </div> */}
                   <input
                     type="text"
                     placeholder="Dataset Name"
@@ -440,11 +508,6 @@ export default function Dashboard() {
                     <select
                       value={datasetForm[project.id]?.format || "CSV"} // Bind the value to datasetForm state for this project
                       onChange={(e) => {
-                        // Log to ensure the format is being updated
-                        console.log(
-                          `beforeeeUpdating format for project ${project.id}: ${e.target.value}`
-                        );
-
                         setDatasetForm((prev) => ({
                           ...prev,
                           [project.id]: {
@@ -460,6 +523,7 @@ export default function Dashboard() {
                     >
                       <option value="CSV">📄 CSV</option>
                       <option value="EXCEL">📊 EXCEL</option>
+                      <option value="JSON">🗂️ JSON</option>
                     </select>
                   </div>
 
@@ -498,58 +562,99 @@ export default function Dashboard() {
                 </div>
 
                 {/* Visualization Section for this Project */}
-                {data[project.id] && data[project.id].length > 0 && (
-                  <div className="mt-6 border-t pt-4">
-                    <h4 className="text-md font-semibold">
-                      📊 Datasets & Visualizations
-                    </h4>
-                    <TableContainer
-                      component={Paper}
-                      sx={{ overflowX: "auto" }}
-                    >
-                      <Table sx={{ minWidth: 650 }} aria-label="data table">
-                        <TableHead>
-                          <TableRow>
-                            {columns.map((column) => (
-                              <TableCell key={column.Header} align="left">
-                                {column.Header}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {data[project.id]
-                            ?.slice(
-                              (pagination[project.id]?.page || 0) *
-                                (pagination[project.id]?.rowsPerPage || 5),
-                              (pagination[project.id]?.page || 0) *
-                                (pagination[project.id]?.rowsPerPage || 5) +
-                                (pagination[project.id]?.rowsPerPage || 5)
-                            )
-                            .map((row, rowIndex) => (
-                              <TableRow key={rowIndex}>
-                                {columns.map((column) => (
-                                  <TableCell key={column.accessor} align="left">
-                                    {row[column.accessor]}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                {data[project.id] &&
+                  Object.keys(data[project.id]).length > 0 && (
+                    <div className="mt-6 border-t pt-4">
+                      <h4 className="text-md font-semibold">
+                        📊 Datasets & Visualizations
+                      </h4>
+                      {Object.entries(data[project.id]).map(
+                        ([datasetId, datasetData]) => (
+                          <div key={datasetId}>
+                            <h5 className="text-sm font-bold">
+                              Dataset ID: {datasetId}
+                            </h5>
+                            <TableContainer
+                              component={Paper}
+                              sx={{ overflowX: "auto" }}
+                            >
+                              <Table
+                                sx={{ minWidth: 650 }}
+                                aria-label="data table"
+                              >
+                                <TableHead>
+                                  <TableRow>
+                                    {columns[project.id][datasetId].map(
+                                      (column) => (
+                                        <TableCell
+                                          key={column.Header}
+                                          align="left"
+                                        >
+                                          {column.Header}
+                                        </TableCell>
+                                      )
+                                    )}
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {datasetData
+                                    .slice(
+                                      (pagination[project.id][datasetId]
+                                        ?.page || 0) *
+                                        (pagination[project.id][datasetId]
+                                          ?.rowsPerPage || 5),
+                                      (pagination[project.id][datasetId]
+                                        ?.page || 0) *
+                                        (pagination[project.id][datasetId]
+                                          ?.rowsPerPage || 5) +
+                                        (pagination[project.id][datasetId]
+                                          ?.rowsPerPage || 5)
+                                    )
+                                    .map((row, rowIndex) => (
+                                      <TableRow
+                                        key={`${datasetId}-${rowIndex}`}
+                                      >
+                                        {columns[project.id][datasetId].map(
+                                          (column) => (
+                                            <TableCell
+                                              key={column.accessor}
+                                              align="left"
+                                            >
+                                              {row[column.accessor]}
+                                            </TableCell>
+                                          )
+                                        )}
+                                      </TableRow>
+                                    ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
 
-                    <TablePagination
-                      component="div"
-                      count={data[project.id]?.length || 0}
-                      page={pagination[project.id]?.page || 0}
-                      onPageChange={handleChangePage(project.id)}
-                      rowsPerPage={pagination[project.id]?.rowsPerPage || 5}
-                      onRowsPerPageChange={handleChangeRowsPerPage(project.id)}
-                      rowsPerPageOptions={[5, 10, 25]}
-                    />
-                  </div>
-                )}
+                            <TablePagination
+                              component="div"
+                              count={datasetData.length}
+                              page={
+                                pagination[project.id][datasetId]?.page || 0
+                              }
+                              onPageChange={handleChangePage(
+                                project.id,
+                                datasetId
+                              )}
+                              rowsPerPage={
+                                pagination[project.id][datasetId]
+                                  ?.rowsPerPage || 5
+                              }
+                              onRowsPerPageChange={handleChangeRowsPerPage(
+                                project.id,
+                                datasetId
+                              )}
+                              rowsPerPageOptions={[5, 10, 25]}
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
               </div>
             ))}
           </div>
