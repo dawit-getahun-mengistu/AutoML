@@ -4,7 +4,7 @@ FROM node:22
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package files and install dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY user-fe/package*.json ./
 RUN npm install
 

@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+// Refresh-Token Strategy
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'refresh_strategy') {
   constructor(private config: ConfigService, private dataBase: PrismaService) {

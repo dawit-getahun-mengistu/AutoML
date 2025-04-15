@@ -2,10 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as passport from 'passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes( new ValidationPipe({whitelist: true}))
+  app.use(passport.initialize());
 
   app.enableCors({
     // origin: false,  // Completely disables cross-origin requests
@@ -17,6 +19,23 @@ async function bootstrap() {
     .setTitle('Users-Backend')
     .setDescription('Service for user authentication and database upload')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'refresh-token',
+    )
+    .addServer('http://localhost:3001/', 'Local environment')
     .addTag('user-be')
     .build();
 
