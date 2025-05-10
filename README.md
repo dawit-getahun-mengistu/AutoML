@@ -22,6 +22,43 @@ This project is brought to you by the following contributors:
 - Naol Taye
 - Tinsae Shemalise Yared
 
+
+## Getting Started
+
+The project uses [uv](https://github.com/astral-sh/uv) for dependency and environment management.
+
+### Prerequisites
+
+- [`uv`](https://github.com/astral-sh/uv) installed 
+- Use uv to install python version 3.11 or above
+
+
+
+### 🛠️ Setup
+
+Follow these steps to set up the project after cloning:
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/WildCayote/AutoML.git
+cd AutoML
+```
+
+#### 2. Create the virtual environment (automatically uses the correct Python version)
+
+```bash
+uv venv
+```
+
+> This reads `.python-version` and installs the correct Python version if needed.
+
+#### 3. To run Pre-commit
+
+```bash
+uv run pre-commit run --all-files
+```
+
 ## Documentation
 
 The full documentation for the AutoML platform, including setup guides, technical documentation, and API references, is available [here](https://wildcayote.github.io/AutoML/).

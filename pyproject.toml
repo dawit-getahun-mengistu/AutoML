@@ -1,0 +1,20 @@
+[project]
+name = "automl"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pre-commit>=4.2.0",
+]
+
+
+[tool.ruff]
+line-length = 100
+
+
+[tool.pyright]
+exclude = ["apps/data-profiling-node/.venv"]
+pythonVersion = "3.11"
+venvPath = "apps/data-profiling-node/."
+venv = ".venv"

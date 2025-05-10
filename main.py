@@ -1,5 +1,5 @@
 def main():
-    print("Hello from data-profiling-node!")
+    print("Hello from automl!")
 
 
 if __name__ == "__main__":
