@@ -21,11 +21,8 @@ import {
 import {
   Menu,
   House,
-  SlidersHorizontal,
-  Database,
-  History,
-  Info,
 } from "lucide-react";
+import SideBar from "../components/SideBar/SideBar";
 import { Button } from "../components/NewButton";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -102,6 +99,7 @@ export default function Dashboard() {
         .then(() => {
           // console.log("the dashboard fetch projects returned successfully");
           setIsLoading(false);
+          console.log(projects)
         });
     } else if (authError) {
       // console.log("authError in dashboard page",authError);
@@ -378,25 +376,7 @@ export default function Dashboard() {
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-lg p-4 flex flex-col justify-between">
-          <nav className="space-y-4">
-            <Button variant="outline" className="w-full flex items-center">
-              <House className="mr-2" /> Home
-            </Button>
-            <Button variant="outline" className="w-full flex items-center">
-              <SlidersHorizontal className="mr-2" /> Use Cases
-            </Button>
-            <Button variant="outline" className="w-full flex items-center">
-              <Database className="mr-2" /> Dataset Storage
-            </Button>
-            <Button variant="outline" className="w-full flex items-center">
-              <History className="mr-2" /> History
-            </Button>
-            <Button variant="outline" className="w-full flex items-center">
-              <Info className="mr-2" /> About
-            </Button>
-          </nav>
-        </aside>
+        <SideBar projects={projects}/>
 
         {/* Main Content */}
         <div className="flex-1 p-6 overflow-hidden">
