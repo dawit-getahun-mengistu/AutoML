@@ -1,0 +1,56 @@
+"use client"
+
+import { useProjects } from "@/lib/projects-context"
+import { Database, UploadIcon, PlusIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export default function DataPage({ params }: { params: { projectId: string } }) {
+  const { projects } = useProjects()
+  const project = projects.find((p) => p.id === params.projectId)
+
+  if (!project) {
+    return <div className="p-8">Project not found</div>
+  }
+
+  return (
+    <div className="p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <Database className="h-5 w-5 text-blue-600 mr-2" />
+          <h1 className="text-2xl font-bold">Data</h1>
+        </div>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm">
+            <UploadIcon className="h-4 w-4 mr-2" />
+            Upload Dataset
+          </Button>
+          <Button size="sm">
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Connect Data Source
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">No Datasets</CardTitle>
+            <CardDescription>Upload or connect a dataset to get started</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg">
+              <Database className="h-10 w-10 text-gray-300 mb-3" />
+              <p className="text-sm text-gray-500 text-center mb-4">
+                Drag and drop your CSV, Excel, or JSON files here
+              </p>
+              <Button variant="outline" size="sm">
+                Browse Files
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

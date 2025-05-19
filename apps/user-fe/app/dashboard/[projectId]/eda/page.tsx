@@ -1,0 +1,46 @@
+"use client"
+
+import { useProjects } from "@/lib/projects-context"
+import { BarChart2, Link2Icon, PlusIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export default function EDAPage({ params }: { params: { projectId: string } }) {
+  const { projects } = useProjects()
+  const project = projects.find((p) => p.id === params.projectId)
+
+  if (!project) {
+    return <div className="p-8">Project not found</div>
+  }
+
+  return (
+    <div className="p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <BarChart2 className="h-5 w-5 text-blue-600 mr-2" />
+          <h1 className="text-2xl font-bold">Exploratory Data Analysis</h1>
+        </div>
+        <Button size="sm">
+          <PlusIcon className="h-4 w-4 mr-2" />
+          New Analysis
+        </Button>
+      </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-lg">Define Dataset Relationships</CardTitle>
+          <CardDescription>Connect your datasets to establish relationships between them</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg">
+            <Link2Icon className="h-10 w-10 text-gray-300 mb-3" />
+            <p className="text-sm text-gray-500 text-center mb-4">No datasets available to create relationships</p>
+            <Button variant="outline" size="sm">
+              Add Dataset
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
