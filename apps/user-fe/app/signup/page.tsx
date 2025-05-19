@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 export default function Signup() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const {status,error,access_token} = useAppSelector((state)=>state.auth);
+  const {status,error,access_token,userInfo} = useAppSelector((state)=>state.auth);
   const [form,setForm] = useState({
     email:"",
     username:"",
@@ -21,10 +21,17 @@ export default function Signup() {
   });
   useEffect(() => {
     if (access_token) {
-      console.log("Access token detected! Redirecting...");
+      console.log("use effect on signup page Access token detected! Redirecting...");
       router.push("/dashboard");
     }
   }, [access_token, router]);
+  
+  useEffect(() => {
+    if(userInfo){
+         localStorage.setItem("userInfo", JSON.stringify(userInfo));
+    }
+  }, [userInfo]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

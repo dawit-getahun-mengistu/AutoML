@@ -3,14 +3,12 @@ import { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 import { Project } from "./projectSlice";
 const axios = require("axios").default;
 const backendURL = "http://localhost:3001"
-const config:AxiosRequestConfig = {
+const getConfig = (): AxiosRequestConfig => ({
   headers: {
     'Content-Type': 'application/json',
-    // TODO:FIXX Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
-
-    // Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
   }
-}
+});
 export const createProject= createAppAsyncThunk<
   {id:string;name:string;description:string;status:string;userId:string;createdAt:string},
   { name: string; description: string; status: string;userId:string }
@@ -21,7 +19,7 @@ export const createProject= createAppAsyncThunk<
       const response: AxiosResponse = await axios.post(
         `${backendURL}/project`,
         { name,description,status,userId },
-        config
+        getConfig()
       );
       //TODO:type guarding before returning to ensure api returns the type we envisioned
       return{
@@ -33,6 +31,7 @@ export const createProject= createAppAsyncThunk<
         createdAt:response.data.createdAt,
       }
     } catch (error: unknown) {
+      console.log("From projectActions creating projects error",error)
         //TODO: custom user handling for better user experience
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<{ message?: string|string[]; error: string; statusCode: number }>;
@@ -52,13 +51,22 @@ Project[]>(
   "project/fetchProjects",
   async (_, { rejectWithValue }) => {
     try {
+      const config:AxiosRequestConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+           Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
+        }
+      }
+      console.log("fetching projects in projectActions..");
+      console.log("config",config)
       const response: AxiosResponse = await axios.get(
-        `${backendURL}/project`,
+        `${backendURL}/project/me`,
          config
       );
       // Assuming response.data is an array of projects
       return response.data;
     } catch (error: unknown) {
+      console.log("From projectActions fetching projects error",error)
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<{ message?: string|string[]; error: string; statusCode: number }>;
         const errorMessage = axiosError.response?.data?.message;
