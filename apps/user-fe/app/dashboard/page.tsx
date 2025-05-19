@@ -91,7 +91,7 @@ export default function Dashboard() {
     // console.log("useffect is being called from dashboard page");
     if (!access_token) {
       // console.log("No access token, redirecting to login...");
-      router.push("/login");
+      router.push("/");
     } else if (access_token) {
       // console.log("fetching projects called from dashboard page");
       dispatch(fetchProjects())
@@ -103,7 +103,7 @@ export default function Dashboard() {
         });
     } else if (authError) {
       // console.log("authError in dashboard page",authError);
-      router.push("/login");
+      router.push("/");
     }
   }, [access_token, dispatch, router, authError]);
 
@@ -125,7 +125,7 @@ export default function Dashboard() {
         if (typeof window !== "undefined") {
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
-          router.push("/login");
+          router.push("/");
         }
       })
       .catch((error) => {
