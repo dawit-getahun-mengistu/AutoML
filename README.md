@@ -22,17 +22,31 @@ This project is brought to you by the following contributors:
 - Naol Taye
 - Tinsae Shemalise Yared
 
-
 ## Getting Started
 
 The project uses [uv](https://github.com/astral-sh/uv) for dependency and environment management.
 
 ### Prerequisites
 
-- [`uv`](https://github.com/astral-sh/uv) installed 
+- [`uv`](https://github.com/astral-sh/uv) installed
 - Use uv to install python version 3.11 or above
 
+#### UV setup
 
+To set up the development environment:
+
+1. Initialize a virtual environment using uv:
+
+    ```uv venv --python 3.12```
+2. Synchronize the environment:
+
+    ```uv sync```
+3. Add the pre-commit package:
+
+    ```uv add pre-commit```
+4. Run pre-commit to check all files:
+
+    ```uv run pre-commit run --all-files```
 
 ### 🛠️ Setup
 
