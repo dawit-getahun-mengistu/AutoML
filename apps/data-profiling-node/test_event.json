@@ -1,0 +1,664 @@
+{
+  "dataset_profile": {
+    "num_columns": 9,
+    "num_observations": 768,
+    "missing_cell_percentage": 0.0,
+    "duplicate_row_percentage": 0.0
+  },
+  "column_profile": {
+    "classification": {
+      "numeric": [
+        "Number of times pregnant",
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test",
+        "Diastolic blood pressure (mm Hg)",
+        "Triceps skin fold thickness (mm)",
+        "2-Hour serum insulin (mu U/ml)",
+        "Body mass index (weight in kg/(height in m)^2)",
+        "Diabetes pedigree function",
+        "Age (years)",
+        "Class variable"
+      ],
+      "boolean": [],
+      "categorical": [],
+      "datetime": [],
+      "mixed": []
+    },
+    "categorical": {},
+    "numerical": {
+      "Number of times pregnant": {
+        "summary": {
+          "mean": 3.8450520833333335,
+          "median": 3.0,
+          "mode": [
+            1
+          ],
+          "min": 0.0,
+          "max": 17.0,
+          "range": 17.0,
+          "variance": 11.354056320621465,
+          "std": 3.3695780626988694,
+          "skewness": 0.9016739791518588,
+          "kurtosis": 0.15921977754746486
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 1.0,
+            "Q3": 6.0,
+            "IQR": 5.0,
+            "left_outliers": 0,
+            "right_outliers": 1
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 4
+          }
+        }
+      },
+      "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": {
+        "summary": {
+          "mean": 120.89453125,
+          "median": 117.0,
+          "mode": [
+            99,
+            100
+          ],
+          "min": 0.0,
+          "max": 199.0,
+          "range": 199.0,
+          "variance": 1022.2483142519557,
+          "std": 31.97261819513622,
+          "skewness": 0.17375350179188992,
+          "kurtosis": 0.6407798203735053
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 99.0,
+            "Q3": 140.25,
+            "IQR": 41.25,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 5,
+            "right_outliers": 0
+          }
+        }
+      },
+      "Diastolic blood pressure (mm Hg)": {
+        "summary": {
+          "mean": 69.10546875,
+          "median": 72.0,
+          "mode": [
+            70
+          ],
+          "min": 0.0,
+          "max": 122.0,
+          "range": 122.0,
+          "variance": 374.6472712271838,
+          "std": 19.355807170644777,
+          "skewness": -1.8436079833551302,
+          "kurtosis": 5.180156560082496
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 62.0,
+            "Q3": 80.0,
+            "IQR": 18.0,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 35,
+            "right_outliers": 0
+          }
+        }
+      },
+      "Triceps skin fold thickness (mm)": {
+        "summary": {
+          "mean": 20.536458333333332,
+          "median": 23.0,
+          "mode": [
+            0
+          ],
+          "min": 0.0,
+          "max": 99.0,
+          "range": 99.0,
+          "variance": 254.47324532811822,
+          "std": 15.952217567727637,
+          "skewness": 0.10937249648187608,
+          "kurtosis": -0.520071866153013
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 32.0,
+            "IQR": 32.0,
+            "left_outliers": 0,
+            "right_outliers": 1
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 1
+          }
+        }
+      },
+      "2-Hour serum insulin (mu U/ml)": {
+        "summary": {
+          "mean": 79.79947916666667,
+          "median": 30.5,
+          "mode": [
+            0
+          ],
+          "min": 0.0,
+          "max": 846.0,
+          "range": 846.0,
+          "variance": 13281.180077955238,
+          "std": 115.24400235133817,
+          "skewness": 2.272250858431574,
+          "kurtosis": 7.2142595543487715
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 127.25,
+            "IQR": 127.25,
+            "left_outliers": 0,
+            "right_outliers": 34
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 18
+          }
+        }
+      },
+      "Body mass index (weight in kg/(height in m)^2)": {
+        "summary": {
+          "mean": 31.992578124999998,
+          "median": 32.0,
+          "mode": [
+            32.0
+          ],
+          "min": 0.0,
+          "max": 67.1,
+          "range": 67.1,
+          "variance": 62.15998395738266,
+          "std": 7.884160320375446,
+          "skewness": -0.42898158845356543,
+          "kurtosis": 3.290442900816981
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 27.3,
+            "Q3": 36.6,
+            "IQR": 9.3,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 11,
+            "right_outliers": 3
+          }
+        }
+      },
+      "Diabetes pedigree function": {
+        "summary": {
+          "mean": 0.47187630208333325,
+          "median": 0.3725,
+          "mode": [
+            0.254,
+            0.258
+          ],
+          "min": 0.078,
+          "max": 2.42,
+          "range": 2.342,
+          "variance": 0.1097786378731394,
+          "std": 0.3313285950127749,
+          "skewness": 1.919911066307204,
+          "kurtosis": 5.5949535279830584
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.24375,
+            "Q3": 0.62625,
+            "IQR": 0.38249999999999995,
+            "left_outliers": 0,
+            "right_outliers": 10
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 11
+          }
+        }
+      },
+      "Age (years)": {
+        "summary": {
+          "mean": 33.240885416666664,
+          "median": 29.0,
+          "mode": [
+            22
+          ],
+          "min": 21.0,
+          "max": 81.0,
+          "range": 60.0,
+          "variance": 138.30304589037377,
+          "std": 11.760231540678685,
+          "skewness": 1.1295967011444805,
+          "kurtosis": 0.6431588885398942
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 24.0,
+            "Q3": 41.0,
+            "IQR": 17.0,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 5
+          }
+        }
+      },
+      "Class variable": {
+        "summary": {
+          "mean": 0.3489583333333333,
+          "median": 0.0,
+          "mode": [
+            0
+          ],
+          "min": 0.0,
+          "max": 1.0,
+          "range": 1.0,
+          "variance": 0.22748261625380273,
+          "std": 0.47695137724279896,
+          "skewness": 0.635016643444986,
+          "kurtosis": -1.600929755156027
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 1.0,
+            "IQR": 1.0,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 0
+          }
+        }
+      }
+    }
+  },
+  "ydata_profile": {
+    "analysis": {
+      "title": "Test Profile",
+      "date_start": "2025-05-24T08:30:48.410768",
+      "date_end": "2025-05-24T08:30:55.731417"
+    },
+    "table": {
+      "n": 768,
+      "n_var": 9,
+      "memory_size": 55428,
+      "record_size": 72.171875,
+      "n_cells_missing": 0,
+      "n_vars_with_missing": 0,
+      "n_vars_all_missing": 0,
+      "p_cells_missing": 0.0,
+      "types": {
+        "Numeric": 8,
+        "Categorical": 1
+      },
+      "n_duplicates": 0,
+      "p_duplicates": 0.0
+    },
+    "correlations": [
+      {
+        "2-Hour serum insulin (mu U/ml)": 1.0,
+        "Age (years)": -0.1142129172644335,
+        "Body mass index (weight in kg/(height in m)^2)": 0.19272568063619994,
+        "Class variable": 0.15905605469716882,
+        "Diabetes pedigree function": 0.22115049154027588,
+        "Diastolic blood pressure (mm Hg)": -0.0067705718113126355,
+        "Number of times pregnant": -0.12672272417606534,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.21320580456193106,
+        "Triceps skin fold thickness (mm)": 0.5410001366628013
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": -0.1142129172644335,
+        "Age (years)": 1.0,
+        "Body mass index (weight in kg/(height in m)^2)": 0.13118588054276872,
+        "Class variable": 0.3142544601266885,
+        "Diabetes pedigree function": 0.042908587709087904,
+        "Diastolic blood pressure (mm Hg)": 0.35089459322163535,
+        "Number of times pregnant": 0.6072163388236559,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.28504471995581177,
+        "Triceps skin fold thickness (mm)": -0.06679492114381454
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": 0.19272568063619994,
+        "Age (years)": 0.13118588054276872,
+        "Body mass index (weight in kg/(height in m)^2)": 1.0,
+        "Class variable": 0.3165189748143356,
+        "Diabetes pedigree function": 0.14119202973187467,
+        "Diastolic blood pressure (mm Hg)": 0.29287043032041404,
+        "Number of times pregnant": 0.0001321468693199425,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.23114119425993723,
+        "Triceps skin fold thickness (mm)": 0.44361450828836047
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": 0.15905605469716882,
+        "Age (years)": 0.3142544601266885,
+        "Body mass index (weight in kg/(height in m)^2)": 0.3165189748143356,
+        "Class variable": 1.0,
+        "Diabetes pedigree function": 0.17321436826205652,
+        "Diastolic blood pressure (mm Hg)": 0.15217013311944494,
+        "Number of times pregnant": 0.23452901828455394,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.4871253007717644,
+        "Triceps skin fold thickness (mm)": 0.20846219237827066
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": 0.22115049154027588,
+        "Age (years)": 0.042908587709087904,
+        "Body mass index (weight in kg/(height in m)^2)": 0.14119202973187467,
+        "Class variable": 0.17321436826205652,
+        "Diabetes pedigree function": 1.0,
+        "Diastolic blood pressure (mm Hg)": 0.030046334854222177,
+        "Number of times pregnant": -0.04324150124936041,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.09129336487628698,
+        "Triceps skin fold thickness (mm)": 0.18039048342264027
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": -0.0067705718113126355,
+        "Age (years)": 0.35089459322163535,
+        "Body mass index (weight in kg/(height in m)^2)": 0.29287043032041404,
+        "Class variable": 0.15217013311944494,
+        "Diabetes pedigree function": 0.030046334854222177,
+        "Diastolic blood pressure (mm Hg)": 1.0,
+        "Number of times pregnant": 0.18512673205801747,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.2351906134781835,
+        "Triceps skin fold thickness (mm)": 0.12648587140494302
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": -0.12672272417606534,
+        "Age (years)": 0.6072163388236559,
+        "Body mass index (weight in kg/(height in m)^2)": 0.0001321468693199425,
+        "Class variable": 0.23452901828455394,
+        "Diabetes pedigree function": -0.04324150124936041,
+        "Diastolic blood pressure (mm Hg)": 0.18512673205801747,
+        "Number of times pregnant": 1.0,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.13073352406886674,
+        "Triceps skin fold thickness (mm)": -0.08522230764950285
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": 0.21320580456193106,
+        "Age (years)": 0.28504471995581177,
+        "Body mass index (weight in kg/(height in m)^2)": 0.23114119425993723,
+        "Class variable": 0.4871253007717644,
+        "Diabetes pedigree function": 0.09129336487628698,
+        "Diastolic blood pressure (mm Hg)": 0.2351906134781835,
+        "Number of times pregnant": 0.13073352406886674,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 1.0,
+        "Triceps skin fold thickness (mm)": 0.06002215292552161
+      },
+      {
+        "2-Hour serum insulin (mu U/ml)": 0.5410001366628013,
+        "Age (years)": -0.06679492114381454,
+        "Body mass index (weight in kg/(height in m)^2)": 0.44361450828836047,
+        "Class variable": 0.20846219237827066,
+        "Diabetes pedigree function": 0.18039048342264027,
+        "Diastolic blood pressure (mm Hg)": 0.12648587140494302,
+        "Number of times pregnant": -0.08522230764950285,
+        "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 0.06002215292552161,
+        "Triceps skin fold thickness (mm)": 1.0
+      }
+    ],
+    "alerts": [
+      "[2-Hour serum insulin (mu U/ml)] is highly overall correlated with [Triceps skin fold thickness (mm)]",
+      "[Age (years)] is highly overall correlated with [Number of times pregnant]",
+      "[Number of times pregnant] is highly overall correlated with [Age (years)]",
+      "[Triceps skin fold thickness (mm)] is highly overall correlated with [2-Hour serum insulin (mu U/ml)]",
+      "[Number of times pregnant] has 111 (14.5%) zeros",
+      "[Diastolic blood pressure (mm Hg)] has 35 (4.6%) zeros",
+      "[Triceps skin fold thickness (mm)] has 227 (29.6%) zeros",
+      "[2-Hour serum insulin (mu U/ml)] has 374 (48.7%) zeros",
+      "[Body mass index (weight in kg/(height in m)^2)] has 11 (1.4%) zeros"
+    ],
+    "samples": [
+      {
+        "id": "head",
+        "data": [
+          {
+            "Number of times pregnant": 6,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 148,
+            "Diastolic blood pressure (mm Hg)": 72,
+            "Triceps skin fold thickness (mm)": 35,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 33.6,
+            "Diabetes pedigree function": 0.627,
+            "Age (years)": 50,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 1,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 85,
+            "Diastolic blood pressure (mm Hg)": 66,
+            "Triceps skin fold thickness (mm)": 29,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 26.6,
+            "Diabetes pedigree function": 0.351,
+            "Age (years)": 31,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 8,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 183,
+            "Diastolic blood pressure (mm Hg)": 64,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 23.3,
+            "Diabetes pedigree function": 0.672,
+            "Age (years)": 32,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 1,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 89,
+            "Diastolic blood pressure (mm Hg)": 66,
+            "Triceps skin fold thickness (mm)": 23,
+            "2-Hour serum insulin (mu U/ml)": 94,
+            "Body mass index (weight in kg/(height in m)^2)": 28.1,
+            "Diabetes pedigree function": 0.167,
+            "Age (years)": 21,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 0,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 137,
+            "Diastolic blood pressure (mm Hg)": 40,
+            "Triceps skin fold thickness (mm)": 35,
+            "2-Hour serum insulin (mu U/ml)": 168,
+            "Body mass index (weight in kg/(height in m)^2)": 43.1,
+            "Diabetes pedigree function": 2.288,
+            "Age (years)": 33,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 5,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 116,
+            "Diastolic blood pressure (mm Hg)": 74,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 25.6,
+            "Diabetes pedigree function": 0.201,
+            "Age (years)": 30,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 3,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 78,
+            "Diastolic blood pressure (mm Hg)": 50,
+            "Triceps skin fold thickness (mm)": 32,
+            "2-Hour serum insulin (mu U/ml)": 88,
+            "Body mass index (weight in kg/(height in m)^2)": 31.0,
+            "Diabetes pedigree function": 0.248,
+            "Age (years)": 26,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 10,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 115,
+            "Diastolic blood pressure (mm Hg)": 0,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 35.3,
+            "Diabetes pedigree function": 0.134,
+            "Age (years)": 29,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 2,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 197,
+            "Diastolic blood pressure (mm Hg)": 70,
+            "Triceps skin fold thickness (mm)": 45,
+            "2-Hour serum insulin (mu U/ml)": 543,
+            "Body mass index (weight in kg/(height in m)^2)": 30.5,
+            "Diabetes pedigree function": 0.158,
+            "Age (years)": 53,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 8,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 125,
+            "Diastolic blood pressure (mm Hg)": 96,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 0.0,
+            "Diabetes pedigree function": 0.232,
+            "Age (years)": 54,
+            "Class variable": 1
+          }
+        ],
+        "name": "First rows",
+        "caption": null
+      },
+      {
+        "id": "tail",
+        "data": [
+          {
+            "Number of times pregnant": 1,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 106,
+            "Diastolic blood pressure (mm Hg)": 76,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 37.5,
+            "Diabetes pedigree function": 0.197,
+            "Age (years)": 26,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 6,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 190,
+            "Diastolic blood pressure (mm Hg)": 92,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 35.5,
+            "Diabetes pedigree function": 0.278,
+            "Age (years)": 66,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 2,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 88,
+            "Diastolic blood pressure (mm Hg)": 58,
+            "Triceps skin fold thickness (mm)": 26,
+            "2-Hour serum insulin (mu U/ml)": 16,
+            "Body mass index (weight in kg/(height in m)^2)": 28.4,
+            "Diabetes pedigree function": 0.766,
+            "Age (years)": 22,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 9,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 170,
+            "Diastolic blood pressure (mm Hg)": 74,
+            "Triceps skin fold thickness (mm)": 31,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 44.0,
+            "Diabetes pedigree function": 0.403,
+            "Age (years)": 43,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 9,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 89,
+            "Diastolic blood pressure (mm Hg)": 62,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 22.5,
+            "Diabetes pedigree function": 0.142,
+            "Age (years)": 33,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 10,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 101,
+            "Diastolic blood pressure (mm Hg)": 76,
+            "Triceps skin fold thickness (mm)": 48,
+            "2-Hour serum insulin (mu U/ml)": 180,
+            "Body mass index (weight in kg/(height in m)^2)": 32.9,
+            "Diabetes pedigree function": 0.171,
+            "Age (years)": 63,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 2,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 122,
+            "Diastolic blood pressure (mm Hg)": 70,
+            "Triceps skin fold thickness (mm)": 27,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 36.8,
+            "Diabetes pedigree function": 0.34,
+            "Age (years)": 27,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 5,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 121,
+            "Diastolic blood pressure (mm Hg)": 72,
+            "Triceps skin fold thickness (mm)": 23,
+            "2-Hour serum insulin (mu U/ml)": 112,
+            "Body mass index (weight in kg/(height in m)^2)": 26.2,
+            "Diabetes pedigree function": 0.245,
+            "Age (years)": 30,
+            "Class variable": 0
+          },
+          {
+            "Number of times pregnant": 1,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 126,
+            "Diastolic blood pressure (mm Hg)": 60,
+            "Triceps skin fold thickness (mm)": 0,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 30.1,
+            "Diabetes pedigree function": 0.349,
+            "Age (years)": 47,
+            "Class variable": 1
+          },
+          {
+            "Number of times pregnant": 1,
+            "Plasma glucose concentration a 2 hours in an oral glucose tolerance test": 93,
+            "Diastolic blood pressure (mm Hg)": 70,
+            "Triceps skin fold thickness (mm)": 31,
+            "2-Hour serum insulin (mu U/ml)": 0,
+            "Body mass index (weight in kg/(height in m)^2)": 30.4,
+            "Diabetes pedigree function": 0.315,
+            "Age (years)": 23,
+            "Class variable": 0
+          }
+        ],
+        "name": "Last rows",
+        "caption": null
+      }
+    ]
+  }
+}
