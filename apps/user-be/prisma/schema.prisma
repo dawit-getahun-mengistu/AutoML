@@ -50,6 +50,9 @@ model Project {
   name        String
   description String?
 
+  taskType         TaskType?
+  task_description String?
+
   status ProjectStatus
 
   // Foreign key relation
@@ -78,9 +81,29 @@ enum DatasetStatus {
   ARCHIVED
 }
 
+enum ProcessStatus {
+  NOT_STARTED
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum TaskType {
+  CLASSIFICATION
+  REGRESSION
+  CLUSTERING
+  ANOMALY_DETECTION
+  TIME_SERIES_FORECASTING
+}
+
+enum TrainingType {
+  CLASSICAL
+  NAS
+}
+
 enum DatasetFormat {
   CSV
-  JSON
   EXCEL
 }
 
@@ -97,6 +120,28 @@ model Dataset {
   size   Int?
   rows   Int?
   cols   Int?
+
+  profiling_context           Json? // LLM context for profiling
+  feature_selection_context   Json? // LLM context for feature selection
+  feature_engineering_context Json? // LLM context for feature engineering
+  training_context            Json? // LLM context for training
+
+  profiling_metadata           Json? // Metadata from profiling
+  feature_selection_metadata   Json? // Metadata from feature selection and engineering
+  feature_engineering_metadata Json? // Metadata from feature engineering
+  training_metadata            Json? // Metadata from training
+
+  profilingStatus          ProcessStatus @default(PENDING)
+  featureSelectionStatus   ProcessStatus @default(NOT_STARTED)
+  featureEngineeringStatus ProcessStatus @default(NOT_STARTED)
+  trainingStatus           ProcessStatus @default(NOT_STARTED)
+
+  // Errors
+  profilingError          String? @default("")
+  featureSelectionError   String? @default("")
+  featureEngineeringError String? @default("")
+  trainingError           String? @default("")
+  llmError                String? @default("")
 
   // Relations (Assuming attributes)
   attributes Attribute[]

@@ -99,4 +99,30 @@ export class DatasetService {
     );
     return url.replace('seaweedfs-s3', process.env.SEAWEED_EXTERNAL_ENDPOINT || 'localhost');
   }
+
+
+  // start dataset profiling
+  async startProfiling(id: string) {
+    const dataset = await this.prisma.dataset.findUnique({ where: { id } });
+
+    if (!dataset) {
+      throw new NotFoundException(`Dataset with ID ${id} not found`);
+    }
+
+    // // Check if the dataset is already being profiled
+    // if (dataset.status === DatasetStatus.PROFILING) {
+    //   throw new Error(`Dataset with ID ${id} is already being profiled`);
+    // }
+
+    // // Update dataset status to PROFILING
+    // await this.prisma.dataset.update({
+    //   where: { id },
+    //   data: { status: DatasetStatus.PROFILING },
+    // });
+
+    // // Here you would typically send a message to a message queue to start profiling
+    // // For example, using RabbitMQ or Kafka
+
+    // return { message: `Profiling started for dataset with ID ${id}` };
+  }
 }
