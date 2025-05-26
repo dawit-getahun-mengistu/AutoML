@@ -103,3 +103,20 @@
 //     </AuthLayout>
 //   );
 // }
+"use client"
+import { PlatformInfo } from "@/components/ui/platform-info"
+import { AuthForm } from "@/components/ui/auth-form"
+
+export default function Signin() {
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      {/* Left side - Platform info */}
+      <PlatformInfo />
+
+      {/* Right side - Sign in form */}
+      <AuthForm
+        mode="signin"
+      />
+    </div>
+  )
+}

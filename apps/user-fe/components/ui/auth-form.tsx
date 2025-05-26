@@ -2,12 +2,15 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { CuboidIcon as Cube } from "lucide-react"
+import { login, signup } from "@/lib/features/auth/authActions"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { useRouter } from "next/navigation"
 
 export type AuthMode = "signin" | "signup"
 
@@ -32,7 +35,7 @@ interface AuthFormProps {
   alternateActionText?: string
   alternateActionLink?: string
   alternateActionLinkText?: string
-  onSubmit?: (data: Record<string, string>) => void
+  
   logoIcon?: React.ReactNode
 }
 
@@ -58,10 +61,27 @@ export function AuthForm({
   alternateActionText = mode === "signin" ? "Don't have an account?" : "Already have an account?",
   alternateActionLink = mode === "signin" ? "/signup" : "/",
   alternateActionLinkText = mode === "signin" ? "Sign up" : "Sign in",
-  onSubmit,
   logoIcon = <Cube className="h-5 w-5 text-blue-600" />,
 }: AuthFormProps) {
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { status, error, access_token, userInfo, refresh_token } = useAppSelector((state) => state.auth)
   const [formData, setFormData] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (access_token && refresh_token) {
+      console.log("Access token detected! Redirecting...")
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
+        router.push("/dashboard")
+    }
+  }, [access_token, refresh_token, router])
+
+  useEffect(() => {
+    if (userInfo) {
+      localStorage.setItem("userInfo", JSON.stringify(userInfo))
+    }
+  }, [userInfo])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -70,10 +90,32 @@ export function AuthForm({
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (onSubmit) {
-      onSubmit(formData)
+    
+    if (mode === "signup") {
+      const signupResult = await dispatch(signup({
+        email: formData.email,
+        username: formData.name,
+        password: formData.password
+      }))
+      
+      if (signup.fulfilled.match(signupResult)) {
+        // Login after successful signup
+        await dispatch(login({ 
+          email: formData.email, 
+          password: formData.password, 
+          username: formData.name 
+        }))
+      }
+    } else if (mode === "signin") {
+      await dispatch(
+              login({
+                email: formData.email, 
+                username: "",
+                password: formData.password,
+              })
+            );
     }
   }
 
@@ -104,6 +146,10 @@ export function AuthForm({
             </div>
           ))}
 
+          {typeof error === "string" && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+
           {showRememberMe && showForgotPassword && (
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -118,8 +164,12 @@ export function AuthForm({
             </div>
           )}
 
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-            {submitLabel}
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            disabled={status === "loading"}
+          >
+            {status === "loading" ? "Loading..." : submitLabel}
           </Button>
 
           {showGoogleAuth && (

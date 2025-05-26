@@ -648,14 +648,23 @@
 import { useProjects } from "@/lib/projects-context"
 import { EmptyProject } from "@/components/dashboard/empty-project"
 import { CuboidIcon as Cube } from "lucide-react"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+    const router = useRouter();
+    const {
+    access_token,
+  } = useAppSelector((state) => state.auth);
+  useEffect(() => {
+        if (!access_token) {
+          router.push("/");
+        }});
   const { projects } = useProjects()
-
   if (projects.length === 0) {
     return <EmptyProject />
   }
-
   return (
     <div className="flex-1 overflow-auto p-8">
       <div className="max-w-5xl mx-auto">

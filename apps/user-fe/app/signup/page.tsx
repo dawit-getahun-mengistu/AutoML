@@ -92,10 +92,6 @@ export default function Signup() {
       {/* Right side - Sign in form */}
       <AuthForm
         mode="signup"
-        onSubmit={(data) => {
-          console.log("Form submitted:", data)
-          // Handle authentication logic here
-        }}
       />
     </div>
   )

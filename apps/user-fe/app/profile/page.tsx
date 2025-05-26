@@ -1,15 +1,50 @@
-import { UserIcon, Mail, Key, Bell } from "lucide-react"
+"use client"
+
+import { UserIcon, Mail, Key, Bell, LogOut } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { logout } from "@/lib/features/auth/authActions"
+import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { status: authStatus } = useAppSelector((state) => state.auth)
+
+  const handleLogout = () => {
+    dispatch(logout())
+      .unwrap()
+      .then(() => {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("access_token")
+          localStorage.removeItem("refresh_token")
+          router.push("/")
+        }
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error)
+      })
+  }
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <div className="flex items-center mb-8">
-        <UserIcon className="h-6 w-6 text-blue-600 mr-3" />
-        <h1 className="text-2xl font-bold">User Profile</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <UserIcon className="h-6 w-6 text-blue-600 mr-3" />
+          <h1 className="text-2xl font-bold">User Profile</h1>
+        </div>
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          disabled={authStatus === "loading"}
+          className="flex items-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          {authStatus === "loading" ? "Logging Out..." : "Logout"}
+        </Button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
