@@ -23,12 +23,19 @@ import { DatasetFormat } from '@prisma/client';
 import { Response } from 'express';
 import { ApiDefaultResponses } from 'src/decorators';
 import { DatasetService } from '../services/dataset.service';
+import { get } from 'http';
+import { getFileValidator } from './file-type-validaor';
 
 
 
 @Controller('datasets')
 export class DatasetController {
+  /**
+   * Controller for managing datasets, including uploading, retrieving, updating, and deleting datasets.
+   * It also provides functionality to download dataset files.
+   */
   constructor(private readonly datasetService: DatasetService) {}
+
 
   @ApiOperation({ summary: 'Upload a dataset with metadata' })
   @ApiConsumes('multipart/form-data')
@@ -52,10 +59,11 @@ export class DatasetController {
   async create(
     @Body() createDatasetDto: CreateDatasetDto,
     @UploadedFile(
+      getFileValidator(), // Custom file type validator 
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 100 * 1024 * 1024 }), // 100MB
-          new FileTypeValidator({ fileType: /(csv|json|xlsx)/ }), // Allow CSV, JSON, Excel
+          // new FileTypeValidator({ fileType: /(csv|json|xlsx)/ }), // Allow CSV, JSON, Excel
         ],
       }),
     )
