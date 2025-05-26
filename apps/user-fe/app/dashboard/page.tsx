@@ -649,65 +649,99 @@ import { useProjects } from "@/lib/projects-context"
 import { EmptyProject } from "@/components/dashboard/empty-project"
 import { CuboidIcon as Cube } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchProjects } from "@/lib/features/project/projectActions";
+import { refresh } from "@/lib/features/auth/authActions";
 
 export default function DashboardPage() {
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    const [isLoading, setIsLoading] = useState(true);
     const {
-    access_token,
-  } = useAppSelector((state) => state.auth);
-  useEffect(() => {
+        access_token,
+        error: authError,
+    } = useAppSelector((state) => state.auth);
+    const { 
+      projects,
+      error:projectError
+     } = useAppSelector((state) => state.project);
+    useEffect(() => {
+      if (projectError) {
+        // console.log("use Effect projectError", projectError);
+        if (projectError == "Unauthorized") {
+          dispatch(refresh());
+        }
+      }
+    }, [projectError]);
+  
+    useEffect(() => {
         if (!access_token) {
-          router.push("/");
-        }});
-  const { projects } = useProjects()
-  if (projects.length === 0) {
-    return <EmptyProject />
-  }
-  return (
-    <div className="flex-1 overflow-auto p-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center mb-8">
-          <div className="bg-blue-50 p-3 rounded-lg mr-4">
-            <Cube className="h-8 w-8 text-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">AutoML Dashboard</h1>
-            <p className="text-gray-500">Build, train, and deploy machine learning models with zero code</p>
-          </div>
-        </div>
+            router.push("/");
+        } else if (access_token) {
+            dispatch(fetchProjects())
+                .unwrap()
+                .then(() => {
+                    setIsLoading(false);
+                })
+                // .catch((error) => {
+                //     console.error("Error fetching projects:", error);
+                //     setIsLoading(false);
+                // });
+        } else if (authError) {
+            router.push("/");
+        }
+    }, [access_token, dispatch, router, authError]);
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <a
-              key={project.id}
-              href={`/dashboard/${project.id}/data`}
-              className="block bg-white border rounded-lg p-6 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="bg-blue-50 p-2 rounded-lg">
-                  <Cube className="h-5 w-5 text-blue-600" />
+    if (isLoading) return null;
+
+    if (projects.length === 0) {
+        return <EmptyProject />
+    }
+
+    return (
+        <div className="flex-1 overflow-auto p-8">
+            <div className="max-w-5xl mx-auto">
+                <div className="flex items-center mb-8">
+                    <div className="bg-blue-50 p-3 rounded-lg mr-4">
+                        <Cube className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">AutoML Dashboard</h1>
+                        <p className="text-gray-500">Build, train, and deploy machine learning models with zero code</p>
+                    </div>
                 </div>
-                <div
-                  className={`text-xs font-medium px-2 py-1 rounded-full ${
-                    project.status === "active"
-                      ? "bg-green-100 text-green-800"
-                      : project.status === "inactive"
-                        ? "bg-gray-100 text-gray-800"
-                        : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {projects.map((project) => (
+                        <a
+                            key={project.id}
+                            href={`/dashboard/data/${project.id}`}
+                            className="block bg-white border rounded-lg p-6 hover:shadow-md transition-shadow"
+                        >
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="bg-blue-50 p-2 rounded-lg">
+                                    <Cube className="h-5 w-5 text-blue-600" />
+                                </div>
+                                <div
+                                    className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                        project.status === "active"
+                                            ? "bg-green-100 text-green-800"
+                                            : project.status === "inactive"
+                                                ? "bg-gray-100 text-gray-800"
+                                                : "bg-blue-100 text-blue-800"
+                                    }`}
+                                >
+                                    {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">{project.name}</h3>
+                            <p className="text-gray-500 text-sm mb-4 line-clamp-2">{project.description}</p>
+                            <div className="text-xs text-gray-400">Created {new Date(project.createdAt).toLocaleDateString()}</div>
+                        </a>
+                    ))}
                 </div>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{project.name}</h3>
-              <p className="text-gray-500 text-sm mb-4 line-clamp-2">{project.description}</p>
-              <div className="text-xs text-gray-400">Created {new Date(project.createdAt).toLocaleDateString()}</div>
-            </a>
-          ))}
+            </div>
         </div>
-      </div>
-    </div>
-  )
+    )
 }

@@ -4,25 +4,47 @@ import { useProjects } from "@/lib/projects-context"
 import { Rocket, ServerIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { use } from "react"
+import { use, useEffect} from "react"
 import { ProjectHeader } from "@/components/dashboard/project-header"
-
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { createProject, fetchProjects } from "@/lib/features/project/projectActions"
+import { refresh } from "@/lib/features/auth/authActions"
+import {useRouter} from "next/navigation"
 type PageParams = {
-  projectId: string
+  projectId: string[]
 }
 
 export default function DeployTestPage({ params }: { params: Promise<PageParams> }) {
-  const { projects } = useProjects()
+  const router = useRouter();
+  const { projects, status: projectStatus, error: projectError } = useAppSelector((state) => state.project)
+  const { access_token, refresh_token, error:authError } = useAppSelector((state) => state.auth)
   const unwrappedParams = use(params)
-  const project = projects.find((p) => p.id === unwrappedParams.projectId)
-
+  const project = projects.find((p) => p.id === unwrappedParams.projectId.join("/"))
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    if (projectError) {
+      // console.log("use Effect projectError", projectError);
+      if (projectError == "Unauthorized") {
+        dispatch(refresh());
+      }
+    }
+  }, [projectError]);
+  useEffect(() => {
+    if (access_token) {
+        dispatch(fetchProjects())
+            .unwrap()
+            .then(() => {
+               
+            })
+    }
+}, [access_token, dispatch, router, authError]);
   if (!project) {
     return <div className="p-8">Project not found</div>
   }
 
   return (
     <>
-      <ProjectHeader projectId={unwrappedParams.projectId} />
+      <ProjectHeader projectId={project.id} />
       <div className="p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">

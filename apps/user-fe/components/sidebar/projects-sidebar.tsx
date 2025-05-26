@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -12,35 +12,82 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useProjects } from "@/lib/projects-context"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { createProject, fetchProjects } from "@/lib/features/project/projectActions"
+import { jwtDecode } from "jwt-decode"
+import { refresh } from "@/lib/features/auth/authActions"
 
 export function ProjectsSidebar() {
+  const router = useRouter();
   const pathname = usePathname()
-  const router = useRouter()
-  const { projects, addProject } = useProjects()
+  const dispatch = useAppDispatch()
+  const { projects, status: projectStatus, error: projectError } = useAppSelector((state) => state.project)
+  const { access_token, refresh_token, error:authError } = useAppSelector((state) => state.auth)
   const [open, setOpen] = useState(false)
   const [newProject, setNewProject] = useState({
     name: "",
     description: "",
-    status: "active",
+    status: "ACTIVE",
   })
 
+  useEffect(() => {
+    if (projectError) {
+      // console.log("use Effect projectError", projectError);
+      if (projectError == "Unauthorized") {
+        dispatch(refresh());
+      }
+    }
+  }, [projectError]);
+
+  useEffect(() => {
+    if (access_token) {
+        dispatch(fetchProjects())
+            .unwrap()
+            .then(() => {
+               
+            })
+            // .catch((error) => {
+            //     console.error("Error fetching projects:", error);
+            //     setIsLoading(false);
+            // });
+    }
+}, [access_token, dispatch, router, authError]);
   const handleCreateProject = () => {
     if (newProject.name.trim()) {
-      const projectId = `proj-${Date.now()}`
-      addProject({
-        id: projectId,
-        name: newProject.name,
-        description: newProject.description,
-        status: newProject.status,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      setNewProject({ name: "", description: "", status: "active" })
-      setOpen(false)
+      const userInfoString = localStorage.getItem("userInfo")
+      let userId = "unknown"
+      
+      if (userInfoString) {
+        try {
+          const userInfo = JSON.parse(userInfoString)
+          userId = userInfo.id
+        } catch (error) {
+          console.error("Error parsing userInfo:", error)
+        }
+      } else if (access_token && refresh_token) {
+        try {
+          const decoded = jwtDecode<{
+            userId: string
+            userName: string
+            iat: number
+            exp: number
+          }>(access_token)
+          userId = decoded.userId
+        } catch (error) {
+          console.error("Error decoding JWT:", error)
+        }
+      }
 
-      // Navigate to the new project's data page
-      router.push(`/dashboard/${projectId}/data`)
+      dispatch(
+        createProject({
+          name: newProject.name,
+          description: newProject.description,
+          status: newProject.status,
+          userId: userId,
+        })
+      )
+      setNewProject({ name: "", description: "", status: "ACTIVE" })
+      setOpen(false)
     }
   }
 
@@ -88,14 +135,18 @@ export function ProjectsSidebar() {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
+                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="INACTIVE">Inactive</SelectItem>
+                      <SelectItem value="DONE">Done</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <Button onClick={handleCreateProject} className="w-full">
-                  Create Project
+                <Button 
+                  onClick={handleCreateProject} 
+                  className="w-full"
+                  disabled={projectStatus === "loading"}
+                >
+                  {projectStatus === "loading" ? "Creating..." : "Create Project"}
                 </Button>
               </div>
             </DialogContent>
@@ -119,10 +170,11 @@ export function ProjectsSidebar() {
         ) : (
           <div className="space-y-2">
             {projects.map((project) => {
-              const isActive = pathname.includes(`/dashboard/${project.id}`)
+          
+              const isActive = pathname.endsWith(project.id)
 
               return (
-                <Link key={project.id} href={`/dashboard/${project.id}/data`}>
+                <Link key={project.id} href={`/dashboard/data/${project.id}`}>
                   <div
                     className={cn(
                       "flex items-center space-x-2 px-3 py-2 rounded-md text-sm",

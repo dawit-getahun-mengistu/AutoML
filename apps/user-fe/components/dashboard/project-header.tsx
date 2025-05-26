@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { FolderIcon, PencilIcon, TrashIcon } from "lucide-react"
@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useProjects } from "@/lib/projects-context"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { fetchProjects } from "@/lib/features/project/projectActions"
 import { cn } from "@/lib/utils"
+import { refresh } from "@/lib/features/auth/authActions"
 
 interface ProjectHeaderProps {
   projectId: string
@@ -20,7 +22,10 @@ interface ProjectHeaderProps {
 export function ProjectHeader({ projectId }: ProjectHeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { projects, updateProject, deleteProject } = useProjects()
+  const dispatch = useAppDispatch()
+  // const { updateProject, deleteProject } = useProjects()
+  const { projects, status: projectStatus, error: projectError } = useAppSelector((state) => state.project)
+  const { access_token, refresh_token, error:authError } = useAppSelector((state) => state.auth)
   const project = projects.find((p) => p.id === projectId)
 
   const [editProject, setEditProject] = useState({
@@ -28,27 +33,27 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
     description: project?.description || "",
     status: project?.status || "active",
   })
-
+ 
   const [open, setOpen] = useState(false)
 
   const handleUpdateProject = () => {
-    if (project && editProject.name.trim()) {
-      updateProject(projectId, {
-        ...project,
-        name: editProject.name,
-        description: editProject.description,
-        status: editProject.status,
-        updatedAt: new Date(),
-      })
-      setOpen(false)
-    }
+    // if (project && editProject.name.trim()) {
+    //   updateProject(projectId, {
+    //     ...project,
+    //     name: editProject.name,
+    //     description: editProject.description,
+    //     status: editProject.status,
+    //     updatedAt: new Date(),
+    //   })
+    //   setOpen(false)
+    // }
   }
 
   const handleDeleteProject = () => {
-    if (project) {
-      deleteProject(projectId)
-      router.push("/dashboard")
-    }
+    // if (project) {
+    //   deleteProject(projectId)
+    //   router.push("/dashboard")
+    // }
   }
 
   if (!project) {
@@ -56,7 +61,7 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
   }
 
   // Get the current section from the pathname
-  const section = pathname.split("/").pop() || "data"
+  const section = pathname.split("/").slice(-2, -1)[0] || "data"
 
   const sections = [
     { name: "Data", path: "data" },
@@ -67,6 +72,23 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
     { name: "Predictions", path: "predictions" },
     { name: "Reports", path: "reports" },
   ]
+  useEffect(() => {
+    if (projectError) {
+      // console.log("use Effect projectError", projectError);
+      if (projectError == "Unauthorized") {
+        dispatch(refresh());
+      }
+    }
+  }, [projectError]);
+  useEffect(() => {
+    if (access_token) {
+        dispatch(fetchProjects())
+            .unwrap()
+            .then(() => {
+               
+            })
+    }
+}, [access_token, dispatch, router, authError]);
 
   return (
     <div className="border-b">
@@ -78,7 +100,7 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
           </div>
           <div className="text-sm text-gray-500 mt-1">
             Last updated:{" "}
-            {new Date(project.updatedAt).toLocaleString(undefined, {
+            {new Date(project.createdAt).toLocaleString(undefined, {
               hour: "numeric",
               minute: "numeric",
               hour12: true,
@@ -155,11 +177,11 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
       <div className="flex border-t">
         {sections.map((item) => {
           const isActive = section === item.path
-
+      
           return (
             <Link
               key={item.path}
-              href={`/dashboard/${projectId}/${item.path}`}
+              href={`/dashboard/${item.path}/${projectId}`}
               className={cn(
                 "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
                 isActive

@@ -7,32 +7,76 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState } from "react"
-import { useProjects } from "@/lib/projects-context"
+import { useEffect, useState } from "react"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { createProject } from "@/lib/features/project/projectActions"
+import { useRouter } from "next/navigation"
+import { jwtDecode } from "jwt-decode"
+import { refresh } from "@/lib/features/auth/authActions"
 
 export function EmptyProject() {
-  const { addProject } = useProjects()
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const {access_token, refresh_token } = useAppSelector((state) => state.auth)
+    const {
+    error: projectError,
+  } = useAppSelector((state) => state.project);
   const [newProject, setNewProject] = useState({
     name: "",
     description: "",
-    status: "active",
+    status: "ACTIVE",
   })
   const [open, setOpen] = useState(false)
 
   const handleCreateProject = () => {
     if (newProject.name.trim()) {
-      addProject({
-        id: `proj-${Date.now()}`,
-        name: newProject.name,
-        description: newProject.description,
-        status: newProject.status,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      setNewProject({ name: "", description: "", status: "active" })
+      let userId = "unknown"
+      
+      // Try to get userId from localStorage first
+      const userInfoString = localStorage.getItem("userInfo")
+      if (userInfoString) {
+        try {
+          const parsedUserInfo = JSON.parse(userInfoString)
+          userId = parsedUserInfo.id
+        } catch (error) {
+          console.error("Error parsing userInfo:", error)
+        }
+      } 
+      // If not in localStorage, try to get from JWT tokens
+      else if (access_token && refresh_token) {
+        try {
+          const decoded = jwtDecode<{
+            userId: string
+            userName: string
+            iat: number
+            exp: number
+          }>(access_token)
+          userId = decoded.userId
+        } catch (error) {
+          console.error("Error decoding JWT:", error)
+        }
+      }
+
+      dispatch(
+        createProject({
+          name: newProject.name,
+          description: newProject.description,
+          status: newProject.status,
+          userId: userId,
+        })
+      )
+      setNewProject({ name: "", description: "", status: "ACTIVE" })
       setOpen(false)
     }
   }
+    useEffect(() => {
+    if (projectError) {
+      // console.log("use Effect projectError", projectError);
+      if (projectError == "Unauthorized") {
+        dispatch(refresh());
+      }
+    }
+  }, [projectError]);
 
   return (
     <div className="flex flex-col items-center justify-center h-full text-center p-8">
@@ -69,7 +113,7 @@ export function EmptyProject() {
               <Textarea
                 id="description"
                 value={newProject.description}
-                onChange={(e:any) => setNewProject({ ...newProject, description: e.target.value })}
+                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
                 placeholder="Enter project description"
               />
             </div>
@@ -77,15 +121,15 @@ export function EmptyProject() {
               <Label htmlFor="status">Status</Label>
               <Select
                 value={newProject.status}
-                onValueChange={(value:any) => setNewProject({ ...newProject, status: value })}
+                onValueChange={(value) => setNewProject({ ...newProject, status: value })}
               >
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="INACTIVE">Inactive</SelectItem>
+                  <SelectItem value="DONE">Done</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -78,23 +78,12 @@ const navItems = [
 
 export function MainSidebar() {
   const pathname = usePathname()
+  console.log("pathname",pathname)
 
   // Get the current active section
   const pathParts = pathname.split("/")
-  const projectId = pathParts.length > 2 ? pathParts[2] : ""
-  const currentSection = pathParts.length > 3 ? pathParts[3] : ""
-
-  // Find the active item
-  const activeItem = navItems.find((item) =>
-    item.projectSpecific
-      ? currentSection === item.path
-      : item.fullPath
-        ? pathname === item.fullPath
-        : pathname === `/dashboard/${item.path}`,
-  )
-
-  // Get related paths from the active item
-//   const relatedPaths = activeItem?.relatedTo || []
+  const currentSection = pathParts.length > 2 ? pathParts[2] : ""
+  const projectId = pathParts.length > 3 ? pathParts[3] : ""
 
   return (
     <div className="h-screen w-16 bg-white border-r flex flex-col items-center py-8">
@@ -127,7 +116,7 @@ export function MainSidebar() {
               ? item.fullPath
               : item.projectSpecific
                 ? projectId
-                  ? `/dashboard/${projectId}/${item.path}`
+                  ? `/dashboard/${item.path}/${projectId}`
                   : "#"
                 : `/dashboard/${item.path}`
 
