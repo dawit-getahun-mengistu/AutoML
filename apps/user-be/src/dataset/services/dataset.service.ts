@@ -3,10 +3,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateDatasetDto } from './../dto/create-dataset.dto';
 import { UpdateDatasetDto } from './../dto/update-dataset.dto';
-import { DatasetStatus, ProcessStatus } from '@prisma/client';
+import { DatasetStatus, ProcessStatus, } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { StorageService } from 'SeaweedClient';
 import { ProducerService } from 'src/rmq/producer.service';
+import { ProfilingService } from './profiling.service';
 
 @Injectable()
 export class DatasetService {
@@ -14,11 +15,13 @@ export class DatasetService {
     private prisma: PrismaService,
     private storageService: StorageService,
     private producerService: ProducerService,
+    private profilingService: ProfilingService
   ) {}
 
   async create(
     createDatasetDto: CreateDatasetDto,
     file: Express.Multer.File,
+    start_profiling: boolean = false,
   ) {
     const { projectId, name, description, format } = createDatasetDto;
 
@@ -41,10 +44,16 @@ export class DatasetService {
     });
 
     // Send message to the queue to start profiling
-    const msg = await this.producerService.sendToQueue(
-      this.producerService.queues[0], 
-      dataset,
-    );
+    if (start_profiling){
+      const msg = await this.producerService.sendToQueue(
+        this.producerService.queues[0], 
+        dataset,
+      );
+      return {
+        dataset: dataset,
+        msg: msg
+      }
+    }
 
     return dataset;
   }
@@ -110,9 +119,7 @@ export class DatasetService {
     return url.replace('seaweedfs-s3', process.env.SEAWEED_EXTERNAL_ENDPOINT || 'localhost');
   }
 
-
-  // start dataset profiling
-  async startProfiling(id: string) {
+  async startDatasetProfiling(id: string) {
     const dataset = await this.prisma.dataset.findUnique({ where: { id }});
 
     if (!dataset) {
@@ -120,41 +127,13 @@ export class DatasetService {
     }
 
     // Check if the dataset is already being profiled
-    if ( dataset.profilingStatus === ProcessStatus.IN_PROGRESS) {
-      throw new Error(`Dataset with ID ${id} is already being profiled`);
-    }
+      if ( dataset.profilingStatus === ProcessStatus.IN_PROGRESS) {
+        throw new Error(`Dataset with ID ${id} is already being profiled`);
+      }
 
-    // Update dataset status to PROFILING
-    await this.prisma.dataset.update({
-      where: { id },
-      data: { status: DatasetStatus.PROCESSING, profilingStatus: ProcessStatus.IN_PROGRESS },
-    });
-    
-    // Here you would typically send a message to a message queue to start profiling
-    // For example, using RabbitMQ or Kafka
-    await this.producerService.sendToQueue(
-      this.producerService.queues[0], 
-      dataset,
-    );
-
-    return { message: `Profiling started for dataset with ID ${id}` };
-  }
-
-  // process profiling result
-  async updateDatasetProfilingData(id: string, report: any) {
-    try{
-      await this.prisma.dataset.update({
-        where: {id},
-        data: {profiling_metadata: report as any, profilingStatus: ProcessStatus.COMPLETED}
-      })
-      return {msg : "Profiling Success"}
-    } catch (err) {
-      await this.prisma.dataset.update({
-        where: {id},
-        data: {profilingStatus: ProcessStatus.FAILED, profilingError: err.message}
-      })
-
-    }
+    // Start profiling
+    return await this.profilingService.startProfiling(id, dataset)
 
   }
+
 }
