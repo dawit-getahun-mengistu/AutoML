@@ -92,7 +92,8 @@ services:
       context: ./data-profiling-node
       dockerfile: Dockerfile
     volumes:
-      - ./data-profiling-node:/app
+      - ./data-profiling-node:/profiling
+      - /profiling/.venv
     env_file:
       - .env
     restart: on-failure

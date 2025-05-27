@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from consumer import start_consumer
+from src.consumer import start_consumer
 import asyncio
 
 app = FastAPI(title="Data Profiling Node", on_startup=start_consumer())

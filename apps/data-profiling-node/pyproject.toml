@@ -16,6 +16,7 @@ dependencies = [
     "pyright>=1.1.400",
     "ruff>=0.11.9",
     "scipy>=1.15.3",
+    "seaweeds3client",
     "setuptools>=80.8.0",
     "types-pika>=1.2.0b1",
     "uvicorn>=0.34.2",
@@ -26,3 +27,6 @@ dependencies = [
 pythonVersion = "3.11" 
 venvPath = "."
 venv = ".venv"
+
+[tool.uv.sources]
+seaweeds3client = { git = "https://github.com/WildCayote/AutoML.git", subdirectory = "common/python/SeaweedS3Client" }

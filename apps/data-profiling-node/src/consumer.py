@@ -1,31 +1,46 @@
 import json
+import logging
 import pika
 import threading
 import os
 from src.data_utils import Dataset
+from src.services.profiling_service import ProfilingService
 
 # RabbitMQ Configuration
 RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "rabbitmq")
 QUEUE_NAME = os.environ.get("DATA_PROFILING_REQUEST_QUEUE", "DATA_PROFILING_REQUEST_QUEUE")
 
 
-def process_message(ch, method, properties, body):
+# Logger Config
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+
+def process_message(ch, method, properties, body) -> None:
     """Callback function to process received messages"""
-    print(f"Received message: {body.decode()}")
+    logger.info(f"Received message: {body.decode()}")
 
     try:
         # Decode message
         message_data = json.loads(body.decode())
         dataset = Dataset.from_dict(message_data)
-        print(f"Received dataset: {dataset.name}")
+        logger.info(f"Received dataset: {dataset.name}")
 
         # ADD Profiling Logic Here
+        profiling_service = ProfilingService()
+        report = profiling_service.profile_dataset(dataset=dataset)
+
         ch.basic_ack(delivery_tag=method.delivery_tag)  # Acknowledge the message
+        logger.info(f"Processed dataset: {dataset.name}, Report: {report}")
     except json.JSONDecodeError as e:
-        print(f"Error decoding JSON: {e}")
+        logger.error(f"Error decoding JSON: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  # Reject the message
     except Exception as e:
-        print(f"Error processing message: {e}")
+        logger.error(f"Error processing message: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)  # Reject and requeue
 
 
@@ -38,12 +53,12 @@ def consume():
     channel.basic_qos(prefetch_count=1)  # Limit prefetch for fair distribution
     channel.basic_consume(queue=QUEUE_NAME, on_message_callback=process_message)
 
-    print(" [*] Waiting for messages. To exit, press CTRL+C")
+    logger.info(" [*] Waiting for messages. To exit, press CTRL+C")
     channel.start_consuming()
 
 
 def start_consumer():
     """Runs RabbitMQ consumer in a separate thread"""
-    print(f"Consumer starting at {QUEUE_NAME}")
+    logger.info(f"Consumer starting at {QUEUE_NAME}")
     thread = threading.Thread(target=consume)
     thread.start()

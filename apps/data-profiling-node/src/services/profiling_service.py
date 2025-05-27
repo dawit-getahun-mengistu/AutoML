@@ -4,6 +4,11 @@ import logging
 import requests
 from io import BytesIO, StringIO
 
+from urllib.parse import urlparse
+
+from src.data_utils import Dataset
+from src.services.storage_service import StorageService
+
 from src.profilers.data_set_profiling import DatasetProfiler
 from src.profilers.column_profiling import ColumnProfiler
 from src.profilers.profiler_ydata import YDataProfiler
@@ -40,18 +45,46 @@ class ProfilingService:
     @staticmethod
     def load_dataframe_from_url(url: str) -> pd.DataFrame:
         """
-        Loads a DataFrame from a given URL. Supports CSV, XLSX, and Parquet files.
+        Loads a DataFrame from a URL, handling S3-style query parameters
+        and ambiguous content-type headers.
         """
+        logger.info(f"Loading data from URL: {url}")
+
         response = requests.get(url)
         response.raise_for_status()
-        if url.endswith(".csv"):
+
+        # 1. Extract filename without query parameters
+        parsed_url = urlparse(url)
+        filepath = parsed_url.path  # /datasets/.../file.csv
+        filename = filepath.split("/")[-1].lower()  # file.csv
+
+        # 2. Get content-type (fallback to empty string)
+        content_type = response.headers.get("content-type", "").lower()
+
+        # 3. Determine file type
+        if filename.endswith(".csv") or "csv" in content_type:
             return pd.read_csv(StringIO(response.text))
-        elif url.endswith(".xlsx"):
+        elif filename.endswith(".xlsx") or "excel" in content_type:
             return pd.read_excel(BytesIO(response.content))
-        elif url.endswith(".parquet"):
+        elif filename.endswith(".parquet") or "parquet" in content_type:
             return pd.read_parquet(BytesIO(response.content))
         else:
-            raise ValueError("Unsupported file format for URL: " + url)
+            # 4. Fallback: Attempt to parse content directly
+            try:
+                # Try CSV first (common case)
+                return pd.read_csv(StringIO(response.text))
+            except pd.errors.ParserError:
+                try:
+                    # Try Excel
+                    return pd.read_excel(BytesIO(response.content))
+                except Exception:
+                    try:
+                        # Try Parquet
+                        return pd.read_parquet(BytesIO(response.content))
+                    except Exception as e:
+                        raise ValueError(
+                            f"Unsupported file format. Failed to parse content. URL: {url}"
+                        ) from e
 
     @staticmethod
     def profile(*, title: str, file_name: Optional[str] = None, url: Optional[str] = None) -> dict:
@@ -94,3 +127,23 @@ class ProfilingService:
             },
             "ydata_profile": ydata_profile,
         }
+
+    @staticmethod
+    def profile_dataset(dataset: Dataset) -> dict:
+        """
+        Profiles a Dataset object and returns a combined profiling report.
+        """
+        try:
+            storage_service = StorageService()
+            file_uri = storage_service.get_presigned_url(
+                bucket_name="datasets", object_name=dataset.file
+            )
+            if not file_uri:
+                raise ValueError(f"Failed to get presigned URL for dataset file: {dataset.file}")
+        except Exception as e:
+            logger.error(f"Error loading dataset from file {dataset.file}: {e}")
+            raise
+
+        logger.info(f"Profiling dataset: {dataset.name} from {file_uri}")
+
+        return ProfilingService.profile(title=dataset.name, url=file_uri, file_name=None)
