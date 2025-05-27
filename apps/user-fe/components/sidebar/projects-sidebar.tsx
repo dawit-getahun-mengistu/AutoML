@@ -73,6 +73,7 @@ export function ProjectsSidebar() {
             exp: number
           }>(access_token)
           userId = decoded.userId
+          localStorage.setItem("userId",userId)
         } catch (error) {
           console.error("Error decoding JWT:", error)
         }
@@ -137,7 +138,7 @@ export function ProjectsSidebar() {
                     <SelectContent>
                       <SelectItem value="ACTIVE">Active</SelectItem>
                       <SelectItem value="INACTIVE">Inactive</SelectItem>
-                      <SelectItem value="DONE">Done</SelectItem>
+                      <SelectItem value="COMPLETED">Completed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -169,7 +170,9 @@ export function ProjectsSidebar() {
           </div>
         ) : (
           <div className="space-y-2">
-            {projects.map((project) => {
+            {[...projects]
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .map((project) => {
           
               const isActive = pathname.endsWith(project.id)
 

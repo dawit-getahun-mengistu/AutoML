@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { fetchProjects } from "@/lib/features/project/projectActions"
+import { fetchProjects, patchProject} from "@/lib/features/project/projectActions"
 import { cn } from "@/lib/utils"
 import { refresh } from "@/lib/features/auth/authActions"
+import { jwtDecode } from "jwt-decode"
 
 interface ProjectHeaderProps {
   projectId: string
@@ -23,30 +24,50 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
   const pathname = usePathname()
   const router = useRouter()
   const dispatch = useAppDispatch()
-  // const { updateProject, deleteProject } = useProjects()
   const { projects, status: projectStatus, error: projectError } = useAppSelector((state) => state.project)
   const { access_token, refresh_token, error:authError } = useAppSelector((state) => state.auth)
   const project = projects.find((p) => p.id === projectId)
-
   const [editProject, setEditProject] = useState({
     name: project?.name || "",
     description: project?.description || "",
-    status: project?.status || "active",
+    status: "ACTIVE",
   })
  
   const [open, setOpen] = useState(false)
 
   const handleUpdateProject = () => {
-    // if (project && editProject.name.trim()) {
-    //   updateProject(projectId, {
-    //     ...project,
-    //     name: editProject.name,
-    //     description: editProject.description,
-    //     status: editProject.status,
-    //     updatedAt: new Date(),
-    //   })
-    //   setOpen(false)
-    // }
+     let userId = localStorage.getItem("userId")||"unknown";
+     //TODO: make this jwt decoding a separate function since it's used in create Project too
+     if(userId=="unknown" &&access_token){
+      try{
+      const decoded = jwtDecode<{
+        userId: string
+        userName: string
+        iat: number
+        exp: number
+      }>(access_token)
+      userId = decoded.userId
+      localStorage.setItem("userId",userId)
+      }catch(error){
+        console.error("Error decoding JWT:", error)
+      }if(!userId){
+        throw new Error("user Id Not found");
+      }
+     }
+    if (project && editProject.name.trim()) {
+      dispatch(
+        patchProject({
+          name: editProject.name,
+          description: editProject.description,
+          status: editProject.status,
+          userId: userId,
+          projectId:project.id,
+        })
+      )
+      // dispatch(fetchProjects())
+      setEditProject({ name: project.name, description: project.description, status: "ACTIVE" })
+      setOpen(false)
+    }
   }
 
   const handleDeleteProject = () => {
@@ -100,7 +121,7 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
           </div>
           <div className="text-sm text-gray-500 mt-1">
             Last updated:{" "}
-            {new Date(project.createdAt).toLocaleString(undefined, {
+            {new Date(project.updatedAt).toLocaleString(undefined, {
               hour: "numeric",
               minute: "numeric",
               hour12: true,
@@ -144,15 +165,15 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
                   <Label htmlFor="edit-status">Status</Label>
                   <Select
                     value={editProject.status}
-                    onValueChange={(value) => setEditProject({ ...editProject, status: value })}
+                    onValueChange={(value) => setEditProject({ ...editProject, status: value})}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="status">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
+                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="INACTIVE">Inactive</SelectItem>
+                      <SelectItem value="COMPLETED">Completed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -161,7 +182,11 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
                     <TrashIcon className="h-4 w-4 mr-1" />
                     Delete
                   </Button>
-                  <Button onClick={handleUpdateProject}>Save Changes</Button>
+                  <Button 
+                  onClick={handleUpdateProject}
+                  disabled={projectStatus === "loading"}
+                  >
+                    Save Changes</Button>
                 </div>
               </div>
             </DialogContent>

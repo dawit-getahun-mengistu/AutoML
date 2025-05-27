@@ -52,6 +52,8 @@ export function EmptyProject() {
             exp: number
           }>(access_token)
           userId = decoded.userId
+          localStorage.setItem("userId",userId)
+         
         } catch (error) {
           console.error("Error decoding JWT:", error)
         }
@@ -129,7 +131,7 @@ export function EmptyProject() {
                 <SelectContent>
                   <SelectItem value="ACTIVE">Active</SelectItem>
                   <SelectItem value="INACTIVE">Inactive</SelectItem>
-                  <SelectItem value="DONE">Done</SelectItem>
+                  <SelectItem value="COMPLETED">Completed</SelectItem>
                 </SelectContent>
               </Select>
             </div>

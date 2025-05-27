@@ -9,16 +9,26 @@ const getConfig = (): AxiosRequestConfig => ({
     Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
   }
 });
-export const createProject= createAppAsyncThunk<
-  {id:string;name:string;description:string;status:string;userId:string;createdAt:string},
-  { name: string; description: string; status: string;userId:string }
+
+// const getUserId = (): string => {
+//   const userId = localStorage.getItem("userId");
+//   if (!userId) {
+//     throw new Error("User ID not found in localStorage");
+//   }
+//   return userId;
+// };
+
+export const createProject = createAppAsyncThunk<
+  {id:string;name:string;description:string;status:string;userId:string;createdAt:string;updatedAt:string},
+  { name: string; description: string; status: string; userId:string }
 >(
   "project",
-  async function createProject({ name,description,status,userId}, { rejectWithValue }) {
+  async function createProject({ name, description, status,userId }, { rejectWithValue }) {
     try {
+      
       const response: AxiosResponse = await axios.post(
         `${backendURL}/project`,
-        { name,description,status,userId },
+        { name, description, status, userId },
         getConfig()
       );
       //TODO:type guarding before returning to ensure api returns the type we envisioned
@@ -29,6 +39,7 @@ export const createProject= createAppAsyncThunk<
         status:response.data.status,
         userId:response.data.userId,
         createdAt:response.data.createdAt,
+        updatedAt:response.data.updatedAt
       }
     } catch (error: unknown) {
       console.log("From projectActions creating projects error",error)
@@ -80,5 +91,39 @@ Project[]>(
   }
 );
 
-//TODO:UPDATE
+export const patchProject = createAppAsyncThunk<
+  {id:string;name:string;description:string;status:string;userId:string;createdAt:string;updatedAt:string},
+  { projectId: string; name: string; description: string; status: string; userId: string }
+>(
+  "project/patchProject",
+  async function patchProject({ projectId, name, description, status, userId }, { rejectWithValue }) {
+    try {
+      const response: AxiosResponse = await axios.patch(
+        `${backendURL}/project/${projectId}`,
+        { name, description, status, userId },
+        getConfig()
+      );
+      return {
+        id: response.data.id,
+        name: response.data.name,
+        description: response.data.description,
+        status: response.data.status,
+        userId: response.data.userId,
+        createdAt: response.data.createdAt,
+        updatedAt: response.data.updatedAt
+      }
+    } catch (error: unknown) {
+      console.log("From projectActions patching project error", error)
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<{ message?: string|string[]; error: string; statusCode: number }>;
+        const errorMessage = axiosError.response?.data?.message;
+        if (Array.isArray(errorMessage)) {
+          return rejectWithValue(errorMessage.join(", "));
+        }
+        return rejectWithValue(errorMessage || "Failed to patch project");
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
 //TODO:DELETE

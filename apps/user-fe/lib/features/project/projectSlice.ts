@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createProject, fetchProjects } from "./projectActions"; // Import your createProject thunk
+import { createProject, fetchProjects, patchProject } from "./projectActions"; // Import your createProject thunk
 import { AxiosError } from "axios";
 
 // Define the shape of a Project
@@ -10,6 +10,7 @@ export interface Project {
   status: string;
   userId: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface ProjectState {
@@ -55,8 +56,22 @@ export const projectSlice = createSlice({
       .addCase(fetchProjects.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
-       // TODO: patch and delete project
+
+      }).addCase(patchProject.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(patchProject.fulfilled, (state, action: PayloadAction<Project>) => {
+        state.status = "succeeded";
+        state.projects = state.projects.map(project => 
+          project.id === action.payload.id ? action.payload : project
+        );
+      })
+      .addCase(patchProject.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        
+      })
+       // TODO: delete project
   },
 });
 
