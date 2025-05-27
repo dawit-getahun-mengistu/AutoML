@@ -6,7 +6,7 @@ from io import BytesIO, StringIO
 
 from urllib.parse import urlparse
 
-from src.data_utils import Dataset
+from src.data_utils import Dataset, serialize
 from src.services.storage_service import StorageService
 
 from src.profilers.data_set_profiling import DatasetProfiler
@@ -116,7 +116,7 @@ class ProfilingService:
         # Optional: adding datetime and mixed profiling as needed
 
         # YData profiling
-        ydata_profile = YDataProfiler.generate_yprofile_report(df, title)
+        ydata_profile = serialize(YDataProfiler.generate_yprofile_report(df, title))
 
         return {
             "dataset_profile": dataset_profile,
@@ -129,12 +129,11 @@ class ProfilingService:
         }
 
     @staticmethod
-    def profile_dataset(dataset: Dataset) -> dict:
+    def profile_dataset(dataset: Dataset, storage_service: StorageService) -> dict:
         """
         Profiles a Dataset object and returns a combined profiling report.
         """
         try:
-            storage_service = StorageService()
             file_uri = storage_service.get_presigned_url(
                 bucket_name="datasets", object_name=dataset.file
             )

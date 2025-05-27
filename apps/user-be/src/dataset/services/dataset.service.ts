@@ -139,4 +139,22 @@ export class DatasetService {
 
     return { message: `Profiling started for dataset with ID ${id}` };
   }
+
+  // process profiling result
+  async updateDatasetProfilingData(id: string, report: any) {
+    try{
+      await this.prisma.dataset.update({
+        where: {id},
+        data: {profiling_metadata: report as any, profilingStatus: ProcessStatus.COMPLETED}
+      })
+      return {msg : "Profiling Success"}
+    } catch (err) {
+      await this.prisma.dataset.update({
+        where: {id},
+        data: {profilingStatus: ProcessStatus.FAILED, profilingError: err.message}
+      })
+
+    }
+
+  }
 }

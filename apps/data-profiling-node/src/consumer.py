@@ -4,7 +4,8 @@ import pika
 import threading
 import os
 from src.data_utils import Dataset
-from src.services.profiling_service import ProfilingService
+
+from src.profiler import perform_profiling
 
 # RabbitMQ Configuration
 RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "rabbitmq")
@@ -31,11 +32,10 @@ def process_message(ch, method, properties, body) -> None:
         logger.info(f"Received dataset: {dataset.name}")
 
         # ADD Profiling Logic Here
-        profiling_service = ProfilingService()
-        report = profiling_service.profile_dataset(dataset=dataset)
+        perform_profiling(dataset=dataset)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)  # Acknowledge the message
-        logger.info(f"Processed dataset: {dataset.name}, Report: {report}")
+
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding JSON: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  # Reject the message

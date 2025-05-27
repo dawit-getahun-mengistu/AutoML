@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Optional
 from SeaweedS3Client import S3Handler
 
 # Logger Config

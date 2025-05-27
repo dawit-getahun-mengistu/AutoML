@@ -10,7 +10,7 @@ export class DataProfilingConsumerService implements OnModuleInit {
     private readonly queue = process.env.DATA_PROFILING_RESULT_QUEUE || 'DATA_PROFILING_RESULT_QUEUE';
 
     constructor(private datasetService: DatasetService) {
-        const connection = amqp.connect([process.env.RABBITMQ_URL || 'amqp://localhost']);
+        const connection = amqp.connect([process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672']);
         this.channelWrapper = connection.createChannel();
     }
 
@@ -20,13 +20,14 @@ export class DataProfilingConsumerService implements OnModuleInit {
                 await channel.assertQueue(this.queue, {durable: true});
                 await channel.consume(this.queue, async (msg) => {
                     if (msg){
-                        const payload = JSON.parse(msg.content.toString());
-                        this.logger.log(`Received message from queue ${this.queue}: ${JSON.stringify(payload)}`);
+                        
                         try {
+                            const payload = JSON.parse(msg.content.toString());
+                            this.logger.log(`Received message from queue ${this.queue}: ${JSON.stringify(payload)}`);   
                             // Process the data profiling result
-                            // const { datasetId, profilingData } = payload;
-                            // await this.datasetService.updateDatasetProfilingData(datasetId, profilingData);
-                            // this.logger.log(`Processed data profiling result for dataset ID: ${datasetId}`);
+                            const { id, report } = payload;
+                            await this.datasetService.updateDatasetProfilingData(id, report);
+                            this.logger.log(`Processed data profiling result for dataset ID: ${id}`);
                         } catch (error) {
                             this.logger.error(`Error processing data profiling result: ${error.message}`, error.stack);
                         } finally {
