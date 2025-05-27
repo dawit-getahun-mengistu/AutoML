@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createProject, fetchProjects, patchProject } from "./projectActions"; // Import your createProject thunk
+import { createProject, fetchProjects, patchProject,deleteProject } from "./projectActions"; // Import your createProject thunk
 import { AxiosError } from "axios";
 
 // Define the shape of a Project
@@ -70,8 +70,19 @@ export const projectSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         
+      }).addCase(deleteProject.pending, (state) => {
+        state.status = "loading";
       })
-       // TODO: delete project
+      .addCase(deleteProject.fulfilled, (state, action: PayloadAction<Project>) => {
+        state.status = "succeeded";
+      state.projects = state.projects.filter(project => project.id !== action.payload.id);
+      })
+      .addCase(deleteProject.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        
+      })
+      
   },
 });
 

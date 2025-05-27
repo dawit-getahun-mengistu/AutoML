@@ -126,4 +126,38 @@ export const patchProject = createAppAsyncThunk<
     }
   }
 );
-//TODO:DELETE
+
+export const deleteProject = createAppAsyncThunk<
+  {id:string;name:string;description:string;status:string;userId:string;createdAt:string;updatedAt:string},
+  { projectId: string }
+>(
+  "project/deleteProject",
+  async function deleteProject({ projectId }, { rejectWithValue }) {
+    try {
+      const response: AxiosResponse = await axios.delete(
+        `${backendURL}/project/${projectId}`,
+        getConfig()
+      );
+      return {
+        id: response.data.id,
+        name: response.data.name,
+        description: response.data.description,
+        status: response.data.status,
+        userId: response.data.userId,
+        createdAt: response.data.createdAt,
+        updatedAt: response.data.updatedAt
+      }
+    } catch (error: unknown) {
+      console.log("From projectActions deleting project error", error)
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<{ message?: string|string[]; error: string; statusCode: number }>;
+        const errorMessage = axiosError.response?.data?.message;
+        if (Array.isArray(errorMessage)) {
+          return rejectWithValue(errorMessage.join(", "));
+        }
+        return rejectWithValue(errorMessage || "Failed to delete project");
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);

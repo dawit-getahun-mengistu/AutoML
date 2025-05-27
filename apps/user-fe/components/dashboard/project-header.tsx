@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { fetchProjects, patchProject} from "@/lib/features/project/projectActions"
+import { fetchProjects, patchProject,deleteProject} from "@/lib/features/project/projectActions"
 import { cn } from "@/lib/utils"
 import { refresh } from "@/lib/features/auth/authActions"
 import { jwtDecode } from "jwt-decode"
@@ -71,10 +71,24 @@ export function ProjectHeader({ projectId }: ProjectHeaderProps) {
   }
 
   const handleDeleteProject = () => {
-    // if (project) {
-    //   deleteProject(projectId)
-    //   router.push("/dashboard")
-    // }
+    if(project){
+      dispatch(deleteProject({
+        projectId:project.id
+      }))
+      .unwrap()
+      .then(() => {
+        // After successful deletion, find the next project to route to
+        const currentIndex = projects.findIndex(p => p.id === project.id);
+        const nextProject = projects[currentIndex + 1] || projects[currentIndex - 1];
+        
+        if (nextProject) {
+          router.push(`/dashboard/data/${nextProject.id}`);
+        } else {
+          // If no other projects exist, route to dashboard
+          router.push('/dashboard');
+        }
+      });
+    }
   }
 
   if (!project) {
