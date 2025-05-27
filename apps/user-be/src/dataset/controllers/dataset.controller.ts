@@ -1,4 +1,3 @@
-
 import {
   Controller,
   Post,
@@ -50,16 +49,17 @@ export class DatasetController {
         projectId: { type: 'string', format: 'uuid', example: '550e8400-e29b-41d4-a716-446655440000' },
         format: { type: 'string', enum: Object.values(DatasetFormat) },
         file: { type: 'string', format: 'binary' },
+        start_profiling: { type: 'boolean', example: false }, // Add start_profiling to the schema
       },
     },
   })
-  @ApiDefaultResponses({type: CreateDatasetDto})
+  @ApiDefaultResponses({ type: CreateDatasetDto })
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async create(
     @Body() createDatasetDto: CreateDatasetDto,
     @UploadedFile(
-      getFileValidator(), // Custom file type validator 
+      getFileValidator(), // Custom file type validator
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 100 * 1024 * 1024 }), // 100MB
@@ -68,8 +68,9 @@ export class DatasetController {
       }),
     )
     file: Express.Multer.File,
+    @Body('start_profiling') start_profiling: boolean = false, // Add start_profiling parameter
   ) {
-    return this.datasetService.create(createDatasetDto, file);
+    return this.datasetService.create(createDatasetDto, file, start_profiling);
   }
 
 
@@ -117,5 +118,11 @@ export class DatasetController {
     });
 
     fileStream.pipe(res);
+  }
+
+  @ApiDefaultResponses({ type: CreateDatasetDto }) // Adjust response type if needed
+  @Patch(':id/start-profiling')
+  async startProfiling(@Param('id') id: string) {
+    return this.datasetService.startDatasetProfiling(id);
   }
 }
