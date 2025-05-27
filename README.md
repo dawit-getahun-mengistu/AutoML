@@ -73,6 +73,14 @@ uv venv
 uv run pre-commit run --all-files
 ```
 
+#### 4. Special Command to Log into the user-be database
+
+```bash
+docker exec -it apps-db-1 psql -h localhost -p 5432 -U {POSTGRES_USER} -d {POSTGRES_DB}
+```
+
+then enter your password from `{POSTGRES_PASSWORD}` in your `.env` file.
+
 ## Documentation
 
 The full documentation for the AutoML platform, including setup guides, technical documentation, and API references, is available [here](https://wildcayote.github.io/AutoML/).

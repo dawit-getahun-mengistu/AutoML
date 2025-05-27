@@ -1,4 +1,3 @@
-
 services:
   db:
     image: postgis/postgis
@@ -92,6 +91,9 @@ services:
     build:
       context: ./data-profiling-node
       dockerfile: Dockerfile
+    volumes:
+      - ./data-profiling-node:/profiling
+      - /profiling/.venv
     env_file:
       - .env
     restart: on-failure
