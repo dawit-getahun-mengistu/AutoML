@@ -1,21 +1,37 @@
+import json
 import pika
 import threading
 import os
+from src.data_utils import Dataset
 
 # RabbitMQ Configuration
-RABBITMQ_HOST = RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "rabbitmq")
-QUEUE_NAME = "task_queue"
+RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "rabbitmq")
+QUEUE_NAME = os.environ.get("DATA_PROFILING_REQUEST_QUEUE", "DATA_PROFILING_REQUEST_QUEUE")
 
 
 def process_message(ch, method, properties, body):
     """Callback function to process received messages"""
     print(f"Received message: {body.decode()}")
-    ch.basic_ack(delivery_tag=method.delivery_tag)  # Acknowledge the message
+
+    try:
+        # Decode message
+        message_data = json.loads(body.decode())
+        dataset = Dataset.from_dict(message_data)
+        print(f"Received dataset: {dataset.name}")
+
+        # ADD Profiling Logic Here
+        ch.basic_ack(delivery_tag=method.delivery_tag)  # Acknowledge the message
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)  # Reject the message
+    except Exception as e:
+        print(f"Error processing message: {e}")
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)  # Reject and requeue
 
 
 def consume():
     """Function to start consuming messages"""
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, port=5672))
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
 

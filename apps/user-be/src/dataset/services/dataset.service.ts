@@ -3,15 +3,17 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateDatasetDto } from './../dto/create-dataset.dto';
 import { UpdateDatasetDto } from './../dto/update-dataset.dto';
-import { DatasetStatus, DatasetFormat } from '@prisma/client';
+import { DatasetStatus, ProcessStatus } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { StorageService } from 'SeaweedClient';
+import { ProducerService } from 'src/rmq/producer.service';
 
 @Injectable()
 export class DatasetService {
   constructor(
     private prisma: PrismaService,
     private storageService: StorageService,
+    private producerService: ProducerService,
   ) {}
 
   async create(
@@ -23,9 +25,10 @@ export class DatasetService {
     // Upload file to SeaweedFS
     const objectName = `${projectId}/${uuidv4()}-${file.originalname}`;
     await this.storageService.uploadFile('datasets', objectName, file.buffer);
+    
 
     // Create dataset in the database
-    return this.prisma.dataset.create({
+    const dataset = await this.prisma.dataset.create({
       data: {
         name,
         description,
@@ -34,9 +37,16 @@ export class DatasetService {
         file: objectName,
         status: DatasetStatus.UPLOADED,
         size: file.size,
-        // add additional processing here (e.g., rows/cols extraction)
       },
     });
+
+    // Send message to the queue to start profiling
+    const msg = await this.producerService.sendToQueue(
+      this.producerService.queues[0], 
+      dataset,
+    );
+
+    return dataset;
   }
 
   async findAll(projectId: string) {
@@ -103,26 +113,30 @@ export class DatasetService {
 
   // start dataset profiling
   async startProfiling(id: string) {
-    const dataset = await this.prisma.dataset.findUnique({ where: { id } });
+    const dataset = await this.prisma.dataset.findUnique({ where: { id }});
 
     if (!dataset) {
       throw new NotFoundException(`Dataset with ID ${id} not found`);
     }
 
-    // // Check if the dataset is already being profiled
-    // if (dataset.status === DatasetStatus.PROFILING) {
-    //   throw new Error(`Dataset with ID ${id} is already being profiled`);
-    // }
+    // Check if the dataset is already being profiled
+    if ( dataset.profilingStatus === ProcessStatus.IN_PROGRESS) {
+      throw new Error(`Dataset with ID ${id} is already being profiled`);
+    }
 
-    // // Update dataset status to PROFILING
-    // await this.prisma.dataset.update({
-    //   where: { id },
-    //   data: { status: DatasetStatus.PROFILING },
-    // });
+    // Update dataset status to PROFILING
+    await this.prisma.dataset.update({
+      where: { id },
+      data: { status: DatasetStatus.PROCESSING, profilingStatus: ProcessStatus.IN_PROGRESS },
+    });
+    
+    // Here you would typically send a message to a message queue to start profiling
+    // For example, using RabbitMQ or Kafka
+    await this.producerService.sendToQueue(
+      this.producerService.queues[0], 
+      dataset,
+    );
 
-    // // Here you would typically send a message to a message queue to start profiling
-    // // For example, using RabbitMQ or Kafka
-
-    // return { message: `Profiling started for dataset with ID ${id}` };
+    return { message: `Profiling started for dataset with ID ${id}` };
   }
 }

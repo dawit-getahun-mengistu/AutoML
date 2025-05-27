@@ -4,10 +4,11 @@ import { DatasetController } from './controllers/dataset.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SeaweedModule } from 'SeaweedClient';
 import { DataProfilingConsumerService } from './services/data-profiling-consumer.service';
+import { RmqModule } from 'src/rmq/rmq.module';
 
 
 @Module({
-  imports: [PrismaModule, SeaweedModule.forRootAsync()],
+  imports: [PrismaModule, SeaweedModule.forRootAsync(), RmqModule],
   controllers: [DatasetController],
   providers: [DatasetService, DataProfilingConsumerService],
 })
