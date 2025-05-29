@@ -1,0 +1,8 @@
+-------------------------------------------------
+## Dataset Profile
+
+The dataset consists of {{ num_cols }} columns and {{ num_observations }} total observations.  
+Among these observations, {{ missing_cell_percentage }}% of the cells contain missing values.  
+Additionally, {{ duplicate_row_percentage }}% of the rows are duplicates.  
+
+-------------------------------------------------

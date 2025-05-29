@@ -10,9 +10,8 @@ async function bootstrap() {
   app.use(passport.initialize());
 
   app.enableCors({
-    // origin: false,  // Completely disables cross-origin requests
-    origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow only these origins
-    Credentials: true,
+    origin: '*', // explicitly set ['http://localhost:3000'] iff from frontend
+    credentials: true,
   });
 
   const config = new DocumentBuilder()

@@ -1,0 +1,1377 @@
+{
+  "dataset_profile": {
+    "num_columns": 19,
+    "num_observations": 525600,
+    "missing_cell_percentage": 5.263157894736842,
+    "duplicate_row_percentage": 0.0
+  },
+  "column_profile": {
+    "classification": {
+      "numeric": [
+        "GHI",
+        "DNI",
+        "DHI",
+        "ModA",
+        "ModB",
+        "Tamb",
+        "RH",
+        "WS",
+        "WSgust",
+        "WSstdev",
+        "WD",
+        "WDstdev",
+        "BP",
+        "Cleaning",
+        "Precipitation",
+        "TModA",
+        "TModB",
+        "Comments"
+      ],
+      "boolean": [],
+      "categorical": [],
+      "datetime": [
+        "Timestamp"
+      ],
+      "mixed": []
+    },
+    "categorical": {},
+    "numerical": {
+      "GHI": {
+        "summary": {
+          "mean": 240.559452435312,
+          "median": 1.8,
+          "mode": [
+            -1.5
+          ],
+          "min": -12.9,
+          "max": 1413.0,
+          "range": 1425.9,
+          "variance": 109647.95590303333,
+          "std": 331.13132727519655,
+          "skewness": 1.0284464750702857,
+          "kurtosis": -0.46018448523301014
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": -2.0,
+            "Q3": 483.4,
+            "IQR": 485.4,
+            "left_outliers": 261398,
+            "right_outliers": 158
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 89
+          }
+        }
+      },
+      "DNI": {
+        "summary": {
+          "mean": 167.18751598173515,
+          "median": -0.1,
+          "mode": [
+            -0.3
+          ],
+          "min": -7.8,
+          "max": 952.3,
+          "range": 960.0999999999999,
+          "variance": 68492.38613468606,
+          "std": 261.7105006198377,
+          "skewness": 1.2902595903328247,
+          "kurtosis": 0.1729559585747249
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": -0.5,
+            "Q3": 314.2,
+            "IQR": 314.7,
+            "left_outliers": 287198,
+            "right_outliers": 15338
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 0
+          }
+        }
+      },
+      "DHI": {
+        "summary": {
+          "mean": 115.35896080669708,
+          "median": 1.6,
+          "mode": [
+            -1.4
+          ],
+          "min": -12.6,
+          "max": 759.2,
+          "range": 771.8000000000001,
+          "variance": 25182.856922628067,
+          "std": 158.69107385933233,
+          "skewness": 1.2104059310956665,
+          "kurtosis": 0.49899307116768465
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": -2.1,
+            "Q3": 216.3,
+            "IQR": 218.4,
+            "left_outliers": 261978,
+            "right_outliers": 9169
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 3738
+          }
+        }
+      },
+      "ModA": {
+        "summary": {
+          "mean": 236.5894961948249,
+          "median": 4.5,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 1342.3,
+          "range": 1342.3,
+          "variance": 106860.24852359034,
+          "std": 326.89485851507413,
+          "skewness": 1.0674162676270473,
+          "kurtosis": -0.3876741814711777
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 463.7,
+            "IQR": 463.7,
+            "left_outliers": 0,
+            "right_outliers": 98
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 27
+          }
+        }
+      },
+      "ModB": {
+        "summary": {
+          "mean": 228.883575913242,
+          "median": 4.3,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 1342.3,
+          "range": 1342.3,
+          "variance": 100195.36556878741,
+          "std": 316.53651537980164,
+          "skewness": 1.076031139024883,
+          "kurtosis": -0.3513320771849915
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 447.9,
+            "IQR": 447.9,
+            "left_outliers": 0,
+            "right_outliers": 240
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 63
+          }
+        }
+      },
+      "Tamb": {
+        "summary": {
+          "mean": 28.179682838660575,
+          "median": 28.0,
+          "mode": [
+            24.9
+          ],
+          "min": 11.0,
+          "max": 43.8,
+          "range": 32.8,
+          "variance": 35.09729472302879,
+          "std": 5.924296981332788,
+          "skewness": 0.0005116827073862378,
+          "kurtosis": -0.4446243287737546
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 24.2,
+            "Q3": 32.3,
+            "IQR": 8.099999999999998,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 0
+          }
+        }
+      },
+      "RH": {
+        "summary": {
+          "mean": 54.4879691780822,
+          "median": 55.1,
+          "mode": [
+            100.0
+          ],
+          "min": 2.1,
+          "max": 100.0,
+          "range": 97.9,
+          "variance": 788.0971907943142,
+          "std": 28.073068781205844,
+          "skewness": -0.026652772519024953,
+          "kurtosis": -1.2985546844763103
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 28.8,
+            "Q3": 80.1,
+            "IQR": 51.3,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 0
+          }
+        }
+      },
+      "WS": {
+        "summary": {
+          "mean": 2.121112823439878,
+          "median": 1.9,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 19.5,
+          "range": 19.5,
+          "variance": 2.5711028428698874,
+          "std": 1.6034658845357102,
+          "skewness": 0.8684060288394488,
+          "kurtosis": 1.5790081026334857
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 1.0,
+            "Q3": 3.1,
+            "IQR": 2.1,
+            "left_outliers": 0,
+            "right_outliers": 1572
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 3109
+          }
+        }
+      },
+      "WSgust": {
+        "summary": {
+          "mean": 2.8091948249619483,
+          "median": 2.6,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 26.6,
+          "range": 26.6,
+          "variance": 4.117326561218579,
+          "std": 2.029119651774774,
+          "skewness": 0.9289081426915101,
+          "kurtosis": 1.942468223969339
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 1.3,
+            "Q3": 4.1,
+            "IQR": 2.8,
+            "left_outliers": 0,
+            "right_outliers": 1383
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 3500
+          }
+        }
+      },
+      "WSstdev": {
+        "summary": {
+          "mean": 0.4733896499238964,
+          "median": 0.5,
+          "mode": [
+            0.4
+          ],
+          "min": 0.0,
+          "max": 4.2,
+          "range": 4.2,
+          "variance": 0.0747446189960323,
+          "std": 0.2733946213736333,
+          "skewness": 0.6954491881602993,
+          "kurtosis": 3.348514353703788
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.4,
+            "Q3": 0.6,
+            "IQR": 0.19999999999999996,
+            "left_outliers": 0,
+            "right_outliers": 1461
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 5653
+          }
+        }
+      },
+      "WD": {
+        "summary": {
+          "mean": 153.43517199391172,
+          "median": 181.0,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 360.0,
+          "range": 360.0,
+          "variance": 10472.010561428866,
+          "std": 102.33284204706163,
+          "skewness": -0.0849739183564297,
+          "kurtosis": -1.2558988376370364
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 59.0,
+            "Q3": 235.1,
+            "IQR": 176.1,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 0
+          }
+        }
+      },
+      "WDstdev": {
+        "summary": {
+          "mean": 8.582406582952814,
+          "median": 8.6,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 99.4,
+          "range": 99.4,
+          "variance": 40.77925970542795,
+          "std": 6.385864053158973,
+          "skewness": 1.0700809489259921,
+          "kurtosis": 4.6543921236337065
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 3.7,
+            "Q3": 12.3,
+            "IQR": 8.600000000000001,
+            "left_outliers": 0,
+            "right_outliers": 3003
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 4765
+          }
+        }
+      },
+      "BP": {
+        "summary": {
+          "mean": 994.197199391172,
+          "median": 994.0,
+          "mode": [
+            995
+          ],
+          "min": 985.0,
+          "max": 1003.0,
+          "range": 18.0,
+          "variance": 6.125591330089681,
+          "std": 2.474993197988568,
+          "skewness": -0.26399510053407194,
+          "kurtosis": -0.06390207307762052
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 993.0,
+            "Q3": 996.0,
+            "IQR": 3.0,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 414,
+            "right_outliers": 451
+          }
+        }
+      },
+      "Cleaning": {
+        "summary": {
+          "mean": 0.0009227549467275495,
+          "median": 0.0,
+          "mode": [
+            0
+          ],
+          "min": 0.0,
+          "max": 1.0,
+          "range": 1.0,
+          "variance": 0.0009219052240412117,
+          "std": 0.030362892221282408,
+          "skewness": 32.8742822323726,
+          "kurtosis": 1078.7225370217434
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 0.0,
+            "IQR": 0.0,
+            "left_outliers": 0,
+            "right_outliers": 485
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 485
+          }
+        }
+      },
+      "Precipitation": {
+        "summary": {
+          "mean": 0.001904870624048706,
+          "median": 0.0,
+          "mode": [
+            0.0
+          ],
+          "min": 0.0,
+          "max": 2.5,
+          "range": 2.5,
+          "variance": 0.0013775384723547868,
+          "std": 0.03711520540633969,
+          "skewness": 34.62044540765274,
+          "kurtosis": 1518.289299750757
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 0.0,
+            "Q3": 0.0,
+            "IQR": 0.0,
+            "left_outliers": 0,
+            "right_outliers": 3789
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 1402
+          }
+        }
+      },
+      "TModA": {
+        "summary": {
+          "mean": 35.2460256849315,
+          "median": 30.0,
+          "mode": [
+            23.9
+          ],
+          "min": 9.0,
+          "max": 81.0,
+          "range": 72.0,
+          "variance": 219.25487551927088,
+          "std": 14.807257528633412,
+          "skewness": 0.6774424747686674,
+          "kurtosis": -0.5810543111088022
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 24.2,
+            "Q3": 46.9,
+            "IQR": 22.7,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 10
+          }
+        }
+      },
+      "TModB": {
+        "summary": {
+          "mean": 32.47173554033485,
+          "median": 28.9,
+          "mode": [
+            25.1
+          ],
+          "min": 8.1,
+          "max": 72.5,
+          "range": 64.4,
+          "variance": 152.49146316648265,
+          "std": 12.348743384105228,
+          "skewness": 0.6168220341269083,
+          "kurtosis": -0.44310138397329046
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": 23.6,
+            "Q3": 41.5,
+            "IQR": 17.9,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 98
+          }
+        }
+      },
+      "Comments": {
+        "summary": {
+          "mean": NaN,
+          "median": NaN,
+          "mode": [],
+          "min": NaN,
+          "max": NaN,
+          "range": NaN,
+          "variance": NaN,
+          "std": NaN,
+          "skewness": NaN,
+          "kurtosis": NaN
+        },
+        "outliers": {
+          "iqr": {
+            "Q1": NaN,
+            "Q3": NaN,
+            "IQR": NaN,
+            "left_outliers": 0,
+            "right_outliers": 0
+          },
+          "z-score": {
+            "left_outliers": 0,
+            "right_outliers": 0
+          }
+        }
+      }
+    }
+  },
+  "ydata_profile": {
+    "analysis": {
+      "title": "Test Profile",
+      "date_start": "2025-05-24T08:37:40.067936",
+      "date_end": "2025-05-24T08:38:38.251590"
+    },
+    "table": {
+      "n": 525600,
+      "n_var": 19,
+      "memory_size": 79891332,
+      "record_size": 152.00025114155252,
+      "n_cells_missing": 525600,
+      "n_vars_with_missing": 1,
+      "n_vars_all_missing": 1,
+      "p_cells_missing": 0.05263157894736842,
+      "types": {
+        "DateTime": 1,
+        "Numeric": 16,
+        "Categorical": 1,
+        "Unsupported": 1
+      },
+      "n_duplicates": 0,
+      "p_duplicates": 0.0
+    },
+    "correlations": [
+      {
+        "BP": 1.0,
+        "Cleaning": 0.01803474667270584,
+        "DHI": 0.028168513524761657,
+        "DNI": 0.05313125867705816,
+        "GHI": 0.03327606153347437,
+        "ModA": -0.013499557682006608,
+        "ModB": -0.012740645445699564,
+        "Precipitation": 0.08210076580286733,
+        "RH": 0.27903456097140994,
+        "TModA": -0.2119353620362138,
+        "TModB": -0.25942607278710755,
+        "Tamb": -0.526467384189674,
+        "WD": -0.13077503396743156,
+        "WDstdev": -0.04865594289061001,
+        "WS": 0.004907481076746755,
+        "WSgust": 0.004643760843385915,
+        "WSstdev": 0.006191681773662945
+      },
+      {
+        "BP": 0.01803474667270584,
+        "Cleaning": 1.0,
+        "DHI": 0.04592688366989982,
+        "DNI": 0.029832243064981678,
+        "GHI": 0.056460050941891375,
+        "ModA": 0.052006252521932056,
+        "ModB": 0.05558383934870543,
+        "Precipitation": 0.0,
+        "RH": 0.011286773139251723,
+        "TModA": 0.03494681853736779,
+        "TModB": 0.028142255936645565,
+        "Tamb": 0.017604372378917422,
+        "WD": 0.012071183743939251,
+        "WDstdev": 0.012063204624287076,
+        "WS": 0.007930663724474922,
+        "WSgust": 0.009595042940775863,
+        "WSstdev": 0.00758356438798079
+      },
+      {
+        "BP": 0.028168513524761657,
+        "Cleaning": 0.04592688366989982,
+        "DHI": 1.0,
+        "DNI": 0.8540792093103471,
+        "GHI": 0.9601756737268122,
+        "ModA": 0.8869827527043982,
+        "ModB": 0.8873357066296654,
+        "Precipitation": -0.02872658655323457,
+        "RH": -0.11445490306113351,
+        "TModA": 0.8028241246639919,
+        "TModB": 0.7816841477641095,
+        "Tamb": 0.5124959643475637,
+        "WD": 0.18070743892643026,
+        "WDstdev": 0.5531856246829724,
+        "WS": 0.4666917770313822,
+        "WSgust": 0.5089166333254739,
+        "WSstdev": 0.49684409748721
+      },
+      {
+        "BP": 0.05313125867705816,
+        "Cleaning": 0.029832243064981678,
+        "DHI": 0.8540792093103471,
+        "DNI": 1.0,
+        "GHI": 0.9217129956300529,
+        "ModA": 0.8782553243992867,
+        "ModB": 0.8786186248481043,
+        "Precipitation": -0.016417087951236146,
+        "RH": -0.1689258073819584,
+        "TModA": 0.7936293357782301,
+        "TModB": 0.7753612576931803,
+        "Tamb": 0.5028431071816519,
+        "WD": 0.12512906051889391,
+        "WDstdev": 0.5817265408483222,
+        "WS": 0.49596291444428947,
+        "WSgust": 0.538549817910724,
+        "WSstdev": 0.512093289407059
+      },
+      {
+        "BP": 0.03327606153347437,
+        "Cleaning": 0.056460050941891375,
+        "DHI": 0.9601756737268122,
+        "DNI": 0.9217129956300529,
+        "GHI": 1.0,
+        "ModA": 0.9290039485312328,
+        "ModB": 0.9295584785323132,
+        "Precipitation": -0.03136436090970613,
+        "RH": -0.15791954698873703,
+        "TModA": 0.8265577159063006,
+        "TModB": 0.8047534073931097,
+        "Tamb": 0.5321508762645675,
+        "WD": 0.1659157213974508,
+        "WDstdev": 0.5663386317766747,
+        "WS": 0.4775157988432171,
+        "WSgust": 0.5203194691968973,
+        "WSstdev": 0.50681305430268
+      },
+      {
+        "BP": -0.013499557682006608,
+        "Cleaning": 0.052006252521932056,
+        "DHI": 0.8869827527043982,
+        "DNI": 0.8782553243992867,
+        "GHI": 0.9290039485312328,
+        "ModA": 1.0,
+        "ModB": 0.9993063924670633,
+        "Precipitation": -0.047015749977642414,
+        "RH": -0.3675750421512773,
+        "TModA": 0.8508692397633961,
+        "TModB": 0.8255905705327135,
+        "Tamb": 0.5606607361268348,
+        "WD": 0.0896428518122593,
+        "WDstdev": 0.55692335262702,
+        "WS": 0.4850460503599344,
+        "WSgust": 0.5230979880504205,
+        "WSstdev": 0.4981609163088869
+      },
+      {
+        "BP": -0.012740645445699564,
+        "Cleaning": 0.05558383934870543,
+        "DHI": 0.8873357066296654,
+        "DNI": 0.8786186248481043,
+        "GHI": 0.9295584785323132,
+        "ModA": 0.9993063924670633,
+        "ModB": 1.0,
+        "Precipitation": -0.047015981824660005,
+        "RH": -0.35820154972512247,
+        "TModA": 0.8521951756285558,
+        "TModB": 0.8279409853198813,
+        "Tamb": 0.560515066747871,
+        "WD": 0.09562302681001353,
+        "WDstdev": 0.5569965215390773,
+        "WS": 0.48178334761719954,
+        "WSgust": 0.5201175031758537,
+        "WSstdev": 0.4962866563525042
+      },
+      {
+        "BP": 0.08210076580286733,
+        "Cleaning": 0.0,
+        "DHI": -0.02872658655323457,
+        "DNI": -0.016417087951236146,
+        "GHI": -0.03136436090970613,
+        "ModA": -0.047015749977642414,
+        "ModB": -0.047015981824660005,
+        "Precipitation": 1.0,
+        "RH": 0.12752325516970958,
+        "TModA": -0.08194245453749267,
+        "TModB": -0.0822033937351543,
+        "Tamb": -0.09167336133738842,
+        "WD": -0.007607596985974761,
+        "WDstdev": 0.026132812653340082,
+        "WS": 0.07127801094520915,
+        "WSgust": 0.07242260066996972,
+        "WSstdev": 0.06739650641616733
+      },
+      {
+        "BP": 0.27903456097140994,
+        "Cleaning": 0.011286773139251723,
+        "DHI": -0.11445490306113351,
+        "DNI": -0.1689258073819584,
+        "GHI": -0.15791954698873703,
+        "ModA": -0.3675750421512773,
+        "ModB": -0.35820154972512247,
+        "Precipitation": 0.12752325516970958,
+        "RH": 1.0,
+        "TModA": -0.34847961938925526,
+        "TModB": -0.33955028718959435,
+        "Tamb": -0.4438304018704086,
+        "WD": 0.24848598131641467,
+        "WDstdev": -0.22267327070546117,
+        "WS": -0.2763893319081316,
+        "WSgust": -0.26973367546417626,
+        "WSstdev": -0.17811533745921979
+      },
+      {
+        "BP": -0.2119353620362138,
+        "Cleaning": 0.03494681853736779,
+        "DHI": 0.8028241246639919,
+        "DNI": 0.7936293357782301,
+        "GHI": 0.8265577159063006,
+        "ModA": 0.8508692397633961,
+        "ModB": 0.8521951756285558,
+        "Precipitation": -0.08194245453749267,
+        "RH": -0.34847961938925526,
+        "TModA": 1.0,
+        "TModB": 0.9921028124208771,
+        "Tamb": 0.8357422838392617,
+        "WD": 0.2166722495139297,
+        "WDstdev": 0.6047024514933282,
+        "WS": 0.5169751262527277,
+        "WSgust": 0.5539947361277093,
+        "WSstdev": 0.5117549616078867
+      },
+      {
+        "BP": -0.25942607278710755,
+        "Cleaning": 0.028142255936645565,
+        "DHI": 0.7816841477641095,
+        "DNI": 0.7753612576931803,
+        "GHI": 0.8047534073931097,
+        "ModA": 0.8255905705327135,
+        "ModB": 0.8279409853198813,
+        "Precipitation": -0.0822033937351543,
+        "RH": -0.33955028718959435,
+        "TModA": 0.9921028124208771,
+        "TModB": 1.0,
+        "Tamb": 0.8734699591011709,
+        "WD": 0.23491694010727115,
+        "WDstdev": 0.6013936581596491,
+        "WS": 0.5022087641002401,
+        "WSgust": 0.5394233558899195,
+        "WSstdev": 0.4976006165258654
+      },
+      {
+        "BP": -0.526467384189674,
+        "Cleaning": 0.017604372378917422,
+        "DHI": 0.5124959643475637,
+        "DNI": 0.5028431071816519,
+        "GHI": 0.5321508762645675,
+        "ModA": 0.5606607361268348,
+        "ModB": 0.560515066747871,
+        "Precipitation": -0.09167336133738842,
+        "RH": -0.4438304018704086,
+        "TModA": 0.8357422838392617,
+        "TModB": 0.8734699591011709,
+        "Tamb": 1.0,
+        "WD": 0.20139437871407,
+        "WDstdev": 0.47015632123486106,
+        "WS": 0.40813814145542193,
+        "WSgust": 0.4298121285357706,
+        "WSstdev": 0.3696412188146385
+      },
+      {
+        "BP": -0.13077503396743156,
+        "Cleaning": 0.012071183743939251,
+        "DHI": 0.18070743892643026,
+        "DNI": 0.12512906051889391,
+        "GHI": 0.1659157213974508,
+        "ModA": 0.0896428518122593,
+        "ModB": 0.09562302681001353,
+        "Precipitation": -0.007607596985974761,
+        "RH": 0.24848598131641467,
+        "TModA": 0.2166722495139297,
+        "TModB": 0.23491694010727115,
+        "Tamb": 0.20139437871407,
+        "WD": 1.0,
+        "WDstdev": 0.3390826850212235,
+        "WS": 0.3131356382695757,
+        "WSgust": 0.3205358184502194,
+        "WSstdev": 0.35121914825217154
+      },
+      {
+        "BP": -0.04865594289061001,
+        "Cleaning": 0.012063204624287076,
+        "DHI": 0.5531856246829724,
+        "DNI": 0.5817265408483222,
+        "GHI": 0.5663386317766747,
+        "ModA": 0.55692335262702,
+        "ModB": 0.5569965215390773,
+        "Precipitation": 0.026132812653340082,
+        "RH": -0.22267327070546117,
+        "TModA": 0.6047024514933282,
+        "TModB": 0.6013936581596491,
+        "Tamb": 0.47015632123486106,
+        "WD": 0.3390826850212235,
+        "WDstdev": 1.0,
+        "WS": 0.675104963521548,
+        "WSgust": 0.7300158215272755,
+        "WSstdev": 0.7050704248185364
+      },
+      {
+        "BP": 0.004907481076746755,
+        "Cleaning": 0.007930663724474922,
+        "DHI": 0.4666917770313822,
+        "DNI": 0.49596291444428947,
+        "GHI": 0.4775157988432171,
+        "ModA": 0.4850460503599344,
+        "ModB": 0.48178334761719954,
+        "Precipitation": 0.07127801094520915,
+        "RH": -0.2763893319081316,
+        "TModA": 0.5169751262527277,
+        "TModB": 0.5022087641002401,
+        "Tamb": 0.40813814145542193,
+        "WD": 0.3131356382695757,
+        "WDstdev": 0.675104963521548,
+        "WS": 1.0,
+        "WSgust": 0.9866092818239914,
+        "WSstdev": 0.7160157806624349
+      },
+      {
+        "BP": 0.004643760843385915,
+        "Cleaning": 0.009595042940775863,
+        "DHI": 0.5089166333254739,
+        "DNI": 0.538549817910724,
+        "GHI": 0.5203194691968973,
+        "ModA": 0.5230979880504205,
+        "ModB": 0.5201175031758537,
+        "Precipitation": 0.07242260066996972,
+        "RH": -0.26973367546417626,
+        "TModA": 0.5539947361277093,
+        "TModB": 0.5394233558899195,
+        "Tamb": 0.4298121285357706,
+        "WD": 0.3205358184502194,
+        "WDstdev": 0.7300158215272755,
+        "WS": 0.9866092818239914,
+        "WSgust": 1.0,
+        "WSstdev": 0.7807678008017777
+      },
+      {
+        "BP": 0.006191681773662945,
+        "Cleaning": 0.00758356438798079,
+        "DHI": 0.49684409748721,
+        "DNI": 0.512093289407059,
+        "GHI": 0.50681305430268,
+        "ModA": 0.4981609163088869,
+        "ModB": 0.4962866563525042,
+        "Precipitation": 0.06739650641616733,
+        "RH": -0.17811533745921979,
+        "TModA": 0.5117549616078867,
+        "TModB": 0.4976006165258654,
+        "Tamb": 0.3696412188146385,
+        "WD": 0.35121914825217154,
+        "WDstdev": 0.7050704248185364,
+        "WS": 0.7160157806624349,
+        "WSgust": 0.7807678008017777,
+        "WSstdev": 1.0
+      }
+    ],
+    "alerts": [
+      "[BP] is highly overall correlated with [Tamb]",
+      "[DHI] is highly overall correlated with [DNI] and 8 other fields",
+      "[DNI] is highly overall correlated with [DHI] and 9 other fields",
+      "[GHI] is highly overall correlated with [DHI] and 9 other fields",
+      "[ModA] is highly overall correlated with [DHI] and 8 other fields",
+      "[ModB] is highly overall correlated with [DHI] and 8 other fields",
+      "[TModA] is highly overall correlated with [DHI] and 10 other fields",
+      "[TModB] is highly overall correlated with [DHI] and 9 other fields",
+      "[Tamb] is highly overall correlated with [BP] and 7 other fields",
+      "[WDstdev] is highly overall correlated with [DHI] and 9 other fields",
+      "[WS] is highly overall correlated with [TModA] and 4 other fields",
+      "[WSgust] is highly overall correlated with [DHI] and 9 other fields",
+      "[WSstdev] is highly overall correlated with [DNI] and 5 other fields",
+      "[Cleaning] is highly imbalanced (0.9893663620610496)",
+      "[Comments] 525600 (100.0%) missing values",
+      "[Comments] was rejected",
+      "[Precipitation] is highly skewed(\u03b31 = 34.62044540765274)",
+      "[Timestamp] has unique values",
+      "[Comments] is an unsupported type, check if it needs cleaning or further analysis",
+      "[DNI] has 5884 (1.1%) zeros",
+      "[ModA] has 245543 (46.7%) zeros",
+      "[ModB] has 245975 (46.8%) zeros",
+      "[WS] has 68187 (13.0%) zeros",
+      "[WSgust] has 64064 (12.2%) zeros",
+      "[WSstdev] has 64409 (12.3%) zeros",
+      "[WD] has 64412 (12.3%) zeros",
+      "[WDstdev] has 73096 (13.9%) zeros",
+      "[Precipitation] has 521811 (99.3%) zeros"
+    ],
+    "samples": [
+      {
+        "id": "head",
+        "data": [
+          {
+            "Timestamp": "2021-08-09 00:01",
+            "GHI": -1.2,
+            "DNI": -0.2,
+            "DHI": -1.1,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.4,
+            "WS": 0.0,
+            "WSgust": 0.4,
+            "WSstdev": 0.1,
+            "WD": 122.1,
+            "WDstdev": 0.0,
+            "BP": 998,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.3,
+            "TModB": 26.2,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:02",
+            "GHI": -1.1,
+            "DNI": -0.2,
+            "DHI": -1.1,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.6,
+            "WS": 0.0,
+            "WSgust": 0.0,
+            "WSstdev": 0.0,
+            "WD": 0.0,
+            "WDstdev": 0.0,
+            "BP": 998,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.3,
+            "TModB": 26.2,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:03",
+            "GHI": -1.1,
+            "DNI": -0.2,
+            "DHI": -1.1,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.7,
+            "WS": 0.3,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 124.6,
+            "WDstdev": 1.5,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.4,
+            "TModB": 26.2,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:04",
+            "GHI": -1.1,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.3,
+            "WS": 0.2,
+            "WSgust": 0.7,
+            "WSstdev": 0.4,
+            "WD": 120.3,
+            "WDstdev": 1.3,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.4,
+            "TModB": 26.3,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:05",
+            "GHI": -1.0,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.3,
+            "WS": 0.1,
+            "WSgust": 0.7,
+            "WSstdev": 0.3,
+            "WD": 113.2,
+            "WDstdev": 1.0,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.4,
+            "TModB": 26.3,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:06",
+            "GHI": -1.0,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.8,
+            "WS": 0.0,
+            "WSgust": 0.4,
+            "WSstdev": 0.1,
+            "WD": 119.1,
+            "WDstdev": 0.0,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.4,
+            "TModB": 26.3,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:07",
+            "GHI": -1.0,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.7,
+            "WS": 0.0,
+            "WSgust": 0.0,
+            "WSstdev": 0.0,
+            "WD": 0.0,
+            "WDstdev": 0.0,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.5,
+            "TModB": 26.3,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:08",
+            "GHI": -1.0,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.7,
+            "WS": 0.7,
+            "WSgust": 1.3,
+            "WSstdev": 0.6,
+            "WD": 126.8,
+            "WDstdev": 2.8,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.5,
+            "TModB": 26.3,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:09",
+            "GHI": -1.0,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.6,
+            "WS": 0.4,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 124.9,
+            "WDstdev": 5.5,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.5,
+            "TModB": 26.4,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2021-08-09 00:10",
+            "GHI": -1.0,
+            "DNI": -0.1,
+            "DHI": -1.0,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 26.2,
+            "RH": 93.6,
+            "WS": 0.5,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 114.2,
+            "WDstdev": 5.1,
+            "BP": 997,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 26.5,
+            "TModB": 26.4,
+            "Comments": NaN
+          }
+        ],
+        "name": "First rows",
+        "caption": null
+      },
+      {
+        "id": "tail",
+        "data": [
+          {
+            "Timestamp": "2022-08-08 23:51",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.8,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 0.6,
+            "WSgust": 1.3,
+            "WSstdev": 0.6,
+            "WD": 95.9,
+            "WDstdev": 6.2,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.4,
+            "TModB": 22.8,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:52",
+            "GHI": -5.5,
+            "DNI": 0.0,
+            "DHI": -5.8,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 0.4,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 94.0,
+            "WDstdev": 2.5,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.4,
+            "TModB": 22.8,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:53",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.8,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.4,
+            "WS": 0.3,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 103.5,
+            "WDstdev": 1.9,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:54",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.9,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.4,
+            "WS": 0.1,
+            "WSgust": 1.1,
+            "WSstdev": 0.3,
+            "WD": 94.3,
+            "WDstdev": 1.5,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:55",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.9,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 0.1,
+            "WSgust": 1.1,
+            "WSstdev": 0.3,
+            "WD": 112.2,
+            "WDstdev": 0.7,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:56",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.9,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 0.3,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 119.3,
+            "WDstdev": 4.1,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:57",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.8,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 0.2,
+            "WSgust": 0.7,
+            "WSstdev": 0.4,
+            "WD": 115.2,
+            "WDstdev": 2.3,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:58",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.8,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.4,
+            "WS": 0.6,
+            "WSgust": 1.1,
+            "WSstdev": 0.5,
+            "WD": 129.8,
+            "WDstdev": 3.4,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-08 23:59",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.8,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 0.9,
+            "WSgust": 1.3,
+            "WSstdev": 0.5,
+            "WD": 124.4,
+            "WDstdev": 4.3,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          },
+          {
+            "Timestamp": "2022-08-09 00:00",
+            "GHI": -5.5,
+            "DNI": -0.1,
+            "DHI": -5.7,
+            "ModA": 0.0,
+            "ModB": 0.0,
+            "Tamb": 23.1,
+            "RH": 98.3,
+            "WS": 1.2,
+            "WSgust": 1.6,
+            "WSstdev": 0.3,
+            "WD": 124.1,
+            "WDstdev": 5.9,
+            "BP": 996,
+            "Cleaning": 0,
+            "Precipitation": 0.0,
+            "TModA": 23.5,
+            "TModB": 22.9,
+            "Comments": NaN
+          }
+        ],
+        "name": "Last rows",
+        "caption": null
+      }
+    ]
+  }
+}
