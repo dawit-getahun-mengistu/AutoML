@@ -45,15 +45,19 @@ services:
     image: chrislusf/seaweedfs
     container_name: seaweedfs-s3
     ports:
-      - "8333:8333"
+      - "8333:8333"  # S3 port
+      - "9333:9333"  # Optional: master port if needed
+      - "8080:8080"  # Optional: volume port if needed
     volumes:
       - ${SEAWEEDFS_CONFIG_PATH}:/etc/seaweedfs/config.json
     entrypoint: /bin/sh -c
     command: |
-      "weed server -s3 -s3.config /etc/seaweedfs/config.json"
+      "weed server -s3 -s3.config /etc/seaweedfs/config.json \
+      -ip=seaweedfs-s3 -publicUrl=localhost:8333"
     restart: unless-stopped
     networks:
       - automl
+
 
   user-be:
     restart: always
