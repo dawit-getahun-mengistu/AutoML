@@ -10,20 +10,19 @@ import {
   Delete,
   ParseFilePipe,
   MaxFileSizeValidator,
-  FileTypeValidator,
-  Res,
   NotFoundException,
+  StreamableFile,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDatasetDto } from '../dto/create-dataset.dto';
 import { UpdateDatasetDto } from '../dto/update-dataset.dto';
 import { DatasetFormat } from '@prisma/client';
-import { Response } from 'express';
 import { ApiDefaultResponses } from 'src/decorators';
 import { DatasetService } from '../services/dataset.service';
-import { get } from 'http';
 import { getFileValidator } from './file-type-validaor';
+import { ProfilingService } from '../services/profiling.service';
 
 
 
@@ -33,7 +32,10 @@ export class DatasetController {
    * Controller for managing datasets, including uploading, retrieving, updating, and deleting datasets.
    * It also provides functionality to download dataset files.
    */
-  constructor(private readonly datasetService: DatasetService) {}
+  constructor(
+    private readonly datasetService: DatasetService,
+    private readonly profilingService: ProfilingService, 
+  ) {}
 
 
   @ApiOperation({ summary: 'Upload a dataset with metadata' })
@@ -104,25 +106,30 @@ export class DatasetController {
   }
 
   @Get(':id/download-url')
-  async getDownloadUrl(@Param('id') id: string, @Res() res: Response) {
-    const dataset = await this.datasetService.findOne(id);
-    if (!dataset) {
-      throw new NotFoundException(`Dataset with ID ${id} not found`);
+  async getDownloadUrl(@Param('id') id: string): Promise<StreamableFile> {
+    try {
+      const { fileStream, filename } = await this.datasetService.downloadDatasetFile(id);
+      
+      return new StreamableFile(await fileStream, {
+        disposition: `attachment; filename="${encodeURIComponent(filename)}"`,
+        type: 'application/octet-stream',
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to download file');
     }
-    const fileStream = await this.datasetService.downloadObject(dataset.file);
-    
-    // Optionally set headers (Content-Type, Content-Disposition, etc.)
-    res.set({
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${dataset.file}"`,
-    });
-
-    fileStream.pipe(res);
   }
 
   @ApiDefaultResponses({ type: CreateDatasetDto }) // Adjust response type if needed
   @Patch(':id/start-profiling')
   async startProfiling(@Param('id') id: string) {
     return this.datasetService.startDatasetProfiling(id);
+  }
+
+  @Get(':id/eda')
+  async getEda(@Param('id') id: string) {
+    return this.profilingService.pollProfilingStatus(id);
   }
 }
