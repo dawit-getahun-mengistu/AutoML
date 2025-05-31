@@ -38,29 +38,45 @@ class Dataset:
     name: str
     description: Optional[str]
     projectId: str
-    status: str  # Assuming DatasetStatus enum is converted to string
+    status: str  # Corresponds to DatasetStatus enum
     file: str
-    format: str  # Assuming DatasetFormat enum is converted to string
+    format: str  # Corresponds to DatasetFormat enum
     size: Optional[int]
     rows: Optional[int]
     cols: Optional[int]
-    profiling_context: Optional[str]  # Assuming JSON is serialized to string
+
+    profiling_context: Optional[str]  # JSON serialized as string
     feature_selection_context: Optional[str]
     feature_engineering_context: Optional[str]
     training_context: Optional[str]
+
     profiling_metadata: Optional[str]
     feature_selection_metadata: Optional[str]
     feature_engineering_metadata: Optional[str]
     training_metadata: Optional[str]
-    profilingStatus: str  # Assuming ProcessStatus enum is converted to string
+
+    profilingStatus: str  # Corresponds to ProcessStatus enum
     featureSelectionStatus: str
     featureEngineeringStatus: str
     trainingStatus: str
+
     profilingError: Optional[str]
     featureSelectionError: Optional[str]
     featureEngineeringError: Optional[str]
     trainingError: Optional[str]
     llmError: Optional[str]
+
+    EDAFileViz: Optional[str]
+    FeaturesVizFile: Optional[str]
+    featureEngineeringVizFile: Optional[str]
+    trainingVizFile: Optional[str]
+
+    profilingFile: Optional[str]
+    featureSelectionFile: Optional[str]
+    featureEngineeringFile: Optional[str]
+    trainingFile: Optional[str]
+    trainingType: Optional[str]  # Corresponds to TrainingType enum
+
     createdAt: str
     updatedAt: Optional[str]
 
@@ -69,31 +85,40 @@ class Dataset:
         return cls(
             id=data["id"],
             name=data["name"],
-            description=data["description"],
+            description=data.get("description"),
             projectId=data["projectId"],
             status=data["status"],
             file=data["file"],
             format=data["format"],
-            size=data["size"],
-            rows=data["rows"],
-            cols=data["cols"],
-            profiling_context=data["profiling_context"],
-            feature_selection_context=data["feature_selection_context"],
-            feature_engineering_context=data["feature_engineering_context"],
-            training_context=data["training_context"],
-            profiling_metadata=data["profiling_metadata"],
-            feature_selection_metadata=data["feature_selection_metadata"],
-            feature_engineering_metadata=data["feature_engineering_metadata"],
-            training_metadata=data["training_metadata"],
+            size=data.get("size"),
+            rows=data.get("rows"),
+            cols=data.get("cols"),
+            profiling_context=data.get("profiling_context"),
+            feature_selection_context=data.get("feature_selection_context"),
+            feature_engineering_context=data.get("feature_engineering_context"),
+            training_context=data.get("training_context"),
+            profiling_metadata=data.get("profiling_metadata"),
+            feature_selection_metadata=data.get("feature_selection_metadata"),
+            feature_engineering_metadata=data.get("feature_engineering_metadata"),
+            training_metadata=data.get("training_metadata"),
             profilingStatus=data["profilingStatus"],
             featureSelectionStatus=data["featureSelectionStatus"],
             featureEngineeringStatus=data["featureEngineeringStatus"],
             trainingStatus=data["trainingStatus"],
-            profilingError=data["profilingError"],
-            featureSelectionError=data["featureSelectionError"],
-            featureEngineeringError=data["featureEngineeringError"],
-            trainingError=data["trainingError"],
-            llmError=data["llmError"],
+            profilingError=data.get("profilingError"),
+            featureSelectionError=data.get("featureSelectionError"),
+            featureEngineeringError=data.get("featureEngineeringError"),
+            trainingError=data.get("trainingError"),
+            llmError=data.get("llmError"),
+            EDAFileViz=data.get("EDAFileViz"),
+            FeaturesVizFile=data.get("FeaturesVizFile"),
+            featureEngineeringVizFile=data.get("featureEngineeringVizFile"),
+            trainingVizFile=data.get("trainingVizFile"),
+            profilingFile=data.get("profilingFile"),
+            featureSelectionFile=data.get("featureSelectionFile"),
+            featureEngineeringFile=data.get("featureEngineeringFile"),
+            trainingFile=data.get("trainingFile"),
+            trainingType=data.get("trainingType"),
             createdAt=data["createdAt"],
-            updatedAt=data["updatedAt"],
+            updatedAt=data.get("updatedAt"),
         )

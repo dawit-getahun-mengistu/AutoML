@@ -1,7 +1,9 @@
 from typing import Optional
 import pandas as pd
 import logging
+import re
 import requests
+import uuid
 from io import BytesIO, StringIO
 
 from urllib.parse import urlparse
@@ -87,7 +89,9 @@ class ProfilingService:
                         ) from e
 
     @staticmethod
-    def profile(*, title: str, file_name: Optional[str] = None, url: Optional[str] = None) -> dict:
+    def profile(
+        *, title: str, file_name: Optional[str] = None, url: Optional[str] = None
+    ) -> tuple[dict, str]:
         """
         Loads the dataset from the URL and returns a combined profiling report.
         """
@@ -116,7 +120,9 @@ class ProfilingService:
         # Optional: adding datetime and mixed profiling as needed
 
         # YData profiling
-        ydata_profile = serialize(YDataProfiler.generate_yprofile_report(df, title))
+        ydata_result, eda_file_path = YDataProfiler.generate_yprofile_report(df, title)
+        logger.info(f"YData Profiling Report saved to: {eda_file_path}")
+        ydata_profile = serialize(ydata_result)
 
         return {
             "dataset_profile": dataset_profile,
@@ -126,7 +132,7 @@ class ProfilingService:
                 "numerical": numerical_profile,
             },
             "ydata_profile": ydata_profile,
-        }
+        }, eda_file_path
 
     @staticmethod
     def profile_dataset(dataset: Dataset, storage_service: StorageService) -> dict:
@@ -145,4 +151,24 @@ class ProfilingService:
 
         logger.info(f"Profiling dataset: {dataset.name} from {file_uri}")
 
-        return ProfilingService.profile(title=dataset.name, url=file_uri, file_name=None)
+        results, eda_file_path = ProfilingService.profile(
+            title=dataset.name, url=file_uri, file_name=None
+        )
+
+        def sanitize_key(key: str) -> str:
+            """Replace problematic characters in object keys"""
+            return re.sub(r"[^a-zA-Z0-9!\-_\.\*\(\)]", "_", key)
+
+        try:
+            # save eda file to storage
+            eda_file_name = sanitize_key(f"{dataset.id}_{uuid.uuid4()}_{dataset.name}")
+            storage_service.upload_file(
+                bucket_name="datasets", object_name=eda_file_name, file_path=eda_file_path
+            )
+            logger.info(f"EDA report saved to storage: {eda_file_name}")
+        except Exception as e:
+            logger.error(f"Error saving EDA report to storage: {e}")
+            raise
+
+        results["eda_object_name"] = eda_file_name
+        return results

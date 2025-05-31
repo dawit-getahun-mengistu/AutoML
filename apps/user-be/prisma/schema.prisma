@@ -131,6 +131,7 @@ model Dataset {
   feature_engineering_metadata Json? // Metadata from feature engineering
   training_metadata            Json? // Metadata from training
 
+  // Process statuses
   profilingStatus          ProcessStatus @default(PENDING)
   featureSelectionStatus   ProcessStatus @default(NOT_STARTED)
   featureEngineeringStatus ProcessStatus @default(NOT_STARTED)
@@ -142,6 +143,18 @@ model Dataset {
   featureEngineeringError String? @default("")
   trainingError           String? @default("")
   llmError                String? @default("")
+
+  // File versions
+  EDAFileViz                String? // HTML File after EDA
+  FeaturesVizFile           String? // HTML File after feature selection
+  featureEngineeringVizFile String? // HTML File after feature engineering
+  trainingVizFile           String? // HTML File after training
+
+  profilingFile          String? // File after profiling  
+  featureSelectionFile   String? // File after feature selection
+  featureEngineeringFile String? // File after feature engineering
+  trainingFile           String? // File after training
+  trainingType           TrainingType? // Type of training (Classical or NAS)
 
   // Relations (Assuming attributes)
   attributes Attribute[]
@@ -162,7 +175,7 @@ enum DataType {
 
 model Attribute {
   id          String  @id @default(uuid())
-  name        String
+  name        String?
   description String?
 
   datasetId String

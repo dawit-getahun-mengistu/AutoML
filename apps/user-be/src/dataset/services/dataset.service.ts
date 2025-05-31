@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateDatasetDto } from './../dto/create-dataset.dto';
@@ -8,11 +8,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { StorageService } from 'SeaweedClient';
 import { ProducerService } from 'src/rmq/producer.service';
 import { ProfilingService } from './profiling.service';
+import { FileService } from './file.service';
+import type { Readable } from 'stream';
 
 @Injectable()
 export class DatasetService {
+  private readonly logger = new Logger(DatasetService.name);
   constructor(
     private prisma: PrismaService,
+    private fileService: FileService,
     private storageService: StorageService,
     private producerService: ProducerService,
     private profilingService: ProfilingService
@@ -100,23 +104,32 @@ export class DatasetService {
     });
   }
 
-  async downloadObject(objectName: string){
-    return this.storageService.downloadObject('datasets', objectName);
+  async downloadDatasetFile(
+    id: string
+  ): Promise<{ fileStream: Promise<Readable>; filename: string }> {
+    try {
+      const dataset = await this.findOne(id);
+      if (!dataset) {
+        throw new NotFoundException(`Dataset with ID ${id} not found`);
+      }
+
+      // Return stream promise without resolving it here
+      const fileStream = this.fileService.downloadObject(dataset.file);
+      const filename = this.extractFilename(dataset.file);
+
+      return { fileStream, filename };
+    } catch (error) {
+      this.logger.error(`Download failed for dataset ${id}: ${error.message}`, error.stack);
+      
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException(`File for dataset with ID ${id} not found`);
+    }
   }
 
-  async getDownloadUrl(id: string) {
-    const dataset = await this.prisma.dataset.findUnique({ where: { id } });
-
-    if (!dataset) {
-      throw new NotFoundException(`Dataset with ID ${id} not found`);
-    }
-
-    // Generate a presigned URL for downloading the file
-    const url = await this.storageService.getPresignedDownloadUrl(
-      'datasets',
-      dataset.file,
-    );
-    return url.replace('seaweedfs-s3', process.env.SEAWEED_EXTERNAL_ENDPOINT || 'localhost');
+  private extractFilename(filePath: string): string {
+    return filePath.split('/').pop() || 'dataset-file';
   }
 
   async startDatasetProfiling(id: string) {
