@@ -5,19 +5,17 @@ import { CreateDatasetDto } from './../dto/create-dataset.dto';
 import { UpdateDatasetDto } from './../dto/update-dataset.dto';
 import { DatasetStatus, ProcessStatus, } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
-import { StorageService } from 'SeaweedClient';
 import { ProducerService } from 'src/rmq/producer.service';
 import { ProfilingService } from './profiling.service';
-import { FileService } from './file.service';
 import type { Readable } from 'stream';
+import { DmsService } from 'src/dms/dms.service';
 
 @Injectable()
 export class DatasetService {
   private readonly logger = new Logger(DatasetService.name);
   constructor(
     private prisma: PrismaService,
-    private fileService: FileService,
-    private storageService: StorageService,
+    private dataManagementService: DmsService,
     private producerService: ProducerService,
     private profilingService: ProfilingService
   ) {}
@@ -30,8 +28,10 @@ export class DatasetService {
     const { projectId, name, description, format } = createDatasetDto;
 
     // Upload file to SeaweedFS
-    const objectName = `${projectId}/${uuidv4()}-${file.originalname}`;
-    await this.storageService.uploadFile('datasets', objectName, file.buffer);
+    // const objectName = `${projectId}/${uuidv4()}-${file.originalname}`;
+    // await this.storageService.uploadFile('datasets', objectName, file.buffer);
+
+    const { url, key, isPublic } = await this.dataManagementService.uploadSingleFile({file, isPublic: true});
     
 
     // Create dataset in the database
@@ -41,7 +41,7 @@ export class DatasetService {
         description,
         format,
         projectId,
-        file: objectName,
+        file: key,
         status: DatasetStatus.UPLOADED,
         size: file.size,
       },
@@ -96,7 +96,8 @@ export class DatasetService {
     }
 
     // Delete file from SeaweedFS
-    await this.storageService.deleteObject('datasets', dataset.file);
+    // await this.storageService.deleteObject('datasets', dataset.file);
+    await this.dataManagementService.deleteFile(dataset.file)
 
     // Delete dataset from the database
     return this.prisma.dataset.delete({
@@ -104,20 +105,16 @@ export class DatasetService {
     });
   }
 
-  async downloadDatasetFile(
+  async getDatasetUrl(
     id: string
-  ): Promise<{ fileStream: Promise<Readable>; filename: string }> {
+  ){
     try {
       const dataset = await this.findOne(id);
       if (!dataset) {
         throw new NotFoundException(`Dataset with ID ${id} not found`);
       }
-
-      // Return stream promise without resolving it here
-      const fileStream = this.fileService.downloadObject(dataset.file);
-      const filename = this.extractFilename(dataset.file);
-
-      return { fileStream, filename };
+      
+      return this.dataManagementService.getFileUrl(dataset.file);
     } catch (error) {
       this.logger.error(`Download failed for dataset ${id}: ${error.message}`, error.stack);
       

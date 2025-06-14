@@ -106,20 +106,8 @@ export class DatasetController {
   }
 
   @Get(':id/download-url')
-  async getDownloadUrl(@Param('id') id: string): Promise<StreamableFile> {
-    try {
-      const { fileStream, filename } = await this.datasetService.downloadDatasetFile(id);
-      
-      return new StreamableFile(await fileStream, {
-        disposition: `attachment; filename="${encodeURIComponent(filename)}"`,
-        type: 'application/octet-stream',
-      });
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Failed to download file');
-    }
+  async getDownloadUrl(@Param('id') id: string) {
+    return this.datasetService.getDatasetUrl(id);
   }
 
   @ApiDefaultResponses({ type: CreateDatasetDto }) // Adjust response type if needed

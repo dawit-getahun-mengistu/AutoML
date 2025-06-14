@@ -9,7 +9,7 @@ from io import BytesIO, StringIO
 from urllib.parse import urlparse
 
 from src.data_utils import Dataset, serialize
-from src.services.storage_service import StorageService
+from src.services.s3_service import S3Service
 
 from src.profilers.data_set_profiling import DatasetProfiler
 from src.profilers.column_profiling import ColumnProfiler
@@ -135,14 +135,15 @@ class ProfilingService:
         }, eda_file_path
 
     @staticmethod
-    def profile_dataset(dataset: Dataset, storage_service: StorageService) -> dict:
+    def profile_dataset(dataset: Dataset, s3_storage: S3Service) -> dict:
         """
         Profiles a Dataset object and returns a combined profiling report.
         """
         try:
-            file_uri = storage_service.get_presigned_url(
-                bucket_name="datasets", object_name=dataset.file
-            )
+            # file_uri = storage_service.get_presigned_url(
+            #     bucket_name="datasets", object_name=dataset.file
+            # )
+            file_uri = s3_storage._public_object_url(key=dataset.file)
             if not file_uri:
                 raise ValueError(f"Failed to get presigned URL for dataset file: {dataset.file}")
         except Exception as e:
@@ -161,10 +162,15 @@ class ProfilingService:
 
         try:
             # save eda file to storage
-            eda_file_name = sanitize_key(f"{dataset.id}_{uuid.uuid4()}_{dataset.name}")
-            storage_service.upload_file(
-                bucket_name="datasets", object_name=eda_file_name, file_path=eda_file_path
+            eda_file_name = sanitize_key(f"{uuid.uuid4()}_{dataset.name}")
+            # storage_service.upload_file(
+            #     bucket_name="datasets", object_name=eda_file_name, file_path=eda_file_path
+            # )
+            s3_storage.upload_single_file_from_path(
+                path=eda_file_path,
+                key=eda_file_name,
             )
+
             logger.info(f"EDA report saved to storage: {eda_file_name}")
         except Exception as e:
             logger.error(f"Error saving EDA report to storage: {e}")
