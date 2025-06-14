@@ -41,24 +41,6 @@ services:
     networks:
       - automl
 
-  seaweedfs-s3:
-    image: chrislusf/seaweedfs
-    container_name: seaweedfs-s3
-    ports:
-      - "8333:8333"  # S3 port
-      - "9333:9333"  # Optional: master port if needed
-      - "8080:8080"  # Optional: volume port if needed
-    volumes:
-      - ${SEAWEEDFS_CONFIG_PATH}:/etc/seaweedfs/config.json
-    entrypoint: /bin/sh -c
-    command: |
-      "weed server -s3 -s3.config /etc/seaweedfs/config.json \
-      -ip=seaweedfs-s3 -publicUrl=localhost:8333"
-    restart: unless-stopped
-    networks:
-      - automl
-
-
   user-be:
     restart: always
     build:
@@ -73,12 +55,12 @@ services:
     env_file:
       - .env
     environment:
-      SEAWEED_ACCESS_KEY: "any"
-      SEAWEED_SECRET_KEY: "any"
-      SEAWEED_S3_ENDPOINT: "http://seaweedfs-s3:8333" # Use the service name
-      AWS_EC2_METADATA_DISABLED: "true" # Disable AWS metadata checks
-      AWS_SDK_LOAD_CONFIG: "false" # Disable AWS config file loading
-
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_SDK_LOAD_CONFIG: "false"
     depends_on:
       db:
         condition: service_healthy
@@ -86,8 +68,6 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-      seaweedfs-s3:
-        condition: service_started
     networks:
       - automl
 
@@ -104,8 +84,6 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      seaweedfs-s3:
-        condition: service_started
     ports:
       - 8000:8000
     networks:
@@ -130,11 +108,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-      seaweedfs-s3:
-        condition: service_started
       user-be:
         condition: service_started
-
     networks:
       - automl
 

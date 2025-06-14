@@ -7,12 +7,13 @@ import { DataProfilingConsumerService } from './services/data-profiling-consumer
 import { RmqModule } from 'src/rmq/rmq.module';
 import { ProfilingService } from './services/profiling.service';
 import { FileService } from './services/file.service';
+import { DmsService } from 'src/dms/dms.service';
 
 
 @Module({
   imports: [PrismaModule, SeaweedModule.forRootAsync(), RmqModule],
   controllers: [DatasetController],
-  providers: [DatasetService, DataProfilingConsumerService, ProfilingService, FileService],
+  providers: [DatasetService, DataProfilingConsumerService, ProfilingService, FileService, DmsService],
   exports: [DatasetService, ProfilingService, FileService],
 })
 export class DatasetModule {}

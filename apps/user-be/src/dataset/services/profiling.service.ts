@@ -1,8 +1,9 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { DatasetStatus, ProcessStatus } from "@prisma/client";
+import { DmsService } from "src/dms/dms.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ProducerService } from "src/rmq/producer.service";
-import { FileService } from "./file.service";
+
 
 @Injectable()
 export class ProfilingService {
@@ -10,7 +11,7 @@ export class ProfilingService {
     constructor(
         private prisma: PrismaService,
         private producerService: ProducerService,
-        private fileService: FileService
+        private dataManagementService: DmsService,
       ) {}
 
   private tryParseJson(value: unknown): unknown {
@@ -106,7 +107,7 @@ export class ProfilingService {
       select: {
         profilingStatus: true,
         profilingError: true,
-        // EDAFileViz: true, // include EDAFileViz if needed
+        EDAFileViz: true, // include EDAFileViz if needed
       }, // only fetch profiling status and error
     });
 
@@ -114,16 +115,17 @@ export class ProfilingService {
       throw new NotFoundException(`Dataset with ID ${id} not found`);
     }
 
-    // // get presigned URL for EDAFileViz if it exists
-    // if (dataset.EDAFileViz) {
-    //   const presignedUrl = await this.fileService.getPresignedUrl(id, dataset.EDAFileViz, 3600);
-    //   // Return the dataset with the presigned URL for EDAFileViz
-    //   return { ...dataset, EDAFileViz: presignedUrl };
-    // }
-    // else  {
-    //   // Return the dataset without EDAFileViz if it doesn't exist
-    //   return dataset;
-    // }
-    return dataset;
+    // get presigned URL for EDAFileViz if it exists
+    if (dataset.EDAFileViz) {
+      // const presignedUrl = await this.fileService.getPresignedUrl(id, dataset.EDAFileViz, 3600);
+      const url = await this.dataManagementService.getFileUrl(dataset.EDAFileViz)
+      
+      return { ...dataset, EDAFileViz: url };
+    }
+    else  {
+      // Return the dataset without EDAFileViz if it doesn't exist
+      return dataset;
+    }
+    // return dataset;
   }
 }

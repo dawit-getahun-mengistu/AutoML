@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProjectModule } from './project/project.module';
 import { DatasetModule } from './dataset/dataset.module';
 import { SeaweedModule } from 'SeaweedClient';
+import { DmsModule } from './dms/dms.module';
 
 
 @Module({
@@ -17,7 +18,7 @@ import { SeaweedModule } from 'SeaweedClient';
     SeaweedModule.forRootAsync(),
     AuthModule, 
     UserModule, 
-    PrismaModule, ProjectModule, DatasetModule
+    PrismaModule, ProjectModule, DatasetModule, DmsModule
   ],
   controllers: [],
   providers: [],
