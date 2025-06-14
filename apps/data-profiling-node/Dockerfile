@@ -1,17 +1,34 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Use a Python image with uv pre-installed
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# Set the working directory in the container
-WORKDIR /app
+# Set working directory
+WORKDIR /profiling
 
-# Copy the requirements.txt file into the container
-COPY requirements.txt .
+# Enable bytecode compilation and set link mode for uv
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install git for installing dependencies from git repositories
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of the application code into the container
+# Create the virtual environment
+RUN uv venv .venv
+
+# Set environment variables to use the virtual environment
+ENV VIRTUAL_ENV=/profiling/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install dependencies into the virtual environment using uv and the lockfile
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-dev
+
+# Copy the rest of the application code
 COPY . .
 
-# Define the command to run the application
-CMD ["python", "src/main.py"]
+# Unbuffer Python output 
+ENV PYTHONUNBUFFERED=1
+
+# Start the FastAPI app with hot reload for development
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

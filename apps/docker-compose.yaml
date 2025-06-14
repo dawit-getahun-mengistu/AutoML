@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   db:
     image: postgis/postgis
@@ -45,20 +43,28 @@ services:
 
   seaweedfs-s3:
     image: chrislusf/seaweedfs
-    container_name: seaweedfs-s3-test
+    container_name: seaweedfs-s3
     ports:
-      - "8333:8333"
+      - "8333:8333"  # S3 port
+      - "9333:9333"  # Optional: master port if needed
+      - "8080:8080"  # Optional: volume port if needed
     volumes:
       - ${SEAWEEDFS_CONFIG_PATH}:/etc/seaweedfs/config.json
     entrypoint: /bin/sh -c
     command: |
-      "weed server -s3 -s3.config /etc/seaweedfs/config.json"
+      "weed server -s3 -s3.config /etc/seaweedfs/config.json \
+      -ip=seaweedfs-s3 -publicUrl=localhost:8333"
     restart: unless-stopped
     networks:
       - automl
 
+
   user-be:
-    image: tinsu2/user-api-gateway:latest
+    restart: always
+    build:
+      context: ./user-be
+      dockerfile: Dockerfile
+    image: ${USER_BE_IMAGE:-user-be:dev}
     ports:
       - 3001:3001
     volumes:
@@ -66,6 +72,13 @@ services:
       - /usr/src/app/node_modules
     env_file:
       - .env
+    environment:
+      SEAWEED_ACCESS_KEY: "any"
+      SEAWEED_SECRET_KEY: "any"
+      SEAWEED_S3_ENDPOINT: "http://seaweedfs-s3:8333" # Use the service name
+      AWS_EC2_METADATA_DISABLED: "true" # Disable AWS metadata checks
+      AWS_SDK_LOAD_CONFIG: "false" # Disable AWS config file loading
+
     depends_on:
       db:
         condition: service_healthy
@@ -78,8 +91,31 @@ services:
     networks:
       - automl
 
+  data-profiling-node:
+    build:
+      context: ./data-profiling-node
+      dockerfile: Dockerfile
+    volumes:
+      - ./data-profiling-node:/profiling
+      - /profiling/.venv
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      seaweedfs-s3:
+        condition: service_started
+    ports:
+      - 8000:8000
+    networks:
+      - automl
+
   user-fe:
-    image: tinsu2/user-dashboard:latest
+    build:
+      context: .
+      dockerfile: user-fe/Dockerfile
+    image: ${USER_FE_IMAGE:-user-fe:dev}
     ports:
       - 3000:3000
     volumes:

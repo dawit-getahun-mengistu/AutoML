@@ -20,16 +20,17 @@ model RefreshToken {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  username     String   @unique
-  email        String   @unique
+  id           String    @id @default(uuid())
+  username     String    @unique
+  email        String    @unique
   passwordHash String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
 
   // Relations (user has projects, reports, and chats)
   projects Project[]
-  // reports       Report[]   
-  // chats         Chat[]    
+  reports  Report[]
+  chats    Chat[]
 
   // Indexes (optional for faster lookups)
   @@index([username])
@@ -38,7 +39,6 @@ model User {
 }
 
 // status = ["Active", "Inactive", "Completed"]
-
 enum ProjectStatus {
   ACTIVE
   INACTIVE
@@ -50,21 +50,216 @@ model Project {
   name        String
   description String?
 
+  taskType         TaskType?
+  task_description String?
+
   status ProjectStatus
 
   // Foreign key relation
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 
   // Relations (Assuming datasets, models, reports, and chat)
-  // datasets    Dataset[]
-  // models      Model[]
-  // reports     Report[]
-  // chats       Chat[]
+  datasets Dataset[]
+  models   Model[]
+  reports  Report[]
+  chats    Chat[]
 
   @@index([name])
   @@index([userId])
   @@map("projects")
+}
+
+enum DatasetStatus {
+  UPLOADED
+  PROCESSING
+  READY
+  IN_USE
+  ARCHIVED
+}
+
+enum ProcessStatus {
+  NOT_STARTED
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum TaskType {
+  CLASSIFICATION
+  REGRESSION
+  CLUSTERING
+  ANOMALY_DETECTION
+  TIME_SERIES_FORECASTING
+}
+
+enum TrainingType {
+  CLASSICAL
+  NAS
+}
+
+enum DatasetFormat {
+  CSV
+  EXCEL
+}
+
+model Dataset {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  status DatasetStatus
+  file   String
+  format DatasetFormat
+  size   Int?
+  rows   Int?
+  cols   Int?
+
+  profiling_context           Json? // LLM context for profiling
+  feature_selection_context   Json? // LLM context for feature selection
+  feature_engineering_context Json? // LLM context for feature engineering
+  training_context            Json? // LLM context for training
+
+  profiling_metadata           Json? // Metadata from profiling
+  feature_selection_metadata   Json? // Metadata from feature selection and engineering
+  feature_engineering_metadata Json? // Metadata from feature engineering
+  training_metadata            Json? // Metadata from training
+
+  // Process statuses
+  profilingStatus          ProcessStatus @default(PENDING)
+  featureSelectionStatus   ProcessStatus @default(NOT_STARTED)
+  featureEngineeringStatus ProcessStatus @default(NOT_STARTED)
+  trainingStatus           ProcessStatus @default(NOT_STARTED)
+
+  // Errors
+  profilingError          String? @default("")
+  featureSelectionError   String? @default("")
+  featureEngineeringError String? @default("")
+  trainingError           String? @default("")
+  llmError                String? @default("")
+
+  // File versions
+  EDAFileViz                String? // HTML File after EDA
+  FeaturesVizFile           String? // HTML File after feature selection
+  featureEngineeringVizFile String? // HTML File after feature engineering
+  trainingVizFile           String? // HTML File after training
+
+  profilingFile          String? // File after profiling  
+  featureSelectionFile   String? // File after feature selection
+  featureEngineeringFile String? // File after feature engineering
+  trainingFile           String? // File after training
+  trainingType           TrainingType? // Type of training (Classical or NAS)
+
+  // Relations (Assuming attributes)
+  attributes Attribute[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+enum DataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  DATE
+  TIME
+  DATETIME
+  JSON
+}
+
+model Attribute {
+  id          String  @id @default(uuid())
+  name        String?
+  description String?
+
+  datasetId String
+  dataset   Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  dataType          String
+  isNullable        Boolean @default(false)
+  isTargetAttribute Boolean @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Model {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Relations (Assuming model performance, inference requests)
+  modelPerformances ModelPerformance[]
+  inferenceRequests InfereneRequest[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Report {
+  id      String @id @default(uuid())
+  title   String
+  content String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model ModelPerformance {
+  id      String @id @default(uuid())
+  modelId String
+  model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  metricName  String
+  metricValue Float
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model InfereneRequest {
+  id      String @id @default(uuid())
+  modelId String
+  model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  inputData  Json
+  prediction Json
+
+  // Request body
+  requestBody String?
+
+  // Response body
+  responseBody String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Chat {
+  id      String @id @default(uuid())
+  message String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
