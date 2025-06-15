@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit, Logger, HttpException, HttpStatus } from "@nestjs/common";  
 import amqp, { ChannelWrapper } from "amqp-connection-manager";
 import { Channel } from "amqplib";
+import { Queues } from "./queues";
 
 
 
@@ -8,10 +9,7 @@ import { Channel } from "amqplib";
 @Injectable()
 export class ProducerService {
     private channelWrapper: ChannelWrapper;
-    readonly queues = [
-        process.env.DATA_PROFILING_REQUEST_QUEUE || 'DATA_PROFILING_REQUEST_QUEUE',
-        process.env.DATA_PROFILING_RESULT_QUEUE || 'DATA_PROFILING_RESULT_QUEUE',
-    ];
+    readonly queues = Queues.getAllQueues()
     constructor() {
         const connection = amqp.connect([process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672']);
         this.channelWrapper = connection.createChannel({

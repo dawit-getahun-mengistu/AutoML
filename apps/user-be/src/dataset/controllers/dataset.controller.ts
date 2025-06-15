@@ -23,6 +23,9 @@ import { ApiDefaultResponses } from 'src/decorators';
 import { DatasetService } from '../services/dataset.service';
 import { getFileValidator } from './file-type-validaor';
 import { ProfilingService } from '../services/profiling.service';
+import { TargetSpecificationDto } from '../dto/target-specification.dto';
+import { ResponseDatasetDto } from '../dto/response-dataset.dto';
+import { EngineeringService } from '../services/feature_engineering.service';
 
 
 
@@ -35,6 +38,7 @@ export class DatasetController {
   constructor(
     private readonly datasetService: DatasetService,
     private readonly profilingService: ProfilingService, 
+    private readonly engineeringService: EngineeringService
   ) {}
 
 
@@ -55,7 +59,7 @@ export class DatasetController {
       },
     },
   })
-  @ApiDefaultResponses({ type: CreateDatasetDto })
+  @ApiDefaultResponses({ type: ResponseDatasetDto })
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async create(
@@ -76,21 +80,21 @@ export class DatasetController {
   }
 
 
-  @ApiDefaultResponses({type: CreateDatasetDto})
+  @ApiDefaultResponses({type: ResponseDatasetDto})
   @Get('project/:projectId')
   async findAll(@Param('projectId') projectId: string) {
     return this.datasetService.findAll(projectId);
   }
 
 
-  @ApiDefaultResponses({type: CreateDatasetDto})
+  @ApiDefaultResponses({type: ResponseDatasetDto})
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.datasetService.findOne(id);
   }
 
 
-  @ApiDefaultResponses({type: UpdateDatasetDto})
+  @ApiDefaultResponses({type: ResponseDatasetDto})
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -99,7 +103,17 @@ export class DatasetController {
     return this.datasetService.update(id, updateDatasetDto);
   }
 
-  @ApiDefaultResponses({type: CreateDatasetDto})
+  @ApiOperation({ summary: 'Specify target column and task type for a dataset' })
+  @ApiDefaultResponses({ type: ResponseDatasetDto })
+  @Patch(':id/specify-targets')
+  async specifyTargets(
+    @Param('id') id: string,
+    @Body() targetDto: TargetSpecificationDto,
+  ) {
+    return this.datasetService.specifyTargets(id, targetDto);
+  }
+
+  @ApiDefaultResponses({type: ResponseDatasetDto})
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.datasetService.remove(id);
@@ -110,7 +124,7 @@ export class DatasetController {
     return this.datasetService.getDatasetUrl(id);
   }
 
-  @ApiDefaultResponses({ type: CreateDatasetDto }) // Adjust response type if needed
+  // DATA PROFILING
   @Patch(':id/start-profiling')
   async startProfiling(@Param('id') id: string) {
     return this.datasetService.startDatasetProfiling(id);
@@ -120,4 +134,17 @@ export class DatasetController {
   async getEda(@Param('id') id: string) {
     return this.profilingService.pollProfilingStatus(id);
   }
+
+
+  // FEATURE ENGINEERING
+  @Patch(':id/start-feature-engineering')
+  async startFeatEngineering(@Param('id') id: string) {
+    return this.datasetService.startDatasetFeatureEngineering(id);
+  }
+
+  @Get(':id/feature-engineering')
+  async getFeatureEngineering(@Param('id') id: string){
+    return this.engineeringService.pollEngineeringStatus(id);
+  }
+
 }
