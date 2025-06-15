@@ -27,9 +27,9 @@ def process_message(ch, method, properties, body):
 
         # Process the feature engineering task
         data_keys = process_feature_engineering_from_queue(dataset_key=task_info.dataset_key, profiling=task_info.json_str, task_type=task_info.task_type, target_column=task_info.target_column)
-
+        
         # publish the result to the result queue
-        send_message(message=data_keys)
+        send_message(message={"dataset_id": task_info.dataset_id, **data_keys})
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except json.JSONDecodeError as e:
