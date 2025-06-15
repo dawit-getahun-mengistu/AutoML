@@ -73,6 +73,14 @@ export class EngineeringService {
         featureEngineeringReportHtml: string;
         engineeringMetadata: any;
     } {
+        // Payload Recieved includes
+            // dataset_id: id
+            // data_key: the updated dataset after feature engineering
+            // feature_engineering_code_key: code to be saved
+            // feature_transformation_code_key: code to be saved
+            // summary_key: summary html report generated file
+            // learned_parameters: json report of the feature engineering service
+            // 
         const payload = tryParseJson(report) as any;
 
         if (!payload || !payload.dataset_id) {
@@ -119,13 +127,13 @@ export class EngineeringService {
         } catch (err) {
             // Handle errors and update the dataset status
             if (id) {
-            await this.prisma.dataset.update({
-                where: { id },
-                data: {
-                    featureEngineeringStatus: ProcessStatus.FAILED,
-                    featureEngineeringError: err.message,
-                },
-            });
+                await this.prisma.dataset.update({
+                    where: { id },
+                    data: {
+                        featureEngineeringStatus: ProcessStatus.FAILED,
+                        featureEngineeringError: err.message,
+                    },
+                });
             }
 
             throw new Error(`Feature Engineering failed: ${err.message}`);

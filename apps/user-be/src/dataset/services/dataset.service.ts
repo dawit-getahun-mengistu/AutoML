@@ -11,6 +11,7 @@ import type { Readable } from 'stream';
 import { DmsService } from 'src/dms/dms.service';
 import { EngineeringService } from './feature_engineering.service';
 import { TargetSpecificationDto } from '../dto/target-specification.dto';
+import { FeatureSelectionService } from './feature_selection.service';
 
 @Injectable()
 export class DatasetService {
@@ -20,7 +21,8 @@ export class DatasetService {
     private dataManagementService: DmsService,
     private producerService: ProducerService,
     private profilingService: ProfilingService,
-    private engineeringService: EngineeringService
+    private engineeringService: EngineeringService,
+    private featureSelectionService: FeatureSelectionService,
   ) {}
 
   async create(
@@ -180,7 +182,7 @@ export class DatasetService {
       throw new NotFoundException(`Dataset with ID ${id} not found`);
     }
 
-    if (!await this.areTargetsFullySpecified(id, dataset)) {
+    if (!await this.areTargetsFullySpecified(id)) {
       throw new BadRequestException('Target Column or Task Type are not fully specified');
     }
 
@@ -202,6 +204,15 @@ export class DatasetService {
     }
     // Start Engineering
     return await this.engineeringService.startFeatureEngineering(id);
+  }
+
+  async startDatasetFeatureSelection(id: string) {
+    // first check targets are fully specified
+    if (!await this.areTargetsFullySpecified(id)) {
+      throw new BadRequestException('Target Column or Task Type are not fully specified');
+    }
+    // Start Feature Selection
+    return await this.featureSelectionService.startFeatureSelection(id);
   }
 
 }
