@@ -3,11 +3,10 @@ from urllib.parse import urlparse
 import pandas as pd
 import logging, json
 
-import requests
+import requests, uuid
 from agents.feature_engineer.agent import feature_engineer
 from agents.predict_feature_creator.agent import predict_feature_creator
 from agents.summarizer.agent import page_generator
-from services.storage_service import StorageService
 from services.s3_service import S3Service
 
 s3_service = S3Service()
@@ -147,6 +146,39 @@ def download_dataset(dataset_key: str):
                         f"Unsupported file format. Failed to parse content. URL: {file_uri}"
                     ) from e
 
+def upload_results_to_s3():
+    # upload the feature engineered data to s3
+    with open("files/resulting_data.csv", "rb") as f:
+        data_name = str(str(uuid.uuid4())) + ".csv"
+        s3_service.upload_single_file(file_obj=f, filename=data_name, content_type="text/csv", is_public=True, key=data_name)
+    
+    # upload the feature_engineering code to s3
+    with open("files/feature_engineering_code.py", "rb") as f:
+        feature_engineering_name = str(str(uuid.uuid4())) + "feature_engineering.py"
+        s3_service.upload_single_file(file_obj=f, filename=feature_engineering_name, content_type="text/x-python", is_public=True, key=data_name)
+
+    # upload the feature_transformation code to s3
+    with open("files/feature_transformation_code.py", "rb") as f:
+        feature_transformation_name = str(str(uuid.uuid4())) + "feature_transformation.py"
+        s3_service.upload_single_file(file_obj=f, filename=feature_transformation_name, content_type="text/x-python", is_public=True, key=data_name)
+
+    # upload the summary page to s3
+    with open("files/summary.html", "rb") as f:
+        summary_name = str(str(uuid.uuid4())) + "summary.html"
+        s3_service.upload_single_file(file_obj=f, filename=summary_name, content_type="text/html", is_public=True, key=summary_name)
+
+    # load the learned parameters from the json file
+    with open("files/learned_parameters.json", "r") as f:
+        learned_parameters = json.load(f)
+
+    return {
+        "data_key": data_name,
+        "feature_engineering_code_key": feature_engineering_name,
+        "feature_transformation_code_key": feature_transformation_name,
+        "summary_key": summary_name,
+        "learned_parameters": learned_parameters
+    }
+
 def process_feature_engineering_from_queue(
         dataset_key:str,
         profiling: str,
@@ -165,7 +197,8 @@ def process_feature_engineering_from_queue(
         # now profile the dataset
         process_feature_engineering(csv_data, profiling_data, target_column, task_type)
 
+        # now upload the results to s3
+        return upload_results_to_s3()
+
     except Exception as e:
         logger.error(f"Error loading dataset: {e}")
-        return
-
