@@ -8,12 +8,15 @@ import { RmqModule } from 'src/rmq/rmq.module';
 import { ProfilingService } from './services/profiling.service';
 import { FileService } from './services/file.service';
 import { DmsService } from 'src/dms/dms.service';
+import { EngineeringService } from './services/feature_engineering.service';
+import { Queues } from 'src/rmq/queues';
+import { FeatureEngineeringConsumerService } from './services/feature-engineering-consumer.service';
 
 
 @Module({
-  imports: [PrismaModule, SeaweedModule.forRootAsync(), RmqModule],
+  imports: [PrismaModule, SeaweedModule.forRootAsync(), RmqModule, Queues,],
   controllers: [DatasetController],
-  providers: [DatasetService, DataProfilingConsumerService, ProfilingService, FileService, DmsService],
+  providers: [DatasetService, DataProfilingConsumerService, FeatureEngineeringConsumerService, ProfilingService, EngineeringService, FileService, DmsService],
   exports: [DatasetService, ProfilingService, FileService],
 })
 export class DatasetModule {}

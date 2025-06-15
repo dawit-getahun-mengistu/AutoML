@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateDatasetDto } from './../dto/create-dataset.dto';
@@ -9,6 +9,8 @@ import { ProducerService } from 'src/rmq/producer.service';
 import { ProfilingService } from './profiling.service';
 import type { Readable } from 'stream';
 import { DmsService } from 'src/dms/dms.service';
+import { EngineeringService } from './feature_engineering.service';
+import { TargetSpecificationDto } from '../dto/target-specification.dto';
 
 @Injectable()
 export class DatasetService {
@@ -17,7 +19,8 @@ export class DatasetService {
     private prisma: PrismaService,
     private dataManagementService: DmsService,
     private producerService: ProducerService,
-    private profilingService: ProfilingService
+    private profilingService: ProfilingService,
+    private engineeringService: EngineeringService
   ) {}
 
   async create(
@@ -26,10 +29,6 @@ export class DatasetService {
     start_profiling: boolean = false,
   ) {
     const { projectId, name, description, format } = createDatasetDto;
-
-    // Upload file to SeaweedFS
-    // const objectName = `${projectId}/${uuidv4()}-${file.originalname}`;
-    // await this.storageService.uploadFile('datasets', objectName, file.buffer);
 
     const { url, key, isPublic } = await this.dataManagementService.uploadSingleFile({file, isPublic: true});
     
@@ -88,6 +87,55 @@ export class DatasetService {
     });
   }
 
+  async specifyTargets(id: string, targetDto: TargetSpecificationDto) {
+    // Lookup the dataset and ensure it exists
+    const dataset = await this.prisma.dataset.findUnique({
+      where: { id },
+      include: { project: true }
+    });
+    if (!dataset) {
+      throw new NotFoundException(`Dataset with ID ${id} not found`);
+    }
+
+    const { targetColumnName, taskType } = targetDto;
+
+    // Update both the project's task type and the dataset's target column name atomically
+    await this.prisma.$transaction([
+      this.prisma.project.update({
+        where: { id: dataset.projectId },
+        data: { taskType }
+      }),
+      this.prisma.dataset.update({
+        where: { id },
+        data: { targetColumnName }
+      })
+    ]);
+
+    // Return the updated dataset
+    return this.prisma.dataset.findUnique({ where: { id } });
+  }
+
+  async areTargetsFullySpecified(id: string, dataset: any = undefined): Promise<boolean> {
+    if (!dataset){
+      // Fetch the dataset by ID
+      dataset = await this.prisma.dataset.findUnique({
+        where: { id },
+        select: { targetColumnName: true, project: { select: { taskType: true } } }, // Fetch targetColumnName and taskType
+      });
+    }
+
+    // If the dataset does not exist, throw an exception
+    if (!dataset) {
+      throw new NotFoundException(`Dataset with ID ${id} not found`);
+    }
+
+    // Check if both targetColumnName and taskType are specified
+    const isTargetColumnSpecified = !!dataset.targetColumnName; // True if targetColumnName is not null or undefined
+    const isTaskTypeSpecified = !!dataset.project?.taskType; // True if taskType is not null or undefined
+
+    return isTargetColumnSpecified && isTaskTypeSpecified; // Return true only if both are specified
+  }
+
   async remove(id: string) {
     const dataset = await this.prisma.dataset.findUnique({ where: { id } });
 
@@ -125,15 +173,15 @@ export class DatasetService {
     }
   }
 
-  private extractFilename(filePath: string): string {
-    return filePath.split('/').pop() || 'dataset-file';
-  }
-
   async startDatasetProfiling(id: string) {
     const dataset = await this.prisma.dataset.findUnique({ where: { id }});
 
     if (!dataset) {
       throw new NotFoundException(`Dataset with ID ${id} not found`);
+    }
+
+    if (!await this.areTargetsFullySpecified(id, dataset)) {
+      throw new BadRequestException('Target Column or Task Type are not fully specified');
     }
 
     // Check if the dataset is already being profiled
@@ -142,8 +190,18 @@ export class DatasetService {
       }
 
     // Start profiling
-    return await this.profilingService.startProfiling(id, dataset)
+    return await this.profilingService.startProfiling(id, dataset);
 
+  }
+
+
+  async startDatasetFeatureEngineering(id: string) {
+    // First check targets are fully specified
+    if (!await this.areTargetsFullySpecified(id)) {
+      throw new BadRequestException('Target Column or Task Type are not fully specified');
+    }
+    // Start Engineering
+    return await this.engineeringService.startFeatureEngineering(id);
   }
 
 }

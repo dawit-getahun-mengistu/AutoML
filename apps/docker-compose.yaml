@@ -89,6 +89,24 @@ services:
     networks:
       - automl
 
+  feature-engineering-node:
+    build:
+      context: ./feature-engineering-node
+      dockerfile: Dockerfile
+    volumes:
+      - ./feature-engineering-node:/engineering
+      - /engineering/.venv
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 8002:8002
+    networks:
+      - automl
+
   user-fe:
     build:
       context: .

@@ -121,6 +121,12 @@ model Dataset {
   rows   Int?
   cols   Int?
 
+  targetColumnName String? // Name of target Column
+
+  // Feature Engineering Generated Code Files
+  featureEngineeringCode    String?
+  featureTransformationCode String?
+
   profiling_context           Json? // LLM context for profiling
   feature_selection_context   Json? // LLM context for feature selection
   feature_engineering_context Json? // LLM context for feature engineering
@@ -150,11 +156,11 @@ model Dataset {
   featureEngineeringVizFile String? // HTML File after feature engineering
   trainingVizFile           String? // HTML File after training
 
-  profilingFile          String? // File after profiling  
-  featureSelectionFile   String? // File after feature selection
-  featureEngineeringFile String? // File after feature engineering
-  trainingFile           String? // File after training
-  trainingType           TrainingType? // Type of training (Classical or NAS)
+  afterProfilingFile          String? // File after profiling  
+  afterFeatureSelectionFile   String? // File after feature selection
+  afterFeatureEngineeringFile String? // File after feature engineering
+  afterTrainingFile           String? // File after training
+  trainingType                TrainingType? // Type of training (Classical or NAS)
 
   // Relations (Assuming attributes)
   attributes Attribute[]
