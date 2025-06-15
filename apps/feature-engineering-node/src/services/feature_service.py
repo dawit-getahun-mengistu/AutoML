@@ -107,7 +107,7 @@ def process_feature_engineering(csv_data: pd.DataFrame, profiling_data: dict, ta
 
 def download_dataset(dataset_key: str):
     # load the dataset from the dataset_key
-    file_uri = s3_service._public_object_url(bucket_name="datasets", object_name=dataset_key)
+    file_uri = s3_service._public_object_url(key=dataset_key)
     if not file_uri:
             raise ValueError(f"Failed to get presigned URL for dataset file: {dataset_key}")
   

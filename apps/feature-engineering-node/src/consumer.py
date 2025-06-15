@@ -6,7 +6,8 @@ import logging
 from data_utils.schemas import TaskDefinition
 from services.feature_service import process_feature_engineering_from_queue
 
-RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "rabbitmq")
+# RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "rabbitmq")
+RABBITMQ_HOST = "localhost"
 QUEUE_NAME = os.environ.get("DATA_ENGINEERING_REQUEST_QUEUE", "DATA_ENGINEERING_REQUEST_QUEUE")
 
 # Logger Config
@@ -25,7 +26,7 @@ def process_message(ch, method, properties, body):
         logger.info(f"Task Definition: {task_info}")
 
         # Process the feature engineering task
-        process_feature_engineering_from_queue(dataset_key=task_info.dataset_key, profiling=task_info.json_key)
+        process_feature_engineering_from_queue(dataset_key=task_info.dataset_key, profiling=task_info.json_str, task_type=task_info.task_type, target_column=task_info.target_column)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except json.JSONDecodeError as e:
