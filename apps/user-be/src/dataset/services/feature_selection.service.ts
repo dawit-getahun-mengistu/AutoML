@@ -1,9 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { ProcessStatus } from "@prisma/client";
+import { BadRequestException, Injectable, Logger, NotFoundException, Query } from "@nestjs/common";
+import { DatasetStatus, ProcessStatus } from "@prisma/client";
 import { tryParseJson } from "constants/parsing";
 import { DmsService } from "src/dms/dms.service";
 import { PrismaService } from "src/prisma/prisma.service";
 import { ProducerService } from "src/rmq/producer.service";
+import { Queues } from "src/rmq/queues";
 
 
 @Injectable()
@@ -19,7 +20,53 @@ export class FeatureSelectionService{
 
     // start feature selection
     async startFeatureSelection(id: string) {
+        const dataset = await this.prisma.dataset.findUnique({
+            where: {id},
+            include: { project: true}
+        });
 
+        if (!dataset) {
+            throw new NotFoundException(`Dataset with ID ${id} not found`);
+        }
+
+        // Check if feature engineering has been completed first
+        if (dataset.featureEngineeringStatus != ProcessStatus.COMPLETED) {
+            throw new BadRequestException(`Dataset with ID ${id} must complete feature engineering for the feature selection to start.`);
+        }
+        if (dataset.featureSelectionStatus === ProcessStatus.IN_PROGRESS){
+            throw new BadRequestException(`Feature Selection is already in progress for Dataset with ID ${id}`)
+        }
+        if (dataset.featureSelectionStatus === ProcessStatus.COMPLETED) {
+            throw new BadRequestException(`Feature Selection can't be started again because it has already been completed for Dataset with ID ${id}`)
+        }
+
+        // define the feature selection payload
+        // dataset_id
+        // dataset_key: the feature engineering output dataset (the object name/key)
+        // target_column: name of the target column
+        const selection_payload = {
+            dataset_id: dataset.id,
+            dataset_key: dataset.afterFeatureEngineeringFile,
+            target_column: dataset.targetColumnName
+        }
+
+        // senf a message to a message queue to start feature selection
+        await this.producerService.sendToQueue(
+            Queues.DATA_SELECTION_REQUEST_QUEUE,
+            selection_payload,
+        );
+
+        // Update dataset status
+        await this.prisma.dataset.update({
+            where: {id},
+            data: {
+                status: DatasetStatus.PROCESSING,
+                featureSelectionStatus: ProcessStatus.IN_PROGRESS,
+                featureSelectionError: "",
+            }
+        });
+
+        return {message: `Feature Selection started for dataset with ID ${id}`};
     }
 
     // Parse payload
@@ -76,7 +123,7 @@ export class FeatureSelectionService{
             await this.prisma.dataset.update({
                 where: { id },
                 data: {
-                    // TODO: add selected columns to the schema
+                    selectedColumns: selectedColumns,
                     afterFeatureSelectionFile: datasetAfterFeatureSelection,
                     FeaturesVizFile: featureSelectionReportHtml,
                     feature_selection_metadata: feature_selection_context                    
@@ -103,6 +150,49 @@ export class FeatureSelectionService{
     }
 
     // get feature selection result
-    async getFeatureSelectionData(id: string){}
+    async getFeatureSelectionData(id: string){
+        const dataset = await this.prisma.dataset.findUnique({
+            where: {id},
+            select: {
+                selectedColumns: true,
+                feature_selection_metadata: true,
+                featureSelectionStatus: true,
+                featureSelectionError: true
+            }
+        })
+
+        if (!dataset){
+            throw new NotFoundException(`Dataset with ID ${id} not found`);
+        }
+
+        return dataset;
+    }
+
+    // poll selection status
+    async pollSelectionStatus(id: string) {
+        const dataset = await this.prisma.dataset.findUnique({
+            where: {id},
+            select: {
+                featureSelectionStatus: true,
+                featureSelectionError: true,
+                afterFeatureSelectionFile: true, // include dataset after feature selection
+                FeaturesVizFile: true, // include viz HTML file
+            }
+        });
+
+        if (!dataset) {
+            throw new NotFoundException(`Dataset with ID ${id} not found`);
+        }
+
+        // get the URLs
+        if (dataset.afterFeatureSelectionFile && dataset.FeaturesVizFile){
+            const vizUrl = await this.dataManagementService.getFileUrl(dataset.FeaturesVizFile);
+            const fileUrl = await this.dataManagementService.getFileUrl(dataset.afterFeatureSelectionFile)
+
+            return {...dataset, afterFeatureSelectionFile: fileUrl, FeaturesVizFile: vizUrl}
+        }
+
+        return dataset;
+    }
 
 }

@@ -6,7 +6,6 @@ pika
 boto3
 botocore
 jsonschema
-git+https://git@github.com/WildCayote/SeaweedS3Client.git
 langchain
 langchain-openai
 langchain-community

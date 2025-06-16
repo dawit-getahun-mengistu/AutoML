@@ -127,10 +127,11 @@ model Dataset {
   featureEngineeringCode    String?
   featureTransformationCode String?
 
-  profiling_context           Json? // LLM context for profiling
-  feature_selection_context   Json? // LLM context for feature selection
-  feature_engineering_context Json? // LLM context for feature engineering
-  training_context            Json? // LLM context for training
+  // LLM Contexts (OPTIONAL)
+  // profiling_context           Json? // LLM context for profiling
+  // feature_selection_context   Json? // LLM context for feature selection
+  // feature_engineering_context Json? // LLM context for feature engineering
+  // training_context            Json? // LLM context for training
 
   profiling_metadata           Json? // Metadata from profiling
   feature_selection_metadata   Json? // Metadata from feature selection and engineering
@@ -151,16 +152,21 @@ model Dataset {
   llmError                String? @default("")
 
   // File versions
+  // Visualization Files: Usually HTML
   EDAFileViz                String? // HTML File after EDA
   FeaturesVizFile           String? // HTML File after feature selection
   featureEngineeringVizFile String? // HTML File after feature engineering
   trainingVizFile           String? // HTML File after training
 
+  // DatasetVersioning
   afterProfilingFile          String? // File after profiling  
   afterFeatureSelectionFile   String? // File after feature selection
   afterFeatureEngineeringFile String? // File after feature engineering
   afterTrainingFile           String? // File after training
   trainingType                TrainingType? // Type of training (Classical or NAS)
+
+  // Columns selected after feature engineering for training
+  selectedColumns String[]
 
   // Relations (Assuming attributes)
   attributes Attribute[]
