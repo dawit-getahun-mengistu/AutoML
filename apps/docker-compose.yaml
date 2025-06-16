@@ -107,6 +107,24 @@ services:
     networks:
       - automl
 
+  feature-selection-node:
+    build:
+      context: ./feature-selection-node
+      dockerfile: Dockerfile
+    volumes:
+      - ./feature-selection-node:/selection
+      - /selection/.venv
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 8003:8003
+    networks:
+      - automl
+
   user-fe:
     build:
       context: .
