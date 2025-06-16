@@ -33,12 +33,12 @@ export class FeatureSelectionService{
         if (dataset.featureEngineeringStatus != ProcessStatus.COMPLETED) {
             throw new BadRequestException(`Dataset with ID ${id} must complete feature engineering for the feature selection to start.`);
         }
-        if (dataset.featureSelectionStatus === ProcessStatus.IN_PROGRESS){
-            throw new BadRequestException(`Feature Selection is already in progress for Dataset with ID ${id}`)
-        }
-        if (dataset.featureSelectionStatus === ProcessStatus.COMPLETED) {
-            throw new BadRequestException(`Feature Selection can't be started again because it has already been completed for Dataset with ID ${id}`)
-        }
+        // if (dataset.featureSelectionStatus === ProcessStatus.IN_PROGRESS){
+        //     throw new BadRequestException(`Feature Selection is already in progress for Dataset with ID ${id}`)
+        // }
+        // if (dataset.featureSelectionStatus === ProcessStatus.COMPLETED) {
+        //     throw new BadRequestException(`Feature Selection can't be started again because it has already been completed for Dataset with ID ${id}`)
+        // }
 
         // define the feature selection payload
         // dataset_id
@@ -101,7 +101,7 @@ export class FeatureSelectionService{
                 figure_data: payload.figure_data
             },
             datasetAfterFeatureSelection: payload.transformed_data,
-            featureSelectionReportHtml: payload.symmary
+            featureSelectionReportHtml: payload.summary
         }
 
     }
@@ -126,7 +126,8 @@ export class FeatureSelectionService{
                     selectedColumns: selectedColumns,
                     afterFeatureSelectionFile: datasetAfterFeatureSelection,
                     FeaturesVizFile: featureSelectionReportHtml,
-                    feature_selection_metadata: feature_selection_context                    
+                    feature_selection_metadata: feature_selection_context  ,
+                    featureSelectionStatus: ProcessStatus.COMPLETED                  
                 },
             });
 

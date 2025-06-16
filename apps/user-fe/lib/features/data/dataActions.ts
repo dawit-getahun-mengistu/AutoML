@@ -280,3 +280,68 @@ export const fetchEDAByDatasetId = createAppAsyncThunk<
     }
   }
 );
+
+
+export const startFeatureEngineering = createAppAsyncThunk<
+  string,
+  string
+>(
+  "datasets/start-feature-engineering",
+  async (datasetId, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
+        }
+      };
+
+      const response = await axios.patch(
+        `${backendURL}/datasets/${datasetId}/start-feature-engineering`,
+        {},
+        config
+      );
+      console.log("start feature engineering log",response)
+      return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message;
+        return rejectWithValue(
+          Array.isArray(errorMessage) 
+            ? errorMessage.join(", ") 
+            : errorMessage || "Failed to start feature engineering"
+        );
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
+
+
+export const fetchFeatureEngineeringResults = createAppAsyncThunk<
+ string,  // Returns EDA report object
+  string      // datasetId as input
+>(
+  "datasets/fetchFeatureEngineering",
+  async (datasetId, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
+        }
+      };
+      
+      const response = await axios.get(
+        `${backendURL}/datasets/${datasetId}/feature-engineering`,
+        config
+      );
+      console.log("fetch feature engineering log", response)
+      return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data?.message || "Failed to fetch EDA report");
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);

@@ -4,6 +4,7 @@ import matplotlib
 import requests
 
 from services.s3_service import S3Service
+
 matplotlib.use("Agg")
 
 import io, logging, json
@@ -23,10 +24,13 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def generate_summary(context: dict):
-    summary = page_generator.invoke({
-        "learned_parameters": json.dumps(context, indent=2),
-    })
+    summary = page_generator.invoke(
+        {
+            "learned_parameters": json.dumps(context, indent=2),
+        }
+    )
     summary = summary.replace("`", "").replace("html", "")
     resulting_page = f"""
       <!DOCTYPE html>
@@ -69,14 +73,15 @@ def generate_summary(context: dict):
       """
 
     with open("files/summary.html", "w") as file:
-          file.write(resulting_page)
-    
+        file.write(resulting_page)
+
+
 def download_dataset(dataset_key: str):
     # load the dataset from the dataset_key
     file_uri = s3_service._public_object_url(key=dataset_key)
     if not file_uri:
-            raise ValueError(f"Failed to get presigned URL for dataset file: {dataset_key}")
-  
+        raise ValueError(f"Failed to get presigned URL for dataset file: {dataset_key}")
+
     response = requests.get(file_uri)
     response.raise_for_status()
 
@@ -113,8 +118,9 @@ def download_dataset(dataset_key: str):
                         f"Unsupported file format. Failed to parse content. URL: {file_uri}"
                     ) from e
 
+
 def extract_data_from_figure(fig):
-  """
+    """
     Inspects a Matplotlib Figure object and extracts numerical data from its axes.
 
     This function iterates through each Axes in the figure and attempts to pull
@@ -128,140 +134,152 @@ def extract_data_from_figure(fig):
         list: A list of dictionaries, where each dictionary represents one
               Axes and contains the extracted data and metadata.
     """
-  extracted_data = []
-  # A figure can have multiple subplots (Axes)
-  for i, ax in enumerate(fig.get_axes()):
-    axis_data = {
-      "axis_index": i,
-      "title": ax.get_title(),
-      "xlabel": ax.get_xlabel(),
-      "ylabel": ax.get_ylabel(),
-      "lines": [],
-      "bars": [],
-      "scatter": [],
-    }
-
-    # 1. Extract data from line plots (Line2D objects)
-    for line in ax.lines:
-      axis_data["lines"].append(
-        {
-          "label": line.get_label(),
-          "x_data": str(line.get_xdata()),
-          "y_data": str(line.get_ydata()),
+    extracted_data = []
+    # A figure can have multiple subplots (Axes)
+    for i, ax in enumerate(fig.get_axes()):
+        axis_data = {
+            "axis_index": i,
+            "title": ax.get_title(),
+            "xlabel": ax.get_xlabel(),
+            "ylabel": ax.get_ylabel(),
+            "lines": [],
+            "bars": [],
+            "scatter": [],
         }
-      )
 
-    # 2. Extract data from bar plots (Rectangle patches)
-    # We check for BarContainer to be more specific, but iterating patches works
-    for patch in ax.patches:
-      # This check helps ignore non-bar rectangles like the axis frame
-      if isinstance(patch, plt.Rectangle):
-        axis_data["bars"].append(
-          {
-            "x_coord": str(patch.get_x()),
-            "y_coord": str(patch.get_y()),
-            "width": str(patch.get_width()),
-            "height": str(patch.get_height()),
-          }
-        )
+        # 1. Extract data from line plots (Line2D objects)
+        for line in ax.lines:
+            axis_data["lines"].append(
+                {
+                    "label": line.get_label(),
+                    "x_data": str(line.get_xdata()),
+                    "y_data": str(line.get_ydata()),
+                }
+            )
 
-    # 3. Extract data from scatter plots (PathCollection objects)
-    for collection in ax.collections:
-      # get_offsets() returns an (N, 2) array of (x, y) coordinates
-      offsets = collection.get_offsets()
-      axis_data["scatter"].append(
-        {"x_data": offsets[:, 0], "y_data": offsets[:, 1]}
-      )
+        # 2. Extract data from bar plots (Rectangle patches)
+        # We check for BarContainer to be more specific, but iterating patches works
+        for patch in ax.patches:
+            # This check helps ignore non-bar rectangles like the axis frame
+            if isinstance(patch, plt.Rectangle):
+                axis_data["bars"].append(
+                    {
+                        "x_coord": str(patch.get_x()),
+                        "y_coord": str(patch.get_y()),
+                        "width": str(patch.get_width()),
+                        "height": str(patch.get_height()),
+                    }
+                )
 
-    extracted_data.append(axis_data)
+        # 3. Extract data from scatter plots (PathCollection objects)
+        for collection in ax.collections:
+            # get_offsets() returns an (N, 2) array of (x, y) coordinates
+            offsets = collection.get_offsets()
+            axis_data["scatter"].append({"x_data": offsets[:, 0], "y_data": offsets[:, 1]})
 
-  return extracted_data
+        extracted_data.append(axis_data)
+
+    return extracted_data
+
 
 def select_features(data: pd.DataFrame, target: str):
-  """
+    """
     Runs featurewiz and captures its console logs and ALL generated plots
     without opening any GUI windows.
     """
-  log_stream = io.StringIO()
+    log_stream = io.StringIO()
 
-  with redirect_stdout(log_stream):
-    selected_features, new_df = featurewiz(
-      dataname=data,
-      target=target,
-      corr_limit=0.70,
-      verbose=2,
-      header=True,
-      test_data="",
-      feature_engg="",
-      category_encoders="",
-    )
+    with redirect_stdout(log_stream):
+        selected_features, new_df = featurewiz(
+            dataname=data,
+            target=target,
+            corr_limit=0.70,
+            verbose=2,
+            header=True,
+            test_data="",
+            feature_engg="",
+            category_encoders="",
+        )
 
-  # Get the integer identifiers for all open figures
-  figure_numbers = plt.get_fignums()
+    # Get the integer identifiers for all open figures
+    figure_numbers = plt.get_fignums()
 
-  # Retrieve the actual figure objects and store them in a list
-  captured_figures = [plt.figure(num) for num in figure_numbers]
+    # Retrieve the actual figure objects and store them in a list
+    captured_figures = [plt.figure(num) for num in figure_numbers]
 
-  # Close all figures to free up memory
-  figure_data = []
-  for fig in captured_figures:
-    figure_data.extend(extract_data_from_figure(fig))
-    plt.close(fig)
+    # Close all figures to free up memory
+    figure_data = []
+    for fig in captured_figures:
+        figure_data.extend(extract_data_from_figure(fig))
+        plt.close(fig)
 
-  capture_logs = log_stream.getvalue()
+    capture_logs = log_stream.getvalue()
 
-  return {
-    "selected_features": selected_features,
-    "logs": capture_logs,
-    # "plot_figures": captured_figures, 
-    "figure_data": json.dumps(figure_data),
-  }
+    return {
+        "selected_features": selected_features,
+        "logs": capture_logs,
+        # "plot_figures": captured_figures,
+        "figure_data": json.dumps(figure_data),
+    }
+
 
 def process_feature_selection_from_queue(dataset_key: str, target_column: str):
     """
     Process feature selection from a dataset stored in S3.
     """
     try:
-      # Download the dataset
-      data = download_dataset(dataset_key)
+        # Download the dataset
+        data = download_dataset(dataset_key)
 
-      # Ensure the target column exists
-      if target_column not in data.columns:
-          raise ValueError(f"Target column '{target_column}' not found in dataset.")
+        logger.info(f"\n\n {target_column} \n\n")
 
-      # Run feature selection
-      result = select_features(data, target_column)
+        # Ensure the target column exists
+        if target_column not in data.columns:
+            raise ValueError(f"Target column '{target_column}' not found in dataset.")
 
-      # select the features of the dataset
-      transformed_data = data[result['selected_features'] + [target_column]]
-      
-      # save the transformed data to the files directory
-      with open("files/transformed_data.csv", "w") as f:
-          transformed_data.to_csv(f, index=False)
+        # Run feature selection
+        result = select_features(data, target_column)
 
-      # upload the dataset to S3
-      name = str(uuid.uuid4())
-      with open("files/transformed_data.csv", "rb") as f:
-          upload_result = s3_service.upload_single_file(file_obj=f, filename=f"{name}.csv", content_type="text/csv", key=name)
+        # select the features of the dataset
+        transformed_data = data[result["selected_features"] + [target_column]]
 
-      # generate summary
-      generate_summary({
-          "selected_features": result['selected_features'],
-          "logs": result['logs'],
-      })
+        # save the transformed data to the files directory
+        with open("files/transformed_data.csv", "w") as f:
+            transformed_data.to_csv(f, index=False)
 
-      # Upload the summary data to S3
-      with open("files/summary.html", "rb") as f:
-          upload_summary_result = s3_service.upload_single_file(file_obj=f, filename=f"{name}_summary.html", content_type="text/html", key=f"{name}_summary")
+        # upload the dataset to S3
+        name = str(uuid.uuid4())
+        with open("files/transformed_data.csv", "rb") as f:
+            upload_result = s3_service.upload_single_file(
+                file_obj=f, filename=f"{name}.csv", content_type="text/csv", key=name
+            )
 
-      logger.info(f"Uploading transformed data with name: {name}")
-      result['transformed_data'] = upload_result['key']
-      result['summary'] = upload_summary_result['key']
+        # generate summary
+        generate_summary(
+            {
+                "selected_features": result["selected_features"],
+                "logs": result["logs"],
+            }
+        )
 
-      # Upload the results to S3 or return them as needed
-      return result
+        # Upload the summary data to S3
+        with open("files/summary.html", "rb") as f:
+            upload_summary_result = s3_service.upload_single_file(
+                file_obj=f,
+                filename=f"{name}_summary.html",
+                content_type="text/html",
+                key=f"{name}_summary",
+            )
+
+        logger.info(f"Uploading transformed data with name: {name}")
+        result["transformed_data"] = upload_result["key"]
+        result["summary"] = upload_summary_result["key"]
+
+        # Upload the results to S3 or return them as needed
+        return result
     except Exception as e:
         logger.error(f"Error loading dataset: {e}")
+
 
 def process_feature_selection_from_api(dataset: pd.DataFrame, target_column: str):
     """
@@ -276,7 +294,7 @@ def process_feature_selection_from_api(dataset: pd.DataFrame, target_column: str
         result = select_features(dataset, target_column)
 
         # select the features of the dataset
-        transformed_data = dataset[result['selected_features'] + [target_column]]
+        transformed_data = dataset[result["selected_features"] + [target_column]]
 
         # save the transformed data to files director
         with open("files/transformed_data.csv", "w") as f:
@@ -285,21 +303,30 @@ def process_feature_selection_from_api(dataset: pd.DataFrame, target_column: str
         # upload the dataset to S3
         name = str(uuid.uuid4())
         with open("files/transformed_data.csv", "rb") as f:
-            upload_result = s3_service.upload_single_file(file_obj=f, filename=f"{name}.csv", content_type="text/csv", key=name)
+            upload_result = s3_service.upload_single_file(
+                file_obj=f, filename=f"{name}.csv", content_type="text/csv", key=name
+            )
 
         # generate summary
-        generate_summary({
-            "selected_features": result['selected_features'],
-            "logs": result['logs'],
-        })
+        generate_summary(
+            {
+                "selected_features": result["selected_features"],
+                "logs": result["logs"],
+            }
+        )
 
         # Upload the summary data to S3
         with open("files/summary.html", "rb") as f:
-            upload_summary_result = s3_service.upload_single_file(file_obj=f, filename=f"{name}_summary.html", content_type="text/html", key=f"{name}_summary")
+            upload_summary_result = s3_service.upload_single_file(
+                file_obj=f,
+                filename=f"{name}_summary.html",
+                content_type="text/html",
+                key=f"{name}_summary",
+            )
 
         logger.info(f"Uploading transformed data with name: {name}")
-        result['transformed_data'] = upload_result['key']
-        result['summary'] = upload_summary_result['key']
+        result["transformed_data"] = upload_result["key"]
+        result["summary"] = upload_summary_result["key"]
 
         return result
     except Exception as e:
