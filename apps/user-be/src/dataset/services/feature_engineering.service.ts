@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { DatasetStatus, ProcessStatus } from "@prisma/client";
 import { tryParseJson } from "constants/parsing";
 import { DmsService } from "src/dms/dms.service";
@@ -30,7 +30,13 @@ export class EngineeringService {
         // Check if the dataset has not been profiled yet.
         // The dataset profile must be complete for the feature engineering to start
         if (dataset.profilingStatus != ProcessStatus.COMPLETED) {
-            throw new Error(`Dataset with ID ${id} must be profiled for the feature engineering to start.`)
+            throw new BadRequestException(`Dataset with ID ${id} must be profiled for the feature engineering to start.`)
+        }
+        if (dataset.featureEngineeringStatus === ProcessStatus.IN_PROGRESS) {
+            throw new BadRequestException(`Feature Engineering is already in progress for Dataset with ID ${id}`)
+        }
+        if (dataset.featureEngineeringStatus === ProcessStatus.COMPLETED){
+            throw new BadRequestException(`Feature Engineering can't be started again because it has already been completed for Dataset with ID ${id}`)
         }
         // define the engineering payload
             // dataset_id: dataset.id
@@ -120,6 +126,7 @@ export class EngineeringService {
                 featureTransformationCode: featureTransformationCode,
                 featureEngineeringVizFile: featureEngineeringReportHtml,
                 afterFeatureEngineeringFile: datasetAfterFeatureEngineering,
+                featureEngineeringStatus: ProcessStatus.COMPLETED
             },
             });
 
@@ -145,7 +152,7 @@ export class EngineeringService {
         const dataset = await this.prisma.dataset.findUnique({
             where: {id},
             select: {
-                feature_selection_metadata: true,
+                feature_engineering_metadata: true,
                 featureEngineeringStatus: true,
                 featureEngineeringError: true,
             }
@@ -165,6 +172,7 @@ export class EngineeringService {
             select: {
                 featureEngineeringStatus: true,
                 featureEngineeringError: true,
+                afterFeatureEngineeringFile: true, // include dataset after feature engineering
                 featureEngineeringVizFile: true, // include Viz HTML file
             }
         })
@@ -173,15 +181,15 @@ export class EngineeringService {
             throw new NotFoundException(`Dataset with ID ${id} not found`);
         }
 
-        // get the file URL 
-        if (dataset.featureEngineeringVizFile) {
-            const url = await this.dataManagementService.getFileUrl(dataset.featureEngineeringVizFile);
+        // get the URLs 
+        if (dataset.featureEngineeringVizFile && dataset.afterFeatureEngineeringFile) {
+            const vizUrl = await this.dataManagementService.getFileUrl(dataset.featureEngineeringVizFile);
+            const fileUrl = await this.dataManagementService.getFileUrl(dataset.afterFeatureEngineeringFile)
 
-            return {...dataset, featureEngineeringVizFile: url}
+            return {...dataset, afterFeatureEngineeringFile: fileUrl,featureEngineeringVizFile: vizUrl}
         }
-        else {
-            return dataset;
-        }
+        
+        return dataset;
 
     }
 

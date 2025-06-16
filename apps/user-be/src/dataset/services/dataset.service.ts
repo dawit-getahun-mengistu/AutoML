@@ -187,13 +187,17 @@ export class DatasetService {
     }
 
     // Check if the dataset is already being profiled
-      if ( dataset.profilingStatus === ProcessStatus.IN_PROGRESS) {
-        throw new Error(`Dataset with ID ${id} is already being profiled`);
-      }
+    if ( dataset.profilingStatus === ProcessStatus.IN_PROGRESS) {
+      throw new Error(`Dataset with ID ${id} is already being profiled`);
+    }
+    
+    // Check if the dataset has been already profiled
+    if (dataset.profilingStatus === ProcessStatus.COMPLETED) {
+      throw new Error(`Dataset with ID ${id} has already been profiled`)
+    }
 
     // Start profiling
     return await this.profilingService.startProfiling(id, dataset);
-
   }
 
 
