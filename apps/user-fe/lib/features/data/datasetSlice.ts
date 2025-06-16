@@ -1,6 +1,6 @@
 // src/lib/features/data/datasetSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createDataset, deleteDataset,startProfiling, specifyTargetColumn, fetchDatasetIdByProjectId, fetchDatasetById, fetchEDAByDatasetId } from "./dataActions";
+import { createDataset, deleteDataset,startProfiling, specifyTargetColumn, fetchDatasetIdByProjectId, fetchDatasetById, fetchEDAByDatasetId, startFeatureEngineering, fetchFeatureEngineeringResults } from "./dataActions";
 
 export interface Dataset {
   id: string;
@@ -206,7 +206,41 @@ const datasetSlice = createSlice({
 .addCase(fetchEDAByDatasetId.rejected, (state, action) => {
   state.status = "failed";
   state.error = action.payload as string;
-});
+})
+ .addCase(startFeatureEngineering.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+  })
+  .addCase(startFeatureEngineering.fulfilled, (state) => {
+        state.status = "succeeded";
+  })
+  .addCase(startFeatureEngineering.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string | string[];
+  })
+  .addCase(fetchFeatureEngineeringResults.pending, (state) => {
+  state.status = "loading";
+  state.error = null;
+})
+.addCase(fetchFeatureEngineeringResults.fulfilled, (state, action: PayloadAction<string>) => {
+  state.status = "succeeded";
+  // You might want to store the EDA report in your state
+  // Here I'm assuming you want to attach it to the dataset
+  console.log("fetch feature engineering sucess",action.payload)
+  
+  // use action.payload.EDAFileViz
+
+  const dataset = state.datasets;
+  console.log("dataset in eda", dataset)
+
+  state.datasets[0].edaReport = action.payload.EDAFileViz;
+  console.log("what fetch eda sends in state",state.datasets[0].edaReport)
+  
+})
+.addCase(fetchFeatureEngineeringResults.rejected, (state, action) => {
+  state.status = "failed";
+  state.error = action.payload as string;
+})
   }
 });
 
