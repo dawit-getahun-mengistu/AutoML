@@ -235,6 +235,10 @@ def process_feature_selection_from_queue(dataset_key: str, target_column: str):
       # select the features of the dataset
       transformed_data = data[result['selected_features'] + [target_column]]
       
+      # save the transformed data to the files directory
+      with open("files/transformed_data.csv", "w") as f:
+          transformed_data.to_csv(f, index=False)
+
       # upload the dataset to S3
       name = str(uuid.uuid4())
       with open("files/transformed_data.csv", "rb") as f:
