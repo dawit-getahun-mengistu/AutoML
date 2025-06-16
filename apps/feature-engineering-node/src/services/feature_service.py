@@ -19,25 +19,32 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-def process_feature_engineering(csv_data: pd.DataFrame, profiling_data: dict, target_column: str, task: str):
+
+def process_feature_engineering(
+    csv_data: pd.DataFrame, profiling_data: dict, target_column: str, task: str
+):
     # invode the agent to process the feature engineering
-    feature_engineering_result = feature_engineer.invoke({
-        "data": csv_data,
-        "profiling": profiling_data,
-        "target_column": target_column,
-        "task_type": task
-    })
+    feature_engineering_result = feature_engineer.invoke(
+        {
+            "data": csv_data,
+            "profiling": profiling_data,
+            "target_column": target_column,
+            "task_type": task,
+        }
+    )
     feature_engineering_code = feature_engineering_result["code"]
     resulting_data, learned_parameters = feature_engineering_result["result"]
-    
+
     # invoke the agent to predict the feature creation
     test_data = csv_data.head(3)
-    prediction_result = predict_feature_creator.invoke({
-        "code": feature_engineering_code,
-        "data": test_data,
-        "task_type": task,
-        "learned_params": learned_parameters
-    })
+    prediction_result = predict_feature_creator.invoke(
+        {
+            "code": feature_engineering_code,
+            "data": test_data,
+            "task_type": task,
+            "learned_params": learned_parameters,
+        }
+    )
 
     # save the codes to files
     with open("files/feature_engineering_code.py", "w") as f:
@@ -51,12 +58,15 @@ def process_feature_engineering(csv_data: pd.DataFrame, profiling_data: dict, ta
     # save the learned parameters to a json file
     with open("files/learned_parameters.json", "w") as f:
         import json
+
         json.dump(learned_parameters, f)
-    
+
     # invoke the summarizer agent to generate a page
-    summary = page_generator.invoke({
-        "learned_parameters": learned_parameters,
-    })
+    summary = page_generator.invoke(
+        {
+            "learned_parameters": learned_parameters,
+        }
+    )
     summary = summary.replace("`", "").replace("html", "")
 
     # load the Jinja2 template
@@ -104,12 +114,13 @@ def process_feature_engineering(csv_data: pd.DataFrame, profiling_data: dict, ta
     with open("files/summary.html", "w", encoding="utf-8") as f:
         f.write(resulting_page)
 
+
 def download_dataset(dataset_key: str):
     # load the dataset from the dataset_key
     file_uri = s3_service._public_object_url(key=dataset_key)
     if not file_uri:
-            raise ValueError(f"Failed to get presigned URL for dataset file: {dataset_key}")
-  
+        raise ValueError(f"Failed to get presigned URL for dataset file: {dataset_key}")
+
     response = requests.get(file_uri)
     response.raise_for_status()
 
@@ -146,26 +157,47 @@ def download_dataset(dataset_key: str):
                         f"Unsupported file format. Failed to parse content. URL: {file_uri}"
                     ) from e
 
+
 def upload_results_to_s3():
     # upload the feature engineered data to s3
     with open("files/resulting_data.csv", "rb") as f:
         data_name = str(str(uuid.uuid4())) + ".csv"
-        s3_service.upload_single_file(file_obj=f, filename=data_name, content_type="text/csv", is_public=True, key=data_name)
-    
+        s3_service.upload_single_file(
+            file_obj=f, filename=data_name, content_type="text/csv", is_public=True, key=data_name
+        )
+
     # upload the feature_engineering code to s3
     with open("files/feature_engineering_code.py", "rb") as f:
         feature_engineering_name = str(str(uuid.uuid4())) + "feature_engineering.py"
-        s3_service.upload_single_file(file_obj=f, filename=feature_engineering_name, content_type="text/x-python", is_public=True, key=data_name)
+        s3_service.upload_single_file(
+            file_obj=f,
+            filename=feature_engineering_name,
+            content_type="text/x-python",
+            is_public=True,
+            key=feature_engineering_name,
+        )
 
     # upload the feature_transformation code to s3
     with open("files/feature_transformation_code.py", "rb") as f:
         feature_transformation_name = str(str(uuid.uuid4())) + "feature_transformation.py"
-        s3_service.upload_single_file(file_obj=f, filename=feature_transformation_name, content_type="text/x-python", is_public=True, key=data_name)
+        s3_service.upload_single_file(
+            file_obj=f,
+            filename=feature_transformation_name,
+            content_type="text/x-python",
+            is_public=True,
+            key=feature_transformation_name,
+        )
 
     # upload the summary page to s3
     with open("files/summary.html", "rb") as f:
         summary_name = str(str(uuid.uuid4())) + "summary.html"
-        s3_service.upload_single_file(file_obj=f, filename=summary_name, content_type="text/html", is_public=True, key=summary_name)
+        s3_service.upload_single_file(
+            file_obj=f,
+            filename=summary_name,
+            content_type="text/html",
+            is_public=True,
+            key=summary_name,
+        )
 
     # load the learned parameters from the json file
     with open("files/learned_parameters.json", "r") as f:
@@ -176,14 +208,15 @@ def upload_results_to_s3():
         "feature_engineering_code_key": feature_engineering_name,
         "feature_transformation_code_key": feature_transformation_name,
         "summary_key": summary_name,
-        "learned_parameters": learned_parameters
+        "learned_parameters": learned_parameters,
     }
 
+
 def process_feature_engineering_from_queue(
-        dataset_key:str,
-        profiling: str,
-        task_type: str,
-        target_column: str,
+    dataset_key: str,
+    profiling: str,
+    task_type: str,
+    target_column: str,
 ):
     try:
         # load the dataset from the dataset_key

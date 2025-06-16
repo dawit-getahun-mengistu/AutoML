@@ -26,6 +26,7 @@ import { ProfilingService } from '../services/profiling.service';
 import { TargetSpecificationDto } from '../dto/target-specification.dto';
 import { ResponseDatasetDto } from '../dto/response-dataset.dto';
 import { EngineeringService } from '../services/feature_engineering.service';
+import { FeatureSelectionService } from '../services/feature_selection.service';
 
 
 
@@ -38,7 +39,8 @@ export class DatasetController {
   constructor(
     private readonly datasetService: DatasetService,
     private readonly profilingService: ProfilingService, 
-    private readonly engineeringService: EngineeringService
+    private readonly engineeringService: EngineeringService,
+    private readonly featureSelectionService: FeatureSelectionService
   ) {}
 
 
@@ -145,6 +147,17 @@ export class DatasetController {
   @Get(':id/feature-engineering')
   async getFeatureEngineering(@Param('id') id: string){
     return this.engineeringService.pollEngineeringStatus(id);
+  }
+
+  // FEATURE SELECTION
+  @Patch(':id/start-feature-selection')
+  async startFeatSelection(@Param('id') id: string) {
+    return this.datasetService.startDatasetFeatureSelection(id);
+  }
+
+  @Get(':id/feature-selection')
+  async getFeatureSelection(@Param('id') id: string) {
+    return this.featureSelectionService.pollSelectionStatus(id);
   }
 
 }

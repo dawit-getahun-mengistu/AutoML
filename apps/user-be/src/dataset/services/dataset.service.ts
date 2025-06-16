@@ -117,14 +117,14 @@ export class DatasetService {
     return this.prisma.dataset.findUnique({ where: { id } });
   }
 
-  async areTargetsFullySpecified(id: string, dataset: any = undefined): Promise<boolean> {
-    if (!dataset){
+  async areTargetsFullySpecified(id: string): Promise<boolean> {
+    
       // Fetch the dataset by ID
-      dataset = await this.prisma.dataset.findUnique({
-        where: { id },
-        select: { targetColumnName: true, project: { select: { taskType: true } } }, // Fetch targetColumnName and taskType
-      });
-    }
+    const dataset = await this.prisma.dataset.findUnique({
+      where: { id },
+      select: { targetColumnName: true, project: { select: { taskType: true } } }, // Fetch targetColumnName and taskType
+    });
+    
 
     // If the dataset does not exist, throw an exception
     if (!dataset) {
@@ -134,6 +134,8 @@ export class DatasetService {
     // Check if both targetColumnName and taskType are specified
     const isTargetColumnSpecified = !!dataset.targetColumnName; // True if targetColumnName is not null or undefined
     const isTaskTypeSpecified = !!dataset.project?.taskType; // True if taskType is not null or undefined
+    this.logger.log(dataset.targetColumnName);
+    this.logger.log(dataset.project.taskType);
 
     return isTargetColumnSpecified && isTaskTypeSpecified; // Return true only if both are specified
   }
@@ -204,6 +206,7 @@ export class DatasetService {
   async startDatasetFeatureEngineering(id: string) {
     // First check targets are fully specified
     if (!await this.areTargetsFullySpecified(id)) {
+      this.logger.log(await this.areTargetsFullySpecified(id))
       throw new BadRequestException('Target Column or Task Type are not fully specified');
     }
     // Start Engineering
