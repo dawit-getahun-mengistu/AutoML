@@ -148,11 +148,8 @@ export class ClassicalService{
                 await tx.dataset.update({
                     where: { id: transformed.dataset_id },
                     data: {
-                        training_metadata: {
-                            best_model_info: payload_best_model_info,
-                            all_models_performance: payload_all_models_performance,
-                        },
                         trainingStatus: ProcessStatus.COMPLETED,
+                        trainingError: ""
                     },
                 });
 
@@ -167,6 +164,10 @@ export class ClassicalService{
                         name: transformed.best_model_info.model_name,
                         description: `Classical model generated named: ${transformed.best_model_info.model_name} for a ${dataset.project.taskType}`,
                         projectId: dataset.projectId,
+
+                        trainingType: TrainingType.CLASSICAL,
+                        // model file
+                        model: transformed.best_model_info.model_uuid,
                         // model performances:
                         modelPerformances: {
                             create: transformed.best_model_info.test_set_performance.map((metric) => ({
@@ -180,6 +181,11 @@ export class ClassicalService{
                                 metricName: hyperparameter.metric,
                                 metricValue: hyperparameter.value,
                             })),
+                        },
+                        // metadata
+                        training_metadata: {
+                            best_model_info: payload_best_model_info,
+                            all_models_performance: payload_all_models_performance,
                         },
                     },
                 });
@@ -210,7 +216,6 @@ export class ClassicalService{
             select: {
                 targetColumnName: true,
                 trainingType: true,
-                training_metadata: true,
                 trainingError: true
             }
         });
@@ -228,8 +233,7 @@ export class ClassicalService{
             where: {id},
             select: {
                 targetColumnName: true,
-                trainingType: true,
-                training_metadata: true,
+                projectId: true
             }
         })
 
@@ -237,6 +241,25 @@ export class ClassicalService{
             throw new NotFoundException(`Dataset with ID ${id} not found`);
         }
 
-        return dataset;
+        const models = await this.prisma.model.findMany({
+            where: {
+                projectId: dataset.projectId,   
+            },
+            include: {
+                modelHyperParameters: true,
+                modelPerformances: true
+            }
+        })
+        models.map(async (model)=>{
+            if (model.model){
+                const url = await this.dataManagementService.getFileUrl(model.model);
+                model.model = url.url
+            }
+        })
+
+        return {
+            dataset,
+            models
+        };
     }
 }
