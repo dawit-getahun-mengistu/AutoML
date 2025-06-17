@@ -239,7 +239,7 @@ model ModelPerformance {
   model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
 
   metricName  String
-  metricValue Float
+  metricValue String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
@@ -251,7 +251,7 @@ model ModelHyperParameters {
   model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
 
   metricName  String
-  metricValue Float
+  metricValue String
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

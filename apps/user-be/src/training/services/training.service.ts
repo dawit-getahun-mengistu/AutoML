@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClassicalService } from './classical_training.service';
 import { DatasetService } from 'src/dataset/services/dataset.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -19,6 +19,9 @@ export class TrainingService {
                 trainingType: dto.trainingType
             }
         });
+        if (!dataset) {
+            throw new NotFoundException("Dataset not found");
+        }
         const message = `Training type selected ${dataset.trainingType} for dataset id ${dataset.id}`
 
         return {dataset, message}

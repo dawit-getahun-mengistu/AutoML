@@ -8,7 +8,7 @@ import { ClassicalService } from "./classical_training.service";
 export class ClassicalTrainingConsumerService implements OnModuleInit {
     private channelWrapper: ChannelWrapper;
     private readonly logger = new Logger(ClassicalTrainingConsumerService.name);
-    private readonly queue = Queues.DATA_SELECTION_RESULT_QUEUE
+    private readonly queue = Queues.CLASSICAL_TRAINING_RESULT_QUEUE
 
     constructor(private classicalService: ClassicalService){
         const connection = amqp.connect([process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672']);

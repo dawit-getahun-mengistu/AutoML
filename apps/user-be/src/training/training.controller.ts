@@ -15,23 +15,23 @@ export class TrainingController {
 
     ){}
 
-    @Post(':id/set-training-type')
+    @Post(':datasetId/set-training-type')
     async setTrainingType(
-        @Param('id') id: string,
+        @Param('datasetId') datasetId: string,
         @Body() trainingTypeDto: TrainingTypeDto
     ){
-        return this.trainingService.setTrainingType(id, trainingTypeDto);
+        return this.trainingService.setTrainingType(datasetId, trainingTypeDto);
     }
 
     // CLASSICAL TRAINING
-    @Patch(':id/start-classical-training')
-    async startClassicalTrainingService(@Param('id') id: string) {
-        return this.trainingService.startClassicalTrainingService(id);
+    @Patch(':datasetId/start-classical-training')
+    async startClassicalTrainingService(@Param('datasetId') datasetId: string) {
+        return this.trainingService.startClassicalTrainingService(datasetId);
     }
 
-    @Get(':id/classical-training-results')
-    async getClassicalTrainingResults(@Param('id') id: string) {
-       return this.classicalService.pollClassicalTrainingStatus(id); 
+    @Get(':datasetId/classical-training-results')
+    async getClassicalTrainingResults(@Param('datasetId') datasetId: string) {
+       return this.classicalService.pollClassicalTrainingStatus(datasetId); 
     }
 
 }

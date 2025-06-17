@@ -8,7 +8,7 @@ import { Queues } from "src/rmq/queues";
 
 interface MetricValue {
   metric: string;
-  value: number;
+  value: string;
 }
 
 interface BestModelInfo {
@@ -54,9 +54,9 @@ export class ClassicalService{
         if (dataset.profilingStatus != ProcessStatus.COMPLETED || dataset.featureEngineeringStatus != ProcessStatus.COMPLETED || dataset.featureSelectionStatus != ProcessStatus.COMPLETED) {
             throw new BadRequestException(`Dataset with ID ${id} must complete profiling, feature engineering, and feature selection to start training.`)
         }
-        if (dataset.trainingStatus === ProcessStatus.IN_PROGRESS) {
-            throw new BadRequestException(`Training is already in progress for this dataset with ID ${id}`)
-        }
+        // if (dataset.trainingStatus === ProcessStatus.IN_PROGRESS) {
+        //     throw new BadRequestException(`Training is already in progress for this dataset with ID ${id}`)
+        // }
         // TODO: other conditions where training must not start
 
 
@@ -68,7 +68,7 @@ export class ClassicalService{
         const classical_training_payload = {
             dataset_id: dataset.id,
             dataset_key: dataset.afterFeatureSelectionFile,
-            TaskType: dataset.project.taskType.toLowerCase(),
+            task_type: dataset.project.taskType.toLowerCase(),
             target_column: dataset.targetColumnName
         }
 
@@ -107,7 +107,7 @@ export class ClassicalService{
         const toMetricArray = (obj: Record<string, any>): MetricValue[] =>
             Object.entries(obj).map(([metric, val]) => ({
             metric,
-            value: Number(val),
+            value: String(val),
             }));
 
         if (!payload || !payload.dataset_id) {
@@ -118,9 +118,9 @@ export class ClassicalService{
             dataset_id: payload.dataset_id,
             best_model_info: {
             model_name: String(payload.best_model_info.model_name),
-            model_uuid: String(payload.best_model.model_uuid),
-            test_set_performance: toMetricArray(payload.best_model.test_set_performance),
-            best_hyperparameters: toMetricArray(payload.best_model.best_hyperparameters),
+            model_uuid: String(payload.best_model_info.model_uuid),
+            test_set_performance: toMetricArray(payload.best_model_info.test_set_performance),
+            best_hyperparameters: toMetricArray(payload.best_model_info.best_hyperparameters),
             },
             all_models_performance: payload.all_models_performance,
         };
