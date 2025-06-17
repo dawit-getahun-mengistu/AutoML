@@ -24,7 +24,7 @@ export default function EDAPage({ params }: { params: Promise<PageParams> }) {
   const initialized = useRef(false);
   
   // Use the custom hook to fetch dataset and EDA
-  const { dataset, isLoading, error, isPolling, fetchData } = fetchEDA(projectId);
+  const { dataset, isLoading, error, isPolling, fetchData, stopPolling } = fetchEDA(projectId);
   
   // Get project data
   const { projects, status: projectStatus, error: projectError } = useAppSelector((state) => state.project);
@@ -35,6 +35,7 @@ export default function EDAPage({ params }: { params: Promise<PageParams> }) {
   useEffect(() => {
     if (!initialized.current && projectId) {
       fetchData();
+      
       initialized.current = true;
     }
   }, [projectId, fetchData]);
@@ -46,12 +47,18 @@ export default function EDAPage({ params }: { params: Promise<PageParams> }) {
     }
   }, [projectError, dispatch]);
 
+  useEffect(()=> {
+    if (!isLoading) {
+      stopPolling()
+    } 
+  }, [isLoading])
+
   if (!project) {
     return <div className="p-8">Project not found</div>;
   }
 
   // Get the EDA visualization data
-  const edaViz = dataset?.edaReport;
+  const edaViz = dataset?.edaReport?.url;
 
   // Handle retry
   const handleRetry = () => {
@@ -114,20 +121,14 @@ export default function EDAPage({ params }: { params: Promise<PageParams> }) {
               </div>
             ) : edaViz ? (
               <div className="p-4 border rounded-lg">
-                {edaViz.startsWith("http") ? (
+                { (
                   <iframe 
                     src={edaViz} 
                     width="100%" 
                     height="500px"
                     title="EDA Visualization"
                   />
-                ) : (
-                  <img 
-                    src={`data:image/png;base64,${edaViz}`} 
-                    alt="EDA Visualization"
-                    className="w-full h-auto"
-                  />
-                )}
+                ) }
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg">
