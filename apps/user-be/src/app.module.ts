@@ -8,6 +8,7 @@ import { ProjectModule } from './project/project.module';
 import { DatasetModule } from './dataset/dataset.module';
 import { SeaweedModule } from 'SeaweedClient';
 import { DmsModule } from './dms/dms.module';
+import { TrainingModule } from './training/training.module';
 
 
 @Module({
@@ -18,7 +19,7 @@ import { DmsModule } from './dms/dms.module';
     SeaweedModule.forRootAsync(),
     AuthModule, 
     UserModule, 
-    PrismaModule, ProjectModule, DatasetModule, DmsModule
+    PrismaModule, ProjectModule, DatasetModule, DmsModule, TrainingModule
   ],
   controllers: [],
   providers: [],
