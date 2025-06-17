@@ -53,7 +53,7 @@ export class EngineeringService {
         }
 
 
-        // Send a message to a message queue to start engineering
+        // Send a message to message queue to start engineering
         await this.producerService.sendToQueue(
             Queues.DATA_ENGINEERING_REQUEST_QUEUE,
             engineering_payload,

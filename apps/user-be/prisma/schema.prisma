@@ -209,9 +209,10 @@ model Model {
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  // Relations (Assuming model performance, inference requests)
-  modelPerformances ModelPerformance[]
-  inferenceRequests InfereneRequest[]
+  // Relations (Assuming model performance, hyperparameters, inference requests)
+  modelPerformances    ModelPerformance[]
+  modelHyperParameters ModelHyperParameters[]
+  inferenceRequests    InfereneRequest[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
@@ -233,6 +234,18 @@ model Report {
 }
 
 model ModelPerformance {
+  id      String @id @default(uuid())
+  modelId String
+  model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  metricName  String
+  metricValue Float
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model ModelHyperParameters {
   id      String @id @default(uuid())
   modelId String
   model   Model  @relation(fields: [modelId], references: [id], onDelete: Cascade)

@@ -33,7 +33,7 @@ import { FeatureSelectionService } from '../services/feature_selection.service';
 @Controller('datasets')
 export class DatasetController {
   /**
-   * Controller for managing datasets, including uploading, retrieving, updating, and deleting datasets.
+   * Controller for managing datasets, including uploading, retrieving, updating, and deleting datasets, and data pre-processing [feature engineering & feature selection].
    * It also provides functionality to download dataset files.
    */
   constructor(

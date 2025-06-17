@@ -19,7 +19,7 @@ import { FeatureSelectionService } from './services/feature_selection.service';
   imports: [PrismaModule, SeaweedModule.forRootAsync(), RmqModule, Queues,],
   controllers: [DatasetController],
   providers: [DatasetService, DataProfilingConsumerService, FeatureEngineeringConsumerService, FeatureSelectionConsumerService, ProfilingService, EngineeringService, FeatureSelectionService,FileService, DmsService],
-  exports: [DatasetService, ProfilingService, FileService],
+  exports: [DatasetService, ProfilingService, FileService, DmsService],
 })
 export class DatasetModule {}
 
