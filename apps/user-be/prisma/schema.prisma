@@ -136,7 +136,6 @@ model Dataset {
   profiling_metadata           Json? // Metadata from profiling
   feature_selection_metadata   Json? // Metadata from feature selection and engineering
   feature_engineering_metadata Json? // Metadata from feature engineering
-  training_metadata            Json? // Metadata from training
 
   // Process statuses
   profilingStatus          ProcessStatus @default(PENDING)
@@ -162,7 +161,7 @@ model Dataset {
   afterProfilingFile          String? // File after profiling  
   afterFeatureSelectionFile   String? // File after feature selection
   afterFeatureEngineeringFile String? // File after feature engineering
-  afterTrainingFile           String? // File after training
+  // afterTrainingFile           String? // File after training
   trainingType                TrainingType? // Type of training (Classical or NAS)
 
   // Columns selected after feature engineering for training
@@ -208,6 +207,11 @@ model Model {
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  model String?
+
+  trainingType      TrainingType?
+  training_metadata Json? // Metadata from training
 
   // Relations (Assuming model performance, hyperparameters, inference requests)
   modelPerformances    ModelPerformance[]
