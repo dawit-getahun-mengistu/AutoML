@@ -1,2 +1,14 @@
-pika
 jsonschema
+fastapi
+uvicorn
+pandas
+pika
+boto3
+botocore
+scikit-learn 
+xgboost 
+scipy
+optuna
+dotenv
+python-multipart
+requests

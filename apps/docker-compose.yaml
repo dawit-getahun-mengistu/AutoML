@@ -125,6 +125,24 @@ services:
     networks:
       - automl
 
+  classical-modeling-node:
+    build:
+      context: ./classical-modeling-node
+      dockerfile: Dockerfile
+    volumes:
+      - ./classical-modeling-node:/selection
+      - /selection/.venv
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 8004:8004
+    networks:
+      - automl
+
   user-fe:
     build:
       context: .
