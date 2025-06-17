@@ -1,21 +1,50 @@
 // components/DataViewer.tsx
 "use client"
 import { fetchEDA } from '@/lib/hooks/fetchEDA';
+import { useFeatureEngineering } from '@/lib/hooks/useFeatureEngineering';
+import { useEffect } from 'react';
 
 export default function DataViewer() {
-    const projectId = "a635f408-d92e-48d2-b5d1-74347bb68e31" 
-  const { dataset, isLoading, error } = fetchEDA(projectId);
+    const projectId = "ca379c92-70d7-466a-b07d-240e5b18e892"
+    const dataId = "c62eced7-ae43-4904-b6ef-4c634f60d81c"
+    // const { dataset, } = fetchEDA(projectId);
+    const { 
+  results, 
+  isLoading, 
+  error, 
+  startFeatureEng, 
+  isPolling 
+} = useFeatureEngineering(dataId);
+console.log("results what feature engineering is giving", results)
+useEffect(()=> {
+    if (!isLoading) {
+      
+    } 
+  }, [isLoading])
 
-  if (isLoading) return <div>Loading dataset...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!dataset) return <div>No dataset found</div>;
+  useEffect(()=> {
+    if (!isPolling) {
+      
+    } 
+  }, [isPolling])
+  
+
+  // if (isLoading) return <div>Loading dataset...</div>;
+  // if (error) return <div>Error: {error}</div>;
+  // if (!results) return <div>No dataset found <button onClick={startFeatureEng}>Start Feature Engineering</button></div>;
 
   return (
-    <div>
-      <h2>{dataset.name}</h2>
-      <p>Format: {dataset.format}</p>
-      <p>Size: {dataset.size} bytes</p>
-      {/* Render other dataset details */}
-    </div>
+    <>
+    <button onClick={startFeatureEng}>Start Feature Engineering</button>
+    {isLoading && <p>Working...</p>}
+    {error && <p style={{ color: 'red' }}>{error}</p>}
+    {results && <pre>{JSON.stringify(results, null, 2)}</pre>}
+    <iframe 
+                    src={results?.url} 
+                    width="100%" 
+                    height="500px"
+                    title="EDA Visualization"
+                  />
+  </>
   );
 }
