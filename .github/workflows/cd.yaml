@@ -44,8 +44,8 @@ jobs:
             cd /home/${{ secrets.EC2_USERNAME }}/app
 
             # Create the .env file inside the 'apps' directory
-            # echo "Creating .env file in the apps directory..."
-            # echo "${{ secrets.ENV_FILE }}" > ./apps/.env
+            echo "Creating .env file in the apps directory..."
+            echo "${{ secrets.ENV_FILE }}" > ./apps/.env
 
             # Navigate into the 'apps' directory to run docker-compose
             cd ./apps
