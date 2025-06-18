@@ -61,9 +61,7 @@ def train_and_select_best_model(
 
     # --- 2. Split data into train and test sets ---
     print("Splitting data into training and testing sets (80/20)...")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # --- 3. Define Model Mappings and Objective Functions ---
 
@@ -181,9 +179,7 @@ def train_and_select_best_model(
 
     # --- 5. Select the best model ---
     print("\n--- Selecting best model based on Test R² score ---")
-    best_model_stats = max(
-        all_models_stats, key=lambda x: x["test_set_performance"]["r_squared"]
-    )
+    best_model_stats = max(all_models_stats, key=lambda x: x["test_set_performance"]["r_squared"])
     best_model_name = best_model_stats["model_name"]
     best_model_object = best_estimators[best_model_name]
 
@@ -227,9 +223,7 @@ if __name__ == "__main__":
 
     # Run the main function
     print("\nStarting the model training and selection process...")
-    final_stats = train_and_select_best_model(
-        df=sample_df, target_column="quality"
-    )
+    final_stats = train_and_select_best_model(df=sample_df, target_column="quality")
 
     # You can now work with the returned dictionary
     print("\n--- Function execution finished ---")
@@ -245,5 +239,6 @@ if __name__ == "__main__":
             loaded_model = pickle.load(f)
         print(f"\nSuccessfully loaded model from {saved_model_path}")
         print("Loaded model object:", loaded_model)
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         print(f"Could not find the model file at {saved_model_path}")
+        raise e

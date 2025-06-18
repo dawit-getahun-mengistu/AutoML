@@ -235,3 +235,4 @@ def process_feature_engineering_from_queue(
 
     except Exception as e:
         logger.error(f"Error loading dataset: {e}")
+        raise e

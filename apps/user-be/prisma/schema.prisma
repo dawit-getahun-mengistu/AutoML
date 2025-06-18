@@ -29,7 +29,6 @@ model User {
 
   // Relations (user has projects, reports, and chats)
   projects Project[]
-  reports  Report[]
   chats    Chat[]
 
   // Indexes (optional for faster lookups)
@@ -65,7 +64,6 @@ model Project {
   // Relations (Assuming datasets, models, reports, and chat)
   datasets Dataset[]
   models   Model[]
-  reports  Report[]
   chats    Chat[]
 
   @@index([name])
@@ -142,6 +140,7 @@ model Dataset {
   featureSelectionStatus   ProcessStatus @default(NOT_STARTED)
   featureEngineeringStatus ProcessStatus @default(NOT_STARTED)
   trainingStatus           ProcessStatus @default(NOT_STARTED)
+  reportGenerationStatus   ProcessStatus @default(NOT_STARTED)
 
   // Errors
   profilingError          String? @default("")
@@ -169,6 +168,9 @@ model Dataset {
 
   // Relations (Assuming attributes)
   attributes Attribute[]
+
+  // generated reports
+  reports Report[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
@@ -223,15 +225,14 @@ model Model {
 }
 
 model Report {
-  id      String @id @default(uuid())
-  title   String
-  content String
+  id String @id @default(uuid())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  datasetID String
+  dataset   Dataset @relation(fields: [datasetID], references: [id], onDelete: Cascade)
 
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Dataset Report html & pdf
+  reportHTML String?
+  reportPDF  String?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt

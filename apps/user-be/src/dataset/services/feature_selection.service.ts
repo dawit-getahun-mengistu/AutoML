@@ -79,6 +79,7 @@ export class FeatureSelectionService{
         };
         datasetAfterFeatureSelection: string;
         featureSelectionReportHtml: string;
+        error: string;
     }{
         // Payload Recieved includes
             // dataset_id: id
@@ -101,7 +102,8 @@ export class FeatureSelectionService{
                 figure_data: payload.figure_data
             },
             datasetAfterFeatureSelection: payload.transformed_data,
-            featureSelectionReportHtml: payload.summary
+            featureSelectionReportHtml: payload.summary,
+            error: payload.error
         }
 
     }
@@ -116,23 +118,41 @@ export class FeatureSelectionService{
             feature_selection_context,
             datasetAfterFeatureSelection,
             featureSelectionReportHtml,
+            error
         } = this.parseSelectionPayload(report);
         try {
+            if (error.trim().length > 0) {
+                // Update the dataset with error
+                await this.prisma.dataset.update({
+                    where: {id},
+                    data: {
+                        selectedColumns: [],
+                        afterFeatureEngineeringFile: null,
+                        FeaturesVizFile: null,
+                        feature_selection_metadata: null,
+                        featureSelectionStatus: ProcessStatus.FAILED,
+                        featureSelectionError: error
+                    }
+                });
 
-            // Update the dataset with feature selection results
-            await this.prisma.dataset.update({
-                where: { id },
-                data: {
-                    selectedColumns: selectedColumns,
-                    afterFeatureSelectionFile: datasetAfterFeatureSelection,
-                    FeaturesVizFile: featureSelectionReportHtml,
-                    feature_selection_metadata: feature_selection_context  ,
-                    featureSelectionStatus: ProcessStatus.COMPLETED                  
-                },
-            });
+                return { message: "Feature selection failed!" };
+            } else {
+                // Update the dataset with feature selection results
+                await this.prisma.dataset.update({
+                    where: { id },
+                    data: {
+                        selectedColumns: selectedColumns,
+                        afterFeatureSelectionFile: datasetAfterFeatureSelection,
+                        FeaturesVizFile: featureSelectionReportHtml,
+                        feature_selection_metadata: feature_selection_context  ,
+                        featureSelectionStatus: ProcessStatus.COMPLETED,
+                        featureSelectionError: ""                  
+                    },
+                });
 
-            this.logger.log(`Feature selection results processed successfully for dataset ID: ${id}`);
-            return { message: "Feature selection results processed successfully." };
+                this.logger.log(`Feature selection results processed successfully for dataset ID: ${id}`);
+                return { message: "Feature selection results processed successfully." };
+            }
         } catch (err) {
             // Handle errors and update the dataset status
             if (id) {
@@ -140,7 +160,11 @@ export class FeatureSelectionService{
                     where: { id },
                     data: {
                         featureSelectionStatus: ProcessStatus.FAILED,
-                        featureSelectionError: err.message, 
+                        featureSelectionError: err.message,
+                        selectedColumns: [],
+                        afterFeatureEngineeringFile: null,
+                        FeaturesVizFile: null,
+                        feature_selection_metadata: null,
                     },
                 });
             }

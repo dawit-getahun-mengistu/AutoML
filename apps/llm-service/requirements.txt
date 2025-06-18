@@ -1,2 +1,15 @@
 pika
+boto3
+botocore
 jsonschema
+pandas
+langchain
+langchain-openai
+langchain-community
+langgraph
+dotenv
+fastapi
+uvicorn
+python-multipart
+markdown2
+xhtml2pdf

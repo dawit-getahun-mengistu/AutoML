@@ -1,5 +1,12 @@
-def run():
-    print("llm-service is running successfully.")
+from fastapi import FastAPI
+from routes.report_router import router as report_router
+from consumer import start_consumer
+import asyncio
 
-if __name__ == "__main__":
-    run()
+app = FastAPI(title="Feature Engineering Node")
+app.include_router(report_router, prefix="/report", tags=["Feature Engineering"])
+
+@app.on_event("startup")
+async def startup_event():
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(None, start_consumer)

@@ -78,6 +78,7 @@ export class EngineeringService {
         featureTransformationCode: string;
         featureEngineeringReportHtml: string;
         engineeringMetadata: any;
+        error: string;
     } {
         // Payload Recieved includes
             // dataset_id: id
@@ -86,7 +87,7 @@ export class EngineeringService {
             // feature_transformation_code_key: code to be saved
             // summary_key: summary html report generated file
             // learned_parameters: json report of the feature engineering service
-            // 
+            // error: error from engineering service
         const payload = tryParseJson(report) as any;
 
         if (!payload || !payload.dataset_id) {
@@ -100,6 +101,7 @@ export class EngineeringService {
             featureTransformationCode: payload.feature_transformation_code_key,
             featureEngineeringReportHtml: payload.summary_key,
             engineeringMetadata: payload.learned_parameters,
+            error: payload.error
         };
     }
 
@@ -113,24 +115,44 @@ export class EngineeringService {
             featureTransformationCode,
             featureEngineeringReportHtml,
             engineeringMetadata,
+            error
         } = this.parseEngineeringPayload(report);
 
         try {
+            this.logger.log(`error: ${error}`)
+            if (error.trim().length > 0) {
+                // Update the dataset with error
+                await this.prisma.dataset.update({
+                    where: {id},
+                    data: {
+                        feature_engineering_metadata: null,
+                        featureEngineeringCode: null,
+                        featureTransformationCode: null,
+                        featureEngineeringVizFile: null,
+                        afterFeatureEngineeringFile: null,
+                        featureEngineeringStatus: ProcessStatus.FAILED,
+                        featureEngineeringError: error,
+                    }
+                });
+                return {message: "Feature Engineering Failed!"}
 
-            // Update the dataset
-            await this.prisma.dataset.update({
-            where: { id },
-            data: {
-                feature_engineering_metadata: engineeringMetadata,
-                featureEngineeringCode: featureEngineeringCode,
-                featureTransformationCode: featureTransformationCode,
-                featureEngineeringVizFile: featureEngineeringReportHtml,
-                afterFeatureEngineeringFile: datasetAfterFeatureEngineering,
-                featureEngineeringStatus: ProcessStatus.COMPLETED
-            },
-            });
+            } else {
+                // Update the dataset
+                await this.prisma.dataset.update({
+                    where: { id },
+                    data: {
+                        feature_engineering_metadata: engineeringMetadata,
+                        featureEngineeringCode: featureEngineeringCode,
+                        featureTransformationCode: featureTransformationCode,
+                        featureEngineeringVizFile: featureEngineeringReportHtml,
+                        afterFeatureEngineeringFile: datasetAfterFeatureEngineering,
+                        featureEngineeringStatus: ProcessStatus.COMPLETED,
+                        featureEngineeringError: ""
+                    },
+                });
 
-            return { message: "Feature Engineering Success!" };
+                return { message: "Feature Engineering Success!" };
+            }
         } catch (err) {
             // Handle errors and update the dataset status
             if (id) {
@@ -139,6 +161,11 @@ export class EngineeringService {
                     data: {
                         featureEngineeringStatus: ProcessStatus.FAILED,
                         featureEngineeringError: err.message,
+                        feature_engineering_metadata: null,
+                        featureEngineeringCode: null,
+                        featureTransformationCode: null,
+                        featureEngineeringVizFile: null,
+                        afterFeatureEngineeringFile: null,
                     },
                 });
             }
