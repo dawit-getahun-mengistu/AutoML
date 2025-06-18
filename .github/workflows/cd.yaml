@@ -36,7 +36,7 @@ jobs:
             username: ${{ secrets.EC2_USERNAME }}
             key: ${{ secrets.EC2_SSH_KEY }}
             source: "."
-            target: "/home/${{ secrets.EC2_USERNAME }}/app"
+            target: "/home/${{ secrets.EC2_USERNAME }}/app/apps/.env"
             timeout: 120s
 
       # Step 5: Copy .env File to EC2
@@ -59,6 +59,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/${{ secrets.EC2_USERNAME }}/app
+
+            cd apps
 
             echo "Stopping existing services..."
             docker-compose down --remove-orphans || true
