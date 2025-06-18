@@ -44,8 +44,8 @@ jobs:
             cd /home/${{ secrets.EC2_USERNAME }}/app
 
             # Create the .env file inside the 'apps' directory
-            echo "Creating .env file in the apps directory..."
-            echo "${{ secrets.ENV_FILE }}" > ./apps/.env
+            # echo "Creating .env file in the apps directory..."
+            # echo "${{ secrets.ENV_FILE }}" > ./apps/.env
 
             # Navigate into the 'apps' directory to run docker-compose
             cd ./apps
@@ -54,7 +54,7 @@ jobs:
             docker-compose down --remove-orphans || true
 
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af
+            # docker system prune -af
 
             echo "Starting new services..."
             docker-compose up -d --build

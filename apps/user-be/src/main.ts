@@ -10,7 +10,8 @@ async function bootstrap() {
   app.use(passport.initialize());
 
   app.enableCors({
-    origin: '*', // explicitly set ['http://localhost:3000'] iff from frontend
+    origin: '*', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
 
