@@ -1,6 +1,6 @@
 // src/lib/features/data/datasetSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createDataset, deleteDataset,startProfiling, specifyTargetColumn, fetchDatasetIdByProjectId, fetchDatasetById, fetchEDAByDatasetId, startFeatureEngineering, fetchFeatureEngineeringResults } from "./dataActions";
+import { createDataset, deleteDataset,startProfiling, specifyTargetColumn, fetchDatasetIdByProjectId, fetchDatasetById, fetchEDAByDatasetId, startFeatureEngineering, fetchFeatureEngineeringResults, startFeatureSelection,fetchFeatureSelectionResults  } from "./dataActions";
 
 export interface Dataset {
   id: string;
@@ -257,8 +257,7 @@ const datasetSlice = createSlice({
   state.status = "failed";
   state.error = action.payload as string;
 })
-  }
-})
+ 
 .addCase(startFeatureSelection.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -307,6 +306,7 @@ const datasetSlice = createSlice({
   state.status = "failed";
   state.error = action.payload as string;
 });
-
+ }
+})
 export default datasetSlice.reducer;
 export const { setLocalFile, clearLocalFile,setDeleted } = datasetSlice.actions;

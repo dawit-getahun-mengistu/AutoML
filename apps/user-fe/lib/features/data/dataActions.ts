@@ -353,7 +353,7 @@ export const startFeatureSelection = createAppAsyncThunk<
   string,
   string
 >(
-  "datasets/start-feature-engineering",
+  "datasets/start-feature-Selection",
   async (datasetId, { rejectWithValue }) => {
     try {
       const config = {
@@ -368,11 +368,13 @@ export const startFeatureSelection = createAppAsyncThunk<
         {},
         config
       );
-      console.log("start feature engineering log",response)
+      console.log("start feature selection log",response)
       return response.data;
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message;
+        console.log("error while tryig to access feature selection log", errorMessage)
+        console.log("error while tryig to access feature selection log", error)
         return rejectWithValue(
           Array.isArray(errorMessage) 
             ? errorMessage.join(", ") 
@@ -389,7 +391,7 @@ export const fetchFeatureSelectionResults = createAppAsyncThunk<
  any,  // Returns EDA report object
   string      // datasetId as input
 >(
-  "datasets/fetchFeatureEngineering",
+  "datasets/fetchFeatureSelection",
   async (datasetId, { rejectWithValue }) => {
     try {
       const config = {
@@ -402,7 +404,7 @@ export const fetchFeatureSelectionResults = createAppAsyncThunk<
         `${backendURL}/datasets/${datasetId}/feature-selection`,
         config
       );
-      console.log("fetch feature engineering log", response)
+      console.log("fetch feature selection log", response)
       // const { data } = await axios.get(`/datasets/${datasetId}/feature-engineering`);
       return { datasetId, vizUrl: response.data.FeaturesVizFile };
       // return response.data;
