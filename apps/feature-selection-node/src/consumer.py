@@ -27,14 +27,19 @@ def process_message(ch, method, properties, body):
         message_data = json.loads(body.decode())
         task_info = TaskDefinition.from_dict(message_data)
         logger.info(f"Task Definition: {task_info}")
+        try:
+            # Process the feature selection task
+            data_keys = process_feature_selection_from_queue(dataset_key=task_info.dataset_key, target_column=task_info.target_column)
 
-        # Process the feature selection task
-        data_keys = process_feature_selection_from_queue(dataset_key=task_info.dataset_key, target_column=task_info.target_column)
+            # publish the result to the result queue
+            send_message(message={"dataset_id": task_info.dataset_id, "error": "", **data_keys})
 
-        # publish the result to the result queue
-        send_message(message={"dataset_id": task_info.dataset_id, **data_keys})
-
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+        except Exception as e:
+            logger.error(f"Error processing feature selection task: {e}")
+            # publish the result to the result queue with error
+            send_message(message={"dataset_id": task_info.dataset_id, "error": str(e)})
+            ch.basic_ack(delivery_tag=method.delivery_tag)
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding JSON: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
