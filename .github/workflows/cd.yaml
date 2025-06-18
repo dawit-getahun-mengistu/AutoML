@@ -7,39 +7,32 @@ on:
 jobs:
   deploy:
     name: Deploy to EC2
-    runs-on: self-hosted
+    runs-on: self-hosted  # Use self-hosted runner for deployment
 
     steps:
+      # Step 1: Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Step 2: Set up SSH Key
       - name: Setup SSH Key
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
           chmod 400 key.pem
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Prepare Environment File
-        run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
-          echo ".env file created"
-
-      # Copy ALL files (including .env) to apps directory
-      - name: Copy Files to EC2
+      # Step 3: Copy Project to EC2
+      - name: Copy Project to EC2
         uses: appleboy/scp-action@master
         with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ${{ secrets.EC2_USERNAME }}
-            key: ${{ secrets.EC2_SSH_KEY }}
-            source: "."
-            target: "/home/${{ secrets.EC2_USERNAME }}/app/apps/"
-            timeout: 120s
-            rm: true  # Clean target directory before copying
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "."
+          target: "/home/${{ secrets.EC2_USERNAME }}/app"
+          timeout: 120s
 
-      # Remove this redundant step - we already copied .env to apps/
-      # - name: Copy .env File to EC2
-      #   ... 
-
+      # Step 4: Deploy Services on EC2
       - name: Deploy Services on EC2
         uses: appleboy/ssh-action@master
         with:
@@ -47,13 +40,25 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.EC2_USERNAME }}/app/apps
+            # Navigate to the main application directory
+            cd /home/${{ secrets.EC2_USERNAME }}/app
+
+            # Create the .env file inside the 'apps' directory
+            echo "Creating .env file in the apps directory..."
+            echo "${{ secrets.ENV_FILE }}" > ./apps/.env
+
+            # Navigate into the 'apps' directory to run docker-compose
+            cd ./apps
+
             echo "Stopping existing services..."
             docker-compose down --remove-orphans || true
-            echo "Cleaning up resources..."
-            docker system prune -f
+
+            echo "Cleaning up unused Docker resources..."
+            docker system prune -af
+
             echo "Starting new services..."
             docker-compose up -d --build
+
             echo "Verifying deployment..."
             docker-compose ps
             echo "Deployment completed successfully."
