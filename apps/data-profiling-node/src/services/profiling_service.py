@@ -148,7 +148,7 @@ class ProfilingService:
                 raise ValueError(f"Failed to get presigned URL for dataset file: {dataset.file}")
         except Exception as e:
             logger.error(f"Error loading dataset from file {dataset.file}: {e}")
-            raise
+            raise e
 
         logger.info(f"Profiling dataset: {dataset.name} from {file_uri}")
 
@@ -174,7 +174,7 @@ class ProfilingService:
             logger.info(f"EDA report saved to storage: {eda_file_name}")
         except Exception as e:
             logger.error(f"Error saving EDA report to storage: {e}")
-            raise
+            raise e
 
         results["eda_object_name"] = eda_file_name
         return results

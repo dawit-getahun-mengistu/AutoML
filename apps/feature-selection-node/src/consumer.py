@@ -21,15 +21,20 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def process_message(ch, method, properties, body):
     logger.info(f"Received message: {body.decode()}")
+    dataset_id = ""
     try:
         message_data = json.loads(body.decode())
         task_info = TaskDefinition.from_dict(message_data)
+        dataset_id = task_info.dataset_id
         logger.info(f"Task Definition: {task_info}")
         try:
             # Process the feature selection task
-            data_keys = process_feature_selection_from_queue(dataset_key=task_info.dataset_key, target_column=task_info.target_column)
+            data_keys = process_feature_selection_from_queue(
+                dataset_key=task_info.dataset_key, target_column=task_info.target_column
+            )
 
             # publish the result to the result queue
             send_message(message={"dataset_id": task_info.dataset_id, "error": "", **data_keys})
@@ -38,14 +43,48 @@ def process_message(ch, method, properties, body):
         except Exception as e:
             logger.error(f"Error processing feature selection task: {e}")
             # publish the result to the result queue with error
-            send_message(message={"dataset_id": task_info.dataset_id, "error": str(e)})
+
+            send_message(
+                message={
+                    "dataset_id": task_info.dataset_id,
+                    "error": str(e),
+                    "selected_features": "",
+                    "logs": "",
+                    "figure_data": "",
+                    "transformed_data": "",
+                    "summary": "",
+                }
+            )
             ch.basic_ack(delivery_tag=method.delivery_tag)
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding JSON: {e}")
+        send_message(
+            message={
+                "dataset_id": dataset_id,
+                "error": str(e),
+                "selected_features": "",
+                "logs": "",
+                "figure_data": "",
+                "transformed_data": "",
+                "summary": "",
+            }
+        )
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
     except Exception as e:
         logger.error(f"Error processing message: {e}")
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        send_message(
+            message={
+                "dataset_id": dataset_id,
+                "error": str(e),
+                "selected_features": "",
+                "logs": "",
+                "figure_data": "",
+                "transformed_data": "",
+                "summary": "",
+            }
+        )
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
 
 def consume():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
@@ -55,6 +94,7 @@ def consume():
     channel.basic_consume(queue=QUEUE_NAME, on_message_callback=process_message)
     logger.info(" [*] Waiting for messages. To exit press CTRL+C")
     channel.start_consuming()
+
 
 def start_consumer():
     logger.info(f"Consumer starting at {QUEUE_NAME}")

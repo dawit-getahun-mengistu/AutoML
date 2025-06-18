@@ -279,6 +279,7 @@ def process_feature_selection_from_queue(dataset_key: str, target_column: str):
         return result
     except Exception as e:
         logger.error(f"Error loading dataset: {e}")
+        raise e
 
 
 def process_feature_selection_from_api(dataset: pd.DataFrame, target_column: str):
@@ -331,3 +332,4 @@ def process_feature_selection_from_api(dataset: pd.DataFrame, target_column: str
         return result
     except Exception as e:
         logger.error(f"Error processing feature selection: {e}")
+        raise e

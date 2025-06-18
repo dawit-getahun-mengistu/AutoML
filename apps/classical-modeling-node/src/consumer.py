@@ -23,6 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def process_message(ch, method, properties, body):
     logger.info(f"Received message: {body.decode()}")
     try:
@@ -31,16 +32,20 @@ def process_message(ch, method, properties, body):
         logger.info(f"Task Definition: {task_info}")
 
         # Process the feature selection task
-        result = handle_queue_requests(dataset_key=task_info.dataset_key, target_column=task_info.target_column, task_type=task_info.task_type)
+        result = handle_queue_requests(
+            dataset_key=task_info.dataset_key,
+            target_column=task_info.target_column,
+            task_type=task_info.task_type,
+        )
         model_key = result["best_model_info"]["model_uuid"]
 
         # upload the model to S3
         with open(result["best_model_info"]["saved_model_path"], "rb") as model_file:
             s3_service.upload_single_file(
                 file_obj=model_file,
-                key=f'{model_key}.pkl',
+                key=f"{model_key}.pkl",
                 content_type="application/octet-stream",
-                filename=f'{model_key}.pkl'
+                filename=f"{model_key}.pkl",
             )
 
         # update the key
@@ -55,16 +60,20 @@ def process_message(ch, method, properties, body):
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
     except Exception as e:
         logger.error(f"Error processing message: {e}")
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
 
 def consume():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, heartbeat=10000))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=RABBITMQ_HOST, heartbeat=10000)
+    )
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(queue=QUEUE_NAME, on_message_callback=process_message)
     logger.info(" [*] Waiting for messages. To exit press CTRL+C")
     channel.start_consuming()
+
 
 def start_consumer():
     logger.info(f"Consumer starting at {QUEUE_NAME}")

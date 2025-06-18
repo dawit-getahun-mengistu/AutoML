@@ -61,7 +61,7 @@ class S3Service:
 
         except (BotoCoreError, ClientError) as exc:
             logger.error("S3 upload failed: %s", exc)
-            raise
+            raise exc
 
     def upload_single_file_from_path(
         self, path: str, is_public: bool = True, key: Optional[str] = None
@@ -94,7 +94,7 @@ class S3Service:
             )
         except (BotoCoreError, ClientError) as exc:
             logger.error("Presigned URL generation failed: %s", exc)
-            raise
+            raise exc
 
     def delete_file(self, key: str) -> dict:
         try:
@@ -102,4 +102,4 @@ class S3Service:
             return {"message": "File deleted successfully"}
         except (BotoCoreError, ClientError) as exc:
             logger.error("S3 delete failed: %s", exc)
-            raise
+            raise exc
