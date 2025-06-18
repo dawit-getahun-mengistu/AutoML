@@ -163,8 +163,43 @@ export class ReportService{
     }
 
     // get report generation result
-    async getReportGenerationData(id: string) {}
+    // async getReportGenerationData(id: string) {}
 
     // poll report generation status
-    async pollReportGenerationStatus(id: string) {}
+    async pollReportGenerationStatus(id: string) {
+        const dataset = await this.prisma.dataset.findUnique({
+            where: {id},
+            select: {
+                reportGenerationStatus: true,
+                llmError: true
+            },
+        });
+
+        if (!dataset) {
+            throw new NotFoundException(`Dataset with ID ${id} not found`);
+        }
+
+        const reports = await this.prisma.report.findMany({
+            where: {
+                datasetID: id
+            }
+        })
+
+        reports.map((async report => {
+            if (report.reportHTML && report.reportPDF){
+                const htmlUrl = await this.dataManagementService.getFileUrl(report.reportHTML);
+                const pdfUrl = await this.dataManagementService.getFileUrl(report.reportPDF);
+                
+                report.reportHTML = htmlUrl.url
+                report.reportPDF = pdfUrl.url
+
+            }
+        }))
+
+        return {
+            dataset,
+            reports
+        }
+
+    }
 }
