@@ -36,7 +36,7 @@ jobs:
             username: ${{ secrets.EC2_USERNAME }}
             key: ${{ secrets.EC2_SSH_KEY }}
             source: "."
-            target: "/home/${{ secrets.EC2_USERNAME }}/app/apps/.env"
+            target: "/home/${{ secrets.EC2_USERNAME }}/app/apps/"
             timeout: 120s
 
       # Step 5: Copy .env File to EC2
