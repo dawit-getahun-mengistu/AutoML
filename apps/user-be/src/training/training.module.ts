@@ -11,10 +11,12 @@ import { DmsService } from 'src/dms/dms.service';
 import { ProfilingService } from 'src/dataset/services/profiling.service';
 import { EngineeringService } from 'src/dataset/services/feature_engineering.service';
 import { FeatureSelectionService } from 'src/dataset/services/feature_selection.service';
+import { ReportGenerationConsumerService } from './services/report-consumer.service';
+import { ReportService } from './services/report.service';
 
 @Module({
   imports: [PrismaModule, RmqModule, Queues],
-  providers: [TrainingService, ClassicalTrainingConsumerService, ClassicalService, DatasetService, DmsService, ProfilingService, EngineeringService, FeatureSelectionService],
+  providers: [TrainingService, ClassicalTrainingConsumerService, ReportGenerationConsumerService, ClassicalService, ReportService, DatasetService, DmsService, ProfilingService, EngineeringService, FeatureSelectionService],
   controllers: [TrainingController],
   exports: [TrainingService]
 })

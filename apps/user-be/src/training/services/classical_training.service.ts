@@ -82,7 +82,7 @@ export class ClassicalService{
         await this.prisma.dataset.update({
             where: {id},
             data: {
-                status: DatasetStatus.PROCESSING,
+                status: DatasetStatus.READY,
                 trainingStatus: ProcessStatus.IN_PROGRESS,
                 trainingError: ""
             }

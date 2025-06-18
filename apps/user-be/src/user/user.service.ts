@@ -62,12 +62,12 @@ export class UserService {
                         id: projectId
                     },
                     include: {
-                        reports: true
+                        datasets: true,
                     }
                 }
             }
         });
-        return user.projects[0].reports;
+        return [];
         
     }
     
