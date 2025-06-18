@@ -1,6 +1,6 @@
 // src/lib/features/data/datasetSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createDataset, deleteDataset,startProfiling, specifyTargetColumn, fetchDatasetIdByProjectId, fetchDatasetById, fetchEDAByDatasetId, startFeatureEngineering, fetchFeatureEngineeringResults } from "./dataActions";
+import { createDataset, deleteDataset,startProfiling, specifyTargetColumn, fetchDatasetIdByProjectId, fetchDatasetById, fetchEDAByDatasetId, startFeatureEngineering, fetchFeatureEngineeringResults, startFeatureSelection,fetchFeatureSelectionResults  } from "./dataActions";
 
 export interface Dataset {
   id: string;
@@ -17,6 +17,8 @@ export interface Dataset {
   updatedAt: string;
   taskType?: "CLASSIFICATION" | "REGRESSION" | null;
   edaReport?: string;
+  featureEngArtifacts?: string;
+  featureSelection?: string;
   targetColumnName?: string | null;
   columnsMetadata?: Array<{
     name: string;
@@ -222,27 +224,89 @@ const datasetSlice = createSlice({
   state.status = "loading";
   state.error = null;
 })
-.addCase(fetchFeatureEngineeringResults.fulfilled, (state, action: PayloadAction<string>) => {
+.addCase(fetchFeatureEngineeringResults.fulfilled, (state, action) => {
   state.status = "succeeded";
-  // You might want to store the EDA report in your state
-  // Here I'm assuming you want to attach it to the dataset
-  console.log("fetch feature engineering sucess",action.payload)
-  
-  // use action.payload.EDAFileViz
 
-  const dataset = state.datasets;
-  console.log("dataset in eda", dataset)
+  const { datasetId, vizUrl } = action.payload;
 
-  state.datasets[0].edaReport = action.payload.EDAFileViz;
-  console.log("what fetch eda sends in state",state.datasets[0].edaReport)
-  
+  // Find the matching dataset
+  const ds = state.datasets.find(d => d.id === datasetId);
+
+  if (ds) {
+    ds.featureEngArtifacts = vizUrl;        // ✅ safe draft mutation
+  } else {
+    // If it isn't in the array yet, push a stub so UI still works
+    state.datasets.push({
+      id: datasetId,
+      name: "",
+      description: "",
+      projectId: "",
+      status: "",
+      file: "",
+      format: "",
+      size: 0,
+      rows: null,
+      cols: null,
+      createdAt: "",
+      updatedAt: "",
+      featureEngArtifacts: vizUrl,
+    });
+  }
 })
 .addCase(fetchFeatureEngineeringResults.rejected, (state, action) => {
   state.status = "failed";
   state.error = action.payload as string;
 })
-  }
-});
+ 
+.addCase(startFeatureSelection.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+  })
+  .addCase(startFeatureSelection.fulfilled, (state) => {
+        state.status = "succeeded";
+  })
+  .addCase(startFeatureSelection.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string | string[];
+  })
+  .addCase(fetchFeatureSelectionResults.pending, (state) => {
+  state.status = "loading";
+  state.error = null;
+})
+.addCase(fetchFeatureSelectionResults.fulfilled, (state, action) => {
+  state.status = "succeeded";
 
+  const { datasetId, vizUrl } = action.payload;
+
+  // Find the matching dataset
+  const ds = state.datasets.find(d => d.id === datasetId);
+
+  if (ds) {
+    ds.featureEngArtifacts = vizUrl;        // ✅ safe draft mutation
+  } else {
+    // If it isn't in the array yet, push a stub so UI still works
+    state.datasets.push({
+      id: datasetId,
+      name: "",
+      description: "",
+      projectId: "",
+      status: "",
+      file: "",
+      format: "",
+      size: 0,
+      rows: null,
+      cols: null,
+      createdAt: "",
+      updatedAt: "",
+      featureSelection: vizUrl,
+    });
+  }
+})
+.addCase(fetchFeatureSelectionResults.rejected, (state, action) => {
+  state.status = "failed";
+  state.error = action.payload as string;
+});
+ }
+})
 export default datasetSlice.reducer;
 export const { setLocalFile, clearLocalFile,setDeleted } = datasetSlice.actions;

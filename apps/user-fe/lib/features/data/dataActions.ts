@@ -319,7 +319,7 @@ export const startFeatureEngineering = createAppAsyncThunk<
 
 
 export const fetchFeatureEngineeringResults = createAppAsyncThunk<
- string,  // Returns EDA report object
+ any,  // Returns EDA report object
   string      // datasetId as input
 >(
   "datasets/fetchFeatureEngineering",
@@ -336,7 +336,78 @@ export const fetchFeatureEngineeringResults = createAppAsyncThunk<
         config
       );
       console.log("fetch feature engineering log", response)
+      // const { data } = await axios.get(`/datasets/${datasetId}/feature-engineering`);
+      return { datasetId, vizUrl: response.data.featureEngineeringVizFile };
+      // return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data?.message || "Failed to fetch EDA report");
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
+
+
+export const startFeatureSelection = createAppAsyncThunk<
+  string,
+  string
+>(
+  "datasets/start-feature-Selection",
+  async (datasetId, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
+        }
+      };
+
+      const response = await axios.patch(
+        `${backendURL}/datasets/${datasetId}/start-feature-selection`,
+        {},
+        config
+      );
+      console.log("start feature selection log",response)
       return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message;
+        console.log("error while tryig to access feature selection log", errorMessage)
+        console.log("error while tryig to access feature selection log", error)
+        return rejectWithValue(
+          Array.isArray(errorMessage) 
+            ? errorMessage.join(", ") 
+            : errorMessage || "Failed to start feature engineering"
+        );
+      }
+      return rejectWithValue("An unknown error occurred");
+    }
+  }
+);
+
+// /datasets/{id}/feature-selection
+export const fetchFeatureSelectionResults = createAppAsyncThunk<
+ any,  // Returns EDA report object
+  string      // datasetId as input
+>(
+  "datasets/fetchFeatureSelection",
+  async (datasetId, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("access_token") : ""}`,
+        }
+      };
+      
+      const response = await axios.get(
+        `${backendURL}/datasets/${datasetId}/feature-selection`,
+        config
+      );
+      console.log("fetch feature selection log", response)
+      // const { data } = await axios.get(`/datasets/${datasetId}/feature-engineering`);
+      return { datasetId, vizUrl: response.data.FeaturesVizFile };
+      // return response.data;
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data?.message || "Failed to fetch EDA report");

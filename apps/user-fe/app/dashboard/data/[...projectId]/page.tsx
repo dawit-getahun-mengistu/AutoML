@@ -85,7 +85,7 @@ export default function DataPage({ params }: { params: Promise<PageParams> }) {
         projectId: project.id,
         format: selectedFile.name.split('.').pop() || '',
         file: selectedFile,
-        start_profiling: true
+        start_profiling: false
       })).unwrap();
 
       alert("Dataset uploaded successfully!");
