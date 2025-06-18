@@ -1,17 +1,38 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set the initial working directory in the container
 WORKDIR /app
 
-# Copy the requirements.txt file into the container
+# Accept proxy settings as build arguments. This is crucial for
+# building in corporate environments and keeps credentials out of the image.
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+
+# Set environment variables for the proxy so that tools like apt and pip
+# will use them during the build process.
+ENV http_proxy=${HTTP_PROXY}
+ENV https_proxy=${HTTPS_PROXY}
+
+# Copy only the requirements file first to leverage Docker's layer caching.
+# The next step will only re-run if requirements.txt changes.
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies and Python packages in a single layer.
+# - Install git for pip to clone private repos.
+# - Install libgomp1 as a runtime dependency for lightgbm/featurewiz.
+# - Install Python packages from requirements.txt.
+# - Clean up by removing git (build dependency) and the apt cache.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git libgomp1 && \
+    pip install --no-cache-dir -r requirements.txt && \
+    apt-get purge -y --auto-remove git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of the application code into the container
+# Copy the rest of the application source code into the container.
 COPY . .
 
-# Define the command to run the application
-CMD ["python", "src/main.py"]
+# Change the working directory to the source folder.
+WORKDIR /app/src
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8005"]

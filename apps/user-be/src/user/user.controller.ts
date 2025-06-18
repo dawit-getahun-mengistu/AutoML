@@ -83,12 +83,12 @@ export class UserController {
     }
 
 
-    // Todo: add api response decorator with report dto
-    @UseGuards(AuthGuard('access_strategy'))
-    @Get(':userId/projects/:projectId/reports')
-    async getUserProjectReports(@Param('userId') userId:string, @Param('projectId') projectId: string){
-        return await this.userService.getUserProjectReports(userId, projectId);
-    }
+    // // Todo: add api response decorator with report dto
+    // @UseGuards(AuthGuard('access_strategy'))
+    // @Get(':userId/projects/:projectId/reports')
+    // async getUserProjectReports(@Param('userId') userId:string, @Param('projectId') projectId: string){
+    //     return await this.userService.getUserProjectReports(userId, projectId);
+    // }
 
 
     // Todo: add api response decorator with chat dto

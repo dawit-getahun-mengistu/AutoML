@@ -50,16 +50,16 @@ export class DatasetService {
     });
 
     // Send message to the queue to start profiling
-    if (start_profiling){
-      const msg = await this.producerService.sendToQueue(
-        this.producerService.queues[0], 
-        dataset,
-      );
-      return {
-        dataset: dataset,
-        msg: msg
-      }
-    }
+    // if (start_profiling){
+    //   const msg = await this.producerService.sendToQueue(
+    //     this.producerService.queues[0], 
+    //     dataset,
+    //   );
+    //   return {
+    //     dataset: dataset,
+    //     msg: msg
+    //   }
+    // }
 
     return dataset;
   }

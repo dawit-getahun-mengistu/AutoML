@@ -143,6 +143,25 @@ services:
     networks:
       - automl
 
+  llm-service:
+    build:
+      context: ./llm-service
+      dockerfile: Dockerfile
+    volumes:
+      - ./llm-service:/selection
+      - /selection/.venv
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 8005:8005
+    networks:
+      - automl
+
+
   user-fe:
     build:
       context: .

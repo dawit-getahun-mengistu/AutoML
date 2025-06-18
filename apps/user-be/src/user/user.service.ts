@@ -48,28 +48,6 @@ export class UserService {
         });
         return user.projects;
     }
-
-
-    async getUserProjectReports(userId: string, projectId: string){
-
-        const user = await this.prismaService.user.findUnique({
-            where: {
-                id: userId
-            },
-            include: {
-                projects: {
-                    where: {
-                        id: projectId
-                    },
-                    include: {
-                        datasets: true,
-                    }
-                }
-            }
-        });
-        return [];
-        
-    }
     
     
     async getUserChats(userId: string){        
