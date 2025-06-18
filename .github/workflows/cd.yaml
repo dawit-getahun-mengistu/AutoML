@@ -38,6 +38,7 @@ jobs:
             source: "."
             target: "/home/${{ secrets.EC2_USERNAME }}/app/apps/"
             timeout: 120s
+            rm: ".env"
 
       # Step 5: Copy .env File to EC2
       - name: Copy .env File to EC2
