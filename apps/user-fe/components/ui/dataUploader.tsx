@@ -44,6 +44,7 @@ function DataUploader({ projectId }: DataUploaderProps, ref: React.Ref<DataUploa
   const [taskType, setTaskType] = useState<TaskType | null>(null);
   const [targetColumn, setTargetColumn] = useState<string | null>(null);
   const [tempDescription, setTempDescription] = useState('');
+  const [isDatasetUploaded, setIsDatasetUploaded] = useState(false);
 
   const dispatch = useAppDispatch();
   const { datasets, deleted, status, hasLocalFile } = useAppSelector((state) => state.data);
@@ -75,6 +76,7 @@ function DataUploader({ projectId }: DataUploaderProps, ref: React.Ref<DataUploa
 
       console.log('Upload successful:', result);
       dispatch(setLocalFile(true));
+      setIsDatasetUploaded(true);
       
     } catch (err) {
       console.error('Upload failed:', err);
@@ -88,31 +90,22 @@ function DataUploader({ projectId }: DataUploaderProps, ref: React.Ref<DataUploa
     }
   };
 
-  const handleSpecifyTarget = async () => {
+  const handleStartProfiling = async () => {
     if (!datasets.length || !taskType || !targetColumn) return;
 
     try {
+      // First specify the target column
       await dispatch(specifyTargetColumn({
         datasetId: datasets[0].id,
         taskType,
         targetColumnName: targetColumn
       })).unwrap();
       
-      alert("Target column specified successfully!");
-    } catch (error) {
-      alert("Failed to specify target column");
-      console.error("Target specification error:", error);
-    }
-  };
-
-  const handleStartProfiling = async () => {
-    if (!datasets.length) return;
-
-    try {
+      // Then start profiling
       await dispatch(startProfiling(datasets[0].id)).unwrap();
-      alert("Profiling started successfully!");
+      alert("Target column specified and profiling started successfully!");
     } catch (error) {
-      alert("Failed to start profiling");
+      alert("Failed to specify target column or start profiling");
       console.error("Profiling error:", error);
     }
   };
@@ -297,74 +290,72 @@ function DataUploader({ projectId }: DataUploaderProps, ref: React.Ref<DataUploa
           </div>
 
           {/* Task Type and Target Column Selection */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Task Type</Label>
-                <Select 
-                  value={taskType || ""}
-                  onValueChange={(value: TaskType) => setTaskType(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select task type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(TaskType).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {isDatasetUploaded && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Task Type</Label>
+                  <Select 
+                    value={taskType || ""}
+                    onValueChange={(value: TaskType) => setTaskType(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select task type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(TaskType).map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Target Column</Label>
+                  <Select
+                    value={targetColumn || ""}
+                    onValueChange={(value: string) => setTargetColumn(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select target column" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableColumns.map((column) => (
+                        <SelectItem key={column} value={column}>
+                          {column}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Target Column</Label>
-                <Select
-                  value={targetColumn || ""}
-                  onValueChange={(value: string) => setTargetColumn(value)}
+              <div className="flex space-x-4">
+                <Button
+                  onClick={handleStartProfiling}
+                  disabled={!canStartProfiling || status === "loading"}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select target column" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableColumns.map((column) => (
-                      <SelectItem key={column} value={column}>
-                        {column}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Start Profiling
+                </Button>
               </div>
             </div>
-
-            <div className="flex space-x-4">
-              <Button
-                onClick={handleSpecifyTarget}
-                disabled={!taskType || !targetColumn || status === "loading"}
-              >
-                Set Target
-              </Button>
-              <Button
-                onClick={handleStartProfiling}
-                disabled={!canStartProfiling || status === "loading"}
-              >
-                Start Profiling
-              </Button>
-            </div>
-          </div>
+          )}
 
           {/* Data Table and other existing components */}
           {/* ... (keep your existing table and pagination code) ... */}
 
           <div className="mt-6 flex justify-end">
-            <Button
-              onClick={handleSubmit}
-              disabled={status === 'loading'}
-              className="px-6 py-2 bg-green-600 text-white hover:bg-green-700"
-            >
-              {status === 'loading' ? 'Submitting...' : 'Submit Data'}
-            </Button>
+            {!isDatasetUploaded && (
+              <Button
+                onClick={handleSubmit}
+                disabled={status === 'loading'}
+                className="px-6 py-2 bg-green-600 text-white hover:bg-green-700"
+              >
+                {status === 'loading' ? 'Submitting...' : 'Submit Data'}
+              </Button>
+            )}
           </div>
         </div>
       )}
