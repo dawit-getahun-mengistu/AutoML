@@ -6,12 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { use, useEffect, useState } from "react"
 import { ProjectHeader } from "@/components/dashboard/project-header"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { createProject, fetchProjects } from "@/lib/features/project/projectActions"
-import { useFeatureEngineering } from '@/lib/hooks/useFeatureEngineering';
-import { useFeatureSelection } from "@/lib/hooks/useFeatureSelection"
-import { fetchDatasetIdByProjectId, startFeatureSelection } from "@/lib/features/data/dataActions";
-import { refresh } from "@/lib/features/auth/authActions"
+import { useAppDispatch, useAppSelector } from "@/libb/hooks"
+import { createProject, fetchProjects } from "@/libb/features/project/projectActions"
+import { useFeatureEngineering } from "@/libb/hooks/useFeatureEngineering";
+import { useFeatureSelection } from "@/libb/hooks/useFeatureSelection"
+import { fetchDatasetIdByProjectId, startFeatureSelection } from "@/libb/features/data/dataActions";
+import { refresh } from "@/libb/features/auth/authActions"
 import {useRouter} from "next/navigation"
 type PageParams = {
   projectId: string[]

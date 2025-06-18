@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect, useState } from "react"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { createProject } from "@/lib/features/project/projectActions"
+import { useAppDispatch, useAppSelector } from "@/libb/hooks"
+import { createProject } from "@/libb/features/project/projectActions"
 import { useRouter } from "next/navigation"
 import { jwtDecode } from "jwt-decode"
-import { refresh } from "@/lib/features/auth/authActions"
+import { refresh } from "@/libb/features/auth/authActions"
 
 export function EmptyProject() {
   const router = useRouter()

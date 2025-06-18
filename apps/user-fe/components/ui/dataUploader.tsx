@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { createDataset, specifyTargetColumn, startProfiling } from '@/lib/features/data/dataActions';
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { createDataset, specifyTargetColumn, startProfiling } from '@/libb/features/data/dataActions';
+import { useAppDispatch, useAppSelector } from "@/libb/hooks";
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Upload, Edit, Check, ChevronLeft, ChevronRight, FileText, BookOpen } from 'lucide-react';
-import { setLocalFile, setDeleted } from '@/lib/features/data/datasetSlice';
+import { setLocalFile, setDeleted } from '@/libb/features/data/datasetSlice';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";

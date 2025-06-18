@@ -13,7 +13,7 @@ import {
   CuboidIcon as Cube,
   UserIcon,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/libb/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const navItems = [

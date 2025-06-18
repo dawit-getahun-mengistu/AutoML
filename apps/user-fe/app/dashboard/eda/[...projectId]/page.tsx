@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { use, useEffect, useRef } from "react"
 import { ProjectHeader } from "@/components/dashboard/project-header"
-import { refresh } from "@/lib/features/auth/authActions"
+import { refresh } from "@/libb/features/auth/authActions"
 import { useRouter } from "next/navigation"
-import { fetchEDA } from "@/lib/hooks/fetchEDA" // Fixed import path
-import { useProjects } from "@/lib/projects-context"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { fetchDatasetIdByProjectId } from "@/lib/features/data/dataActions";// Import the action directly
+import { fetchEDA } from "@/libb/hooks/fetchEDA"; // Fixed import path
+import { useProjects } from "@/libb/projects-context"
+import { useAppDispatch, useAppSelector } from "@/libb/hooks"
+import { fetchDatasetIdByProjectId } from "@/libb/features/data/dataActions";// Import the action directly
 
 type PageParams = {
   projectId: string[]

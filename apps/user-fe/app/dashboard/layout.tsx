@@ -3,7 +3,7 @@ import { MainSidebar } from "@/components/sidebar/main-sidebar"
 import { ProjectsSidebar } from "@/components/sidebar/projects-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { ChatButton } from "@/components/chat/chat-button"
-import { ProjectsProvider } from "@/lib/projects-context"
+import { ProjectsProvider } from "@/libb/projects-context"
 
 export default function DashboardLayout({
   children,

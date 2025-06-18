@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { specifyTargetColumn } from '@/lib/features/data/dataActions';
+import { useAppDispatch, useAppSelector } from '@/libb/hooks';
+import { specifyTargetColumn } from '@/libb/features/data/dataActions';
 
 interface TargetSpecificationFormProps {
   datasetId: string;

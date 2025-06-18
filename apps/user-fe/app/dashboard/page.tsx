@@ -645,14 +645,14 @@
 // }
 "use client"
 
-import { useProjects } from "@/lib/projects-context"
+import { useProjects } from "@/libb/projects-context"
 import { EmptyProject } from "@/components/dashboard/empty-project"
 import { CuboidIcon as Cube } from "lucide-react"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/libb/hooks";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchProjects } from "@/lib/features/project/projectActions";
-import { refresh } from "@/lib/features/auth/authActions";
+import { fetchProjects } from "@/libb/features/project/projectActions";
+import { refresh } from "@/libb/features/auth/authActions";
 
 export default function DashboardPage() {
     const router = useRouter();

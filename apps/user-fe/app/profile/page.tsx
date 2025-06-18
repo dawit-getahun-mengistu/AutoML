@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { logout } from "@/lib/features/auth/authActions"
+import { useAppDispatch, useAppSelector } from "@/libb/hooks"
+import { logout } from "@/libb/features/auth/authActions"
 import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {

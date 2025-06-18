@@ -3,7 +3,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import {Button} from "../NewButton";
-import { Project } from "@/lib/features/project/projectSlice";
+import { Project } from "@/libb/features/project/projectSlice";
 type SideBarProps = {
   projects: Project[];
 };

@@ -1,14 +1,14 @@
 "use client"
 
-import { useProjects } from "@/lib/projects-context"
+import { useProjects } from "@/libb/projects-context"
 import { Rocket, ServerIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { use, useEffect} from "react"
 import { ProjectHeader } from "@/components/dashboard/project-header"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { createProject, fetchProjects } from "@/lib/features/project/projectActions"
-import { refresh } from "@/lib/features/auth/authActions"
+import { useAppDispatch, useAppSelector } from "@/libb/hooks"
+import { createProject, fetchProjects } from "@/libb/features/project/projectActions"
+import { refresh } from "@/libb/features/auth/authActions"
 import {useRouter} from "next/navigation"
 type PageParams = {
   projectId: string[]

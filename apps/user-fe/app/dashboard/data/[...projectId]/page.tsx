@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/card";
 import { use, useEffect, useRef, useState } from "react";
 import { ProjectHeader } from "@/components/dashboard/project-header";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/libb/hooks";
 import {
   createProject,
   fetchProjects,
-} from "@/lib/features/project/projectActions";
-import { refresh } from "@/lib/features/auth/authActions";
-import { createDataset, deleteDataset } from "@/lib/features/data/dataActions";
+} from "@/libb/features/project/projectActions";
+import { refresh } from "@/libb/features/auth/authActions";
+import { createDataset, deleteDataset } from "@/libb/features/data/dataActions";
 import { useRouter } from "next/navigation";
 import DataUploader, { DataUploaderRef } from "@/components/ui/dataUploader";
 

@@ -1,7 +1,7 @@
 // components/DataViewer.tsx
 "use client"
-import { fetchEDA } from '@/lib/hooks/fetchEDA';
-import { useFeatureEngineering } from '@/lib/hooks/useFeatureEngineering';
+import { fetchEDA } from '@/libb/hooks/fetchEDA';
+import { useFeatureEngineering } from '@/libb/hooks/useFeatureEngineering';
 import { useEffect } from 'react';
 
 export default function DataViewer() {
