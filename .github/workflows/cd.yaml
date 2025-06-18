@@ -1,0 +1,74 @@
+
+name: CD Pipeline
+
+on:
+    push:
+      branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: self-hosted  # Use self-hosted runner for deployment
+
+    steps:
+      # Step 1: Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH Key
+      - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 400 key.pem
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      # Step 3: Prepare Environment File
+      - name: Prepare Environment File
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+          echo ".env file created"
+
+      # Step 4: Copy Files to EC2
+      - name: Copy Files to EC2
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            source: "."
+            target: "/home/${{ secrets.EC2_USERNAME }}/app"
+            timeout: 120s
+
+      # Step 5: Copy .env File to EC2
+      - name: Copy .env File to EC2
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            source: ".env"
+            target: "/home/${{ secrets.EC2_USERNAME }}/app"
+            timeout: 120s
+
+      # Step 6: Deploy Services on EC2
+      - name: Deploy Services on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.EC2_USERNAME }}/app
+
+            echo "Stopping existing services..."
+            docker-compose down --remove-orphans || true
+
+            echo "Cleaning up resources..."
+            docker system prune -f
+
+            echo "Starting new services..."
+            docker-compose up -d --build
+
+            echo "Verifying deployment..."
+            docker-compose ps
+            echo "Deployment completed successfully."
