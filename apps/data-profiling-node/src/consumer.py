@@ -46,7 +46,9 @@ def process_message(ch, method, properties, body) -> None:
 
 def consume():
     """Function to start consuming messages"""
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, port=5672))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=RABBITMQ_HOST, port=5672, heartbeat=10000)
+    )
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
 

@@ -18,6 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def process_message(ch, method, properties, body):
     logger.info(f"Received message: {body.decode()}")
     dataset_id = ""
@@ -30,28 +31,36 @@ def process_message(ch, method, properties, body):
             profiling_context=task_info.profiling_context,
             feature_engineering_context=task_info.feature_engineering_context,
             feature_selection_context=task_info.feature_selection_context,
-            model_training_context=task_info.model_training_context
+            model_training_context=task_info.model_training_context,
         )
 
         send_message(message={"dataset_id": task_info.dataset_id, "error": "", **data_keys})
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except json.JSONDecodeError as e:
         logger.error(f"Error decoding JSON: {e}")
-        send_message(message={"dataset_id": dataset_id, "error": str(e), "html_key": "", "pdf_key": ""}) 
+        send_message(
+            message={"dataset_id": dataset_id, "error": str(e), "html_key": "", "pdf_key": ""}
+        )
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
     except Exception as e:
         logger.error(f"Error processing message: {e}")
-        send_message(message={"dataset_id": dataset_id, "error": str(e), "html_key": "", "pdf_key": ""}) 
+        send_message(
+            message={"dataset_id": dataset_id, "error": str(e), "html_key": "", "pdf_key": ""}
+        )
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
+
 def consume():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=RABBITMQ_HOST, port=5672, heartbeat=10000)
+    )
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(queue=QUEUE_NAME, on_message_callback=process_message)
     logger.info(" [*] Waiting for messages. To exit press CTRL+C")
     channel.start_consuming()
+
 
 def start_consumer():
     logger.info(f"Consumer starting at {QUEUE_NAME}")
