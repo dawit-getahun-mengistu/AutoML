@@ -9,6 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes( new ValidationPipe({whitelist: true}))
   app.use(passport.initialize());
 
+  // review later
   app.enableCors({
     origin: '*', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
