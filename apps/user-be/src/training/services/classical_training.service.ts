@@ -54,9 +54,9 @@ export class ClassicalService{
         if (dataset.profilingStatus != ProcessStatus.COMPLETED || dataset.featureEngineeringStatus != ProcessStatus.COMPLETED || dataset.featureSelectionStatus != ProcessStatus.COMPLETED) {
             throw new BadRequestException(`Dataset with ID ${id} must complete profiling, feature engineering, and feature selection to start training.`)
         }
-        // if (dataset.trainingStatus === ProcessStatus.IN_PROGRESS) {
-        //     throw new BadRequestException(`Training is already in progress for this dataset with ID ${id}`)
-        // }
+        if (dataset.trainingStatus === ProcessStatus.IN_PROGRESS) {
+            throw new BadRequestException(`Training is already in progress for this dataset with ID ${id}`)
+        }
         // TODO: other conditions where training must not start
 
 

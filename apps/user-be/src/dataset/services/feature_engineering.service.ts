@@ -35,9 +35,9 @@ export class EngineeringService {
         if (dataset.featureEngineeringStatus === ProcessStatus.IN_PROGRESS) {
             throw new BadRequestException(`Feature Engineering is already in progress for Dataset with ID ${id}`)
         }
-        // if (dataset.featureEngineeringStatus === ProcessStatus.COMPLETED){
-        //     throw new BadRequestException(`Feature Engineering can't be started again because it has already been completed for Dataset with ID ${id}`)
-        // }
+        if (dataset.featureEngineeringStatus === ProcessStatus.COMPLETED){
+            throw new BadRequestException(`Feature Engineering can't be started again because it has already been completed for Dataset with ID ${id}`)
+        }
         // define the engineering payload
             // dataset_id: dataset.id
             // dataset_key: dataset.file (the object name/key),
